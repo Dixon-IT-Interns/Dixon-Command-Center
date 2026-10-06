@@ -12,7 +12,16 @@ against `Dixon_Command_Center`.
 
 If the queue table was already created from an earlier version, the migration is idempotent for the table/index creation.
 
-## 2. Workflow
+## 2. Snapshot uniqueness migration
+
+Run `005_kpi_daily_snapshot_uniqueness.sql` against `Dixon_Command_Center` after the base schema is installed. It replaces the legacy `(KPI_MasterId, ReportDate)` unique constraint with:
+
+- a filtered unique index for rows that have a non-null `KPI_MasterId`;
+- a filtered unique index on `DailyReportId`, which ensures one final snapshot per approved daily report while allowing multiple reports on the same date with `KPI_MasterId = NULL`.
+
+The migration stops without changing the schema if duplicate snapshots already exist for a `DailyReportId`.
+
+## 3. Workflow
 
 Contributor:
 
@@ -28,7 +37,7 @@ Approver:
 
 Rejected reports remain editable by the contributor and can be submitted again. The same queue row is reset to `PENDING` on resubmission.
 
-## 3. Brand binding
+## 4. Brand binding
 
 `UserCustomer` controls brand access. Admin can assign brands from the Administration page.
 
@@ -38,7 +47,7 @@ Rejected reports remain editable by the contributor and can be submitted again. 
 
 The backend also checks the assignment for reporting APIs; frontend filtering alone is not used as the security boundary.
 
-## 4. Model behavior
+## 5. Model behavior
 
 Models are fetched from `KPI_Master` by Customer + Category + Line, not only by the current month. This preserves the line/model relationship even when the current month's KPI targets still need to be configured.
 

@@ -66,6 +66,7 @@ C:\Users\Saksham Jain\Downloads\Dixon-Command-Center-Final-UI-Admin-KPI\Dixon-Co
 C:\Users\Saksham Jain\Downloads\Dixon-Command-Center-Final-UI-Admin-KPI\Dixon-Command-Center\Command-Center-Backend\obj\Debug\net8.0\Dixon.CommandCenter.API.csproj.CoreCompileInputs.cache
 C:\Users\Saksham Jain\Downloads\Dixon-Command-Center-Final-UI-Admin-KPI\Dixon-Command-Center\Command-Center-Backend\obj\Debug\net8.0\Dixon.CommandCenter.API.MvcApplicationPartsAssemblyInfo.cs
 C:\Users\Saksham Jain\Downloads\Dixon-Command-Center-Final-UI-Admin-KPI\Dixon-Command-Center\Command-Center-Backend\obj\Debug\net8.0\Dixon.CommandCenter.API.MvcApplicationPartsAssemblyInfo.cache
+C:\Users\Saksham Jain\Downloads\Dixon-Command-Center-Final-UI-Admin-KPI\Dixon-Command-Center\Command-Center-Backend\obj\Debug\net8.0\Dixon.CommandCenter.API.sourcelink.json
 C:\Users\Saksham Jain\Downloads\Dixon-Command-Center-Final-UI-Admin-KPI\Dixon-Command-Center\Command-Center-Backend\obj\Debug\net8.0\rjimswa.dswa.cache.json
 C:\Users\Saksham Jain\Downloads\Dixon-Command-Center-Final-UI-Admin-KPI\Dixon-Command-Center\Command-Center-Backend\obj\Debug\net8.0\rjsmrazor.dswa.cache.json
 C:\Users\Saksham Jain\Downloads\Dixon-Command-Center-Final-UI-Admin-KPI\Dixon-Command-Center\Command-Center-Backend\obj\Debug\net8.0\rjsmcshtml.dswa.cache.json
@@ -82,3 +83,11 @@ C:\Users\Saksham Jain\Downloads\Dixon-Command-Center-Final-UI-Admin-KPI\Dixon-Co
 C:\Users\Saksham Jain\Downloads\Dixon-Command-Center-Final-UI-Admin-KPI\Dixon-Command-Center\Command-Center-Backend\obj\Debug\net8.0\Dixon.CommandCenter.API.pdb
 C:\Users\Saksham Jain\Downloads\Dixon-Command-Center-Final-UI-Admin-KPI\Dixon-Command-Center\Command-Center-Backend\obj\Debug\net8.0\Dixon.CommandCenter.API.genruntimeconfig.cache
 C:\Users\Saksham Jain\Downloads\Dixon-Command-Center-Final-UI-Admin-KPI\Dixon-Command-Center\Command-Center-Backend\obj\Debug\net8.0\ref\Dixon.CommandCenter.API.dll
+C:\Users\Saksham Jain\AppData\Local\Temp\DixonCommandCenterBuild-7fcaa57380424b3da845a306df59b2cd\appsettings.Development.json
+C:\Users\Saksham Jain\AppData\Local\Temp\DixonCommandCenterBuild-7fcaa57380424b3da845a306df59b2cd\appsettings.json
+C:\Users\Saksham Jain\AppData\Local\Temp\DixonCommandCenterBuild-7fcaa57380424b3da845a306df59b2cd\Dixon.CommandCenter.API.staticwebassets.endpoints.json
+C:\Users\Saksham Jain\AppData\Local\Temp\DixonCommandCenterBuild-7fcaa57380424b3da845a306df59b2cd\Dixon.CommandCenter.API.deps.json
+C:\Users\Saksham Jain\AppData\Local\Temp\DixonCommandCenterBuild-7fcaa57380424b3da845a306df59b2cd\Dixon.CommandCenter.API.runtimeconfig.json
+C:\Users\Saksham Jain\AppData\Local\Temp\DixonCommandCenterBuild-7fcaa57380424b3da845a306df59b2cd\Dixon.CommandCenter.API.runtimeconfig.dev.json
+C:\Users\Saksham Jain\AppData\Local\Temp\DixonCommandCenterBuild-7fcaa57380424b3da845a306df59b2cd\Dixon.CommandCenter.API.dll
+C:\Users\Saksham Jain\AppData\Local\Temp\DixonCommandCenterBuild-7fcaa57380424b3da845a306df59b2cd\Dixon.CommandCenter.API.pdb
