@@ -1,6 +1,6 @@
 import Navbar from "./Navbar";
 import Sidebar from "./Sidebar";
-import Footer from "./Footer";
+import AppFooter from "../AppFooter";
 import "./ContributorShell.css";
 
 export default function ContributorLayout({ user, onSignOut, children }) {
@@ -10,7 +10,7 @@ export default function ContributorLayout({ user, onSignOut, children }) {
       <div className="cc-workspace">
         <Navbar user={user} onSignOut={onSignOut} />
         <div className="cc-content">{children}</div>
-        <Footer />
+        <AppFooter user={user} />
       </div>
     </div>
   );
