@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { api } from "../api";
 import dixonLogo from "../assets/dixon-logo.jpeg";
+import AppFooter from "../components/AppFooter";
 import "./Login.css";
 
 function Login({ onSignIn }) {
@@ -36,6 +37,7 @@ function Login({ onSignIn }) {
   };
 
   return (
+    <div className="login-page-shell">
     <main className="login-shell">
       <div className="login-orb login-orb-one" />
       <div className="login-orb login-orb-two" />
@@ -151,6 +153,8 @@ function Login({ onSignIn }) {
         <p className="login-bottom">Dixon Digital Command Center · Factory reporting platform</p>
       </section>
     </main>
+    <AppFooter />
+    </div>
   );
 }
 

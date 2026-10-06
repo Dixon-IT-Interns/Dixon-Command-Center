@@ -1,3 +1,8 @@
+.login-page-shell {
+  min-height: 100vh;
+  background: #f7f8fc;
+}
+
 .login-shell {
   min-height: 100vh;
   display: grid;
