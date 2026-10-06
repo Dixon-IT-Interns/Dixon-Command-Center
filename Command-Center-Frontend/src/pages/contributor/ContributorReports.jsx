@@ -1,0 +1,15 @@
+import { useEffect, useMemo, useState } from "react";
+import { ClipboardList, Filter, RefreshCw, Search } from "lucide-react";
+import { api } from "../../api";
+import ContributorLayout from "../../components/contributor/ContributorLayout";
+import "./ContributorReports.css";
+
+export default function ContributorReports({session,onSignOut}){
+ const [rows,setRows]=useState([]);const [status,setStatus]=useState("");const [search,setSearch]=useState("");const [loading,setLoading]=useState(true);const [error,setError]=useState("");
+ const load=async()=>{setLoading(true);try{setRows(await api.get(`/contributor/submissions?days=90${status?`&status=${status}`:""}`))}catch(e){setError(e.message)}finally{setLoading(false)}};
+ // eslint-disable-next-line react-hooks/set-state-in-effect, react-hooks/exhaustive-deps
+ useEffect(()=>{load()},[status]);
+ const filtered=useMemo(()=>rows.filter(x=>`${x.customerName} ${x.categoryName} ${x.lineName} ${x.modelName||""}`.toLowerCase().includes(search.toLowerCase())),[rows,search]);
+ return <ContributorLayout user={session.user} onSignOut={onSignOut}><main className="contributor-reports"><div className="cr-head"><div><span>REPORT CENTER</span><h1>My submissions</h1><p>Track every daily report you have saved or sent through approval.</p></div><button onClick={load}><RefreshCw size={15}/> Refresh</button></div><div className="cr-toolbar"><div className="cr-search"><Search size={16}/><input placeholder="Search customer, line or model" value={search} onChange={e=>setSearch(e.target.value)}/></div><div className="cr-filter"><Filter size={15}/><select value={status} onChange={e=>setStatus(e.target.value)}><option value="">All statuses</option><option value="DRAFT">Draft</option><option value="SUBMITTED">Submitted</option><option value="APPROVED">Approved</option><option value="REJECTED">Rejected</option></select></div></div>{error&&<div className="cr-error">{error}</div>}<section className="cr-table-wrap"><table><thead><tr><th>Date</th><th>Customer / category</th><th>Line</th><th>Model</th><th>Status</th><th>Last update</th><th>Comment</th></tr></thead><tbody>{loading?<tr><td colSpan="7" className="cr-empty">Loading submissions…</td></tr>:filtered.length?filtered.map(x=><tr key={x.dailyReportId}><td><strong>{formatDate(x.reportDate)}</strong></td><td><strong>{x.customerName}</strong><small>{x.categoryName}</small></td><td>{x.lineName}<small>{x.sapLocation||""}</small></td><td>{x.modelName||"—"}</td><td><span className={`cr-status ${x.status.toLowerCase()}`}>{x.status}</span></td><td>{x.updatedAt?formatDateTime(x.updatedAt):"—"}</td><td className="cr-comment">{x.rejectionReason||"—"}</td></tr>):<tr><td colSpan="7" className="cr-empty"><ClipboardList size={24}/><strong>No submissions found</strong><span>Change the filter or start a new daily report.</span></td></tr>}</tbody></table></section></main></ContributorLayout>
+}
+function formatDate(v){return new Date(`${v}T00:00:00`).toLocaleDateString("en-IN",{day:"2-digit",month:"short",year:"numeric"})}function formatDateTime(v){return new Date(v).toLocaleString("en-IN",{day:"2-digit",month:"short",hour:"2-digit",minute:"2-digit"})}

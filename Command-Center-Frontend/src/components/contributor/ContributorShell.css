@@ -1,0 +1,85 @@
+.cc-contributor-shell {
+  min-height: 100vh;
+  background: #f7f8fc;
+  color: #171923;
+}
+
+.cc-sidebar {
+  position: fixed;
+  inset: 14px auto 14px 14px;
+  width: 62px;
+  z-index: 50;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 10px 8px;
+  background: rgba(255,255,255,.94);
+  border: 1px solid #e5e7ee;
+  border-radius: 20px;
+  box-shadow: 0 12px 34px rgba(23,25,35,.07);
+  backdrop-filter: blur(14px);
+}
+.cc-sidebar-logo{width:44px;height:38px;display:grid;place-items:center;margin-bottom:18px;overflow:hidden}.cc-sidebar-logo img{width:42px;height:30px;object-fit:contain;object-position:left center;mix-blend-mode:multiply}
+.cc-sidebar-nav { display:flex; flex-direction:column; gap:8px; width:100%; }
+.cc-sidebar-item {
+  position: relative;
+  width: 100%;
+  height: 44px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color:#7b8292;
+  text-decoration:none;
+  border-radius:12px;
+  transition: .18s ease;
+}
+.cc-sidebar-item span { position:absolute; left:58px; opacity:0; pointer-events:none; white-space:nowrap; background:#171923; color:#fff; padding:7px 9px; border-radius:8px; font-size:11px; font-weight:700; transition:.15s; }
+.cc-sidebar:hover .cc-sidebar-item span { opacity:0; }
+.cc-sidebar-item:hover, .cc-sidebar-item.active { color:#635bff; background:#efedff; }
+.cc-sidebar-item:hover span { opacity:1; }
+.cc-sidebar-bottom { margin-top:auto; width:100%; display:flex; justify-content:center; padding-top:16px; border-top:1px solid #eef0f4; }
+.cc-sidebar-dot { width:8px; height:8px; border-radius:50%; background:#18a874; box-shadow:0 0 0 4px #eaf8f2; }
+
+.cc-workspace { min-height:100vh; margin-left:90px; display:flex; flex-direction:column; }
+.cc-navbar {
+  position:sticky;
+  top:14px;
+  z-index:40;
+  width:calc(100% - 28px);
+  margin:14px 14px 0 0;
+  min-height:68px;
+  padding:0 16px 0 20px;
+  box-sizing:border-box;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:20px;
+  background:rgba(255,255,255,.94);
+  border:1px solid #e3e6ed;
+  border-radius:20px;
+  box-shadow:0 10px 28px rgba(23,25,35,.055);
+  backdrop-filter:blur(14px);
+}
+.cc-navbar-brand { display:flex; align-items:center; gap:12px; color:#171923; text-decoration:none; font-size:14px; font-weight:600; }
+.cc-navbar-brand strong { font-weight:800; }.cc-brand-logo{width:78px;height:27px;object-fit:contain;object-position:left center;mix-blend-mode:multiply}.cc-navbar-brand:before{content:"";width:1px;height:25px;background:#e5e7ee;order:2}.cc-navbar-brand>span{order:3}.cc-navbar-brand>img{order:1}
+.cc-navbar-actions { display:flex; align-items:center; gap:10px; }
+.cc-user-pill { display:flex; align-items:center; gap:8px; padding:8px 10px 8px 13px; border-radius:12px; background:#f7f8fc; }
+.cc-user-name { font-size:12px; font-weight:750; color:#4f5667; }
+.cc-role-pill { padding:4px 7px; border-radius:999px; background:#efedff; color:#635bff; font-size:9px; font-weight:800; }
+.cc-signout { height:38px; padding:0 12px; display:inline-flex; align-items:center; gap:7px; border:1px solid #e0e3ea; background:#fff; color:#626b7c; border-radius:10px; font:700 12px inherit; cursor:pointer; }
+.cc-signout:hover { border-color:#cfcaff; color:#5147e8; background:#faf9ff; }
+.cc-content { flex:1; min-width:0; }
+.cc-footer { display:flex; justify-content:space-between; gap:20px; padding:18px 18px 22px; color:#9299a8; font-size:10px; font-weight:650; }
+
+@media (max-width: 760px) {
+  .cc-sidebar { inset: auto 12px 12px 12px; width:auto; height:58px; flex-direction:row; justify-content:center; padding:6px 8px; border-radius:18px; }
+  .cc-sidebar-logo, .cc-sidebar-bottom { display:none; }
+  .cc-sidebar-nav { flex-direction:row; width:auto; }
+  .cc-sidebar-item { width:52px; height:44px; }
+  .cc-sidebar-item span { display:none; }
+  .cc-workspace { margin-left:0; padding-bottom:70px; }
+  .cc-navbar { top:8px; width:calc(100% - 16px); margin:8px 8px 0; min-height:60px; border-radius:16px; }
+  .cc-navbar-brand { font-size:12px; }
+  .cc-user-pill { display:none; }
+  .cc-footer { padding:14px; }
+}

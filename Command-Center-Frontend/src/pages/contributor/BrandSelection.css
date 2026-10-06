@@ -1,0 +1,56 @@
+.products-container { min-height: 100vh; background: #f7f8fc; }
+.products-content { width: min(1220px, calc(100% - 48px)); margin: 0 auto; padding: 28px 0 60px; }
+
+.journey-strip { display: flex; align-items: center; width: fit-content; margin: 0 auto 48px; padding: 8px 14px; border: 1px solid #e8eaf0; border-radius: 999px; background: rgba(255,255,255,.78); box-shadow: 0 8px 28px rgba(31,35,70,.05); }
+.journey-step { display: flex; align-items: center; gap: 8px; color: #9aa0ad; font-size: 11px; }
+.journey-step span { width: 24px; height: 24px; display: grid; place-items: center; border-radius: 50%; background: #f0f1f5; color: #777e8c; font-size: 10px; font-weight: 800; }
+.journey-step.active { color: #635bff; }
+.journey-step.active span { color: white; background: #635bff; box-shadow: 0 5px 12px rgba(99,91,255,.25); }
+.journey-strip i { width: 42px; height: 1px; margin: 0 10px; background: #e4e6ed; }
+
+.products-hero { display: flex; align-items: flex-end; justify-content: space-between; gap: 30px; padding: 0 12px; }
+.page-kicker { color: #746df0; font-size: 10px; font-weight: 800; letter-spacing: .14em; }
+.products-hero h1 { margin: 12px 0 9px; color: #171923; font-family: Manrope, sans-serif; font-size: clamp(34px, 4vw, 48px); line-height: 1.05; letter-spacing: -.045em; }
+.products-hero p { max-width: 620px; margin: 0; color: #697386; font-size: 14px; line-height: 1.65; }
+.today-chip { flex: 0 0 auto; display: flex; align-items: center; gap: 8px; padding: 10px 13px; border: 1px solid #e7e8ef; border-radius: 999px; background: white; color: #697386; font-size: 11px; font-weight: 600; box-shadow: 0 6px 20px rgba(31,35,70,.04); }
+.today-chip span { width: 7px; height: 7px; border-radius: 50%; background: #19b87a; box-shadow: 0 0 0 4px #e8f8f1; }
+
+.brand-section { margin-top: 52px; }
+.section-heading { display: flex; align-items: end; justify-content: space-between; margin: 0 12px 18px; }
+.section-heading span { color: #9aa0ad; font-size: 10px; font-weight: 800; letter-spacing: .13em; }
+.section-heading h2 { margin: 6px 0 0; font-family: Manrope, sans-serif; font-size: 21px; letter-spacing: -.025em; }
+.section-heading small { color: #9299a9; font-size: 11px; }
+
+.brand-grid { display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 16px; }
+.brand-card { min-height: 260px; position: relative; overflow: hidden; display: flex; flex-direction: column; align-items: stretch; justify-content: space-between; padding: 20px; border: 1px solid #e7e8ef; border-radius: 21px; background: #fff; color: #171923; text-align: left; cursor: pointer; box-shadow: 0 8px 30px rgba(31,35,70,.045); transition: transform .24s ease, border-color .24s ease, box-shadow .24s ease; }
+.brand-card:hover { transform: translateY(-6px); border-color: rgba(99,91,255,.38); box-shadow: 0 18px 48px rgba(55,48,135,.12); }
+.brand-card:active { transform: translateY(-2px) scale(.995); }
+.brand-card::before { content: ""; position: absolute; width: 190px; height: 190px; right: -95px; top: -105px; border-radius: 50%; background: var(--card-glow, rgba(99,91,255,.12)); }
+.brand-card-glow { position: absolute; width: 140px; height: 140px; left: -70px; bottom: -100px; border-radius: 50%; background: var(--card-glow, rgba(99,91,255,.08)); filter: blur(8px); pointer-events: none; }
+.brand-card-blue { --card-glow: rgba(64,133,255,.15); }
+.brand-card-violet { --card-glow: rgba(125,102,255,.15); }
+.brand-card-green { --card-glow: rgba(25,184,122,.13); }
+.brand-card-orange { --card-glow: rgba(245,166,35,.13); }
+.brand-card-top, .brand-card-copy, .brand-card-bottom { position: relative; z-index: 1; }
+.brand-card-top { display: flex; align-items: center; justify-content: space-between; }
+.brand-mark { min-width: 54px; height: 42px; display: inline-flex; align-items: center; justify-content: center; padding: 0 11px; border-radius: 12px; font-family: Manrope, sans-serif; font-size: 14px; font-weight: 800; letter-spacing: -.03em; }
+.brand-mark-blue { background: #edf4ff; color: #2664d8; }
+.brand-mark-violet { background: #f0edff; color: #635bff; }
+.brand-mark-green { background: #e9f8f1; color: #15986a; }
+.brand-mark-orange { background: #fff4e5; color: #c27a08; font-size: 11px; }
+.brand-open { width: 31px; height: 31px; display: grid; place-items: center; border-radius: 10px; background: #f6f6fa; color: #858b99; font-size: 15px; transition: .2s; }
+.brand-card:hover .brand-open { background: #eeecff; color: #635bff; transform: translate(1px,-1px); }
+.brand-card-copy { margin-top: 34px; }
+.brand-card-copy h3 { margin: 0 0 6px; font-family: Manrope, sans-serif; font-size: 25px; letter-spacing: -.035em; }
+.brand-card-copy p { margin: 0; color: #7b8291; font-size: 12px; }
+.brand-card-bottom { display: flex; align-items: center; justify-content: space-between; padding-top: 17px; border-top: 1px solid #eef0f4; color: #9096a4; font-size: 10px; }
+.brand-card-bottom strong { color: #555c6b; font-size: 11px; }
+.loading-card { grid-column: 1 / -1; padding: 50px; border: 1px dashed #d9dce5; border-radius: 20px; background: white; color: #697386; text-align: center; }
+
+.workspace-tip { display: flex; align-items: center; gap: 14px; max-width: 720px; margin: 34px auto 0; padding: 15px 18px; border: 1px solid #e8e7fa; border-radius: 16px; background: linear-gradient(100deg, #fbfaff, #fff); }
+.tip-icon { width: 34px; height: 34px; display: grid; place-items: center; flex: 0 0 auto; border-radius: 11px; background: #eeecff; color: #635bff; }
+.workspace-tip strong { font-size: 12px; }
+.workspace-tip p { margin: 3px 0 0; color: #7b8291; font-size: 11px; line-height: 1.5; }
+
+@media (max-width: 980px) { .brand-grid { grid-template-columns: repeat(2, minmax(0,1fr)); } .products-hero { align-items: flex-start; flex-direction: column; } }
+@media (max-width: 650px) { .products-content { width: min(100% - 28px, 560px); padding-top: 20px; } .journey-strip { margin-bottom: 34px; } .journey-step b { display: none; } .journey-strip i { width: 25px; margin: 0 7px; } .brand-grid { grid-template-columns: 1fr; } .brand-card { min-height: 220px; } .section-heading small { display: none; } }
