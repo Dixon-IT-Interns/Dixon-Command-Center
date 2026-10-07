@@ -21,7 +21,11 @@ Run `005_kpi_daily_snapshot_uniqueness.sql` against `Dixon_Command_Center` after
 
 The migration stops without changing the schema if duplicate snapshots already exist for a `DailyReportId`.
 
-## 3. Workflow
+## 3. Category-specific CPH fields
+
+Run `006_category_cph_fields.sql` against `Dixon_Command_Center` to add `CPHTarget` and `CPHActual` to `DailyReport` and `CPHTarget` to `KPI_Daily`. `KPI_Daily.CPHActual` is already part of the schema and is not added again.
+
+## 4. Workflow
 
 Contributor:
 
@@ -37,7 +41,7 @@ Approver:
 
 Rejected reports remain editable by the contributor and can be submitted again. The same queue row is reset to `PENDING` on resubmission.
 
-## 4. Brand binding
+## 5. Brand binding
 
 `UserCustomer` controls brand access. Admin can assign brands from the Administration page.
 
@@ -47,7 +51,7 @@ Rejected reports remain editable by the contributor and can be submitted again. 
 
 The backend also checks the assignment for reporting APIs; frontend filtering alone is not used as the security boundary.
 
-## 5. Model behavior
+## 6. Model behavior
 
 Models are fetched from `KPI_Master` by Customer + Category + Line, not only by the current month. This preserves the line/model relationship even when the current month's KPI targets still need to be configured.
 

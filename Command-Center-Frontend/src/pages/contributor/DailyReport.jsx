@@ -1,9 +1,9 @@
 /* eslint-disable react-hooks/set-state-in-effect */
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import {
   AlertCircle, ArrowLeft, CheckCircle2, ClipboardList, Loader2,
-  Plus, Send, ToggleLeft, ToggleRight, Trash2, X
+  Plus, Send, ToggleLeft, ToggleRight, Trash2, Upload, X
 } from "lucide-react";
 import { api } from "../../api";
 import ContributorLayout from "../../components/contributor/ContributorLayout";
@@ -15,6 +15,7 @@ const EMPTY_FORM = {
   productionPlan: "", productionActual: "",
   uphTarget: "", uphActual: "",
   upphInstalled: "", upphActual: "",
+  cphTarget: "", cphActual: "",
   fpyTarget: "", fpyActual: "",
   ftyTarget: "", ftyActual: "",
   rtyTarget: "", rtyActual: "",
@@ -39,6 +40,8 @@ const GROUPS = [
       ["UPH", "uphActual", "Actual"],
       ["UPPH", "upphInstalled", "Installed"],
       ["UPPH", "upphActual", "Actual"],
+      ["CPH", "cphTarget", "Target"],
+      ["CPH", "cphActual", "Actual"],
     ],
   },
   {
@@ -101,8 +104,23 @@ export default function DailyReport({ session, onSignOut }) {
   const [reportDate, setReportDate] = useState(today());
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState("");
+  const [isImporting, setIsImporting] = useState(false);
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
+  const excelFileInput = useRef(null);
+  const isSmtCategory = category?.categoryName?.trim().toUpperCase() === "SMT";
+  const reportGroups = useMemo(() => GROUPS.map((group) => (
+    group.title === "Production"
+      ? {
+          ...group,
+          rows: group.rows.filter(([, key]) => (
+            isSmtCategory
+              ? key !== "upphInstalled" && key !== "upphActual"
+              : key !== "cphTarget" && key !== "cphActual"
+          )),
+        }
+      : group
+  )), [isSmtCategory]);
 
   const loadReport = async (showLoader = true) => {
     if (showLoader) setLoading(true);
@@ -243,7 +261,10 @@ export default function DailyReport({ session, onSignOut }) {
     monthPlan: asNumber(entry.form.monthPlan), monthActual: asNumber(entry.form.monthActual),
     productionPlan: asNumber(entry.form.productionPlan), productionActual: asNumber(entry.form.productionActual),
     uphTarget: asNumber(entry.form.uphTarget), uphActual: asNumber(entry.form.uphActual),
-    upphInstalled: asNumber(entry.form.upphInstalled), upphActual: asNumber(entry.form.upphActual),
+    upphInstalled: isSmtCategory ? null : asNumber(entry.form.upphInstalled),
+    upphActual: isSmtCategory ? null : asNumber(entry.form.upphActual),
+    cphTarget: isSmtCategory ? asNumber(entry.form.cphTarget) : null,
+    cphActual: isSmtCategory ? asNumber(entry.form.cphActual) : null,
     fpyTarget: asNumber(entry.form.fpyTarget), fpyActual: asNumber(entry.form.fpyActual),
     ftyTarget: asNumber(entry.form.ftyTarget), ftyActual: asNumber(entry.form.ftyActual),
     rtyTarget: asNumber(entry.form.rtyTarget), rtyActual: asNumber(entry.form.rtyActual),
@@ -273,6 +294,121 @@ export default function DailyReport({ session, onSignOut }) {
     } finally { setBusy(""); }
   };
 
+  const importExcel = async (event) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    setIsImporting(true);
+    setError("");
+    setNotice("");
+
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("customerId", String(customerId));
+      formData.append("categoryId", String(categoryId));
+      formData.append("reportDate", reportDate);
+
+      const preview = await api.postFormData(
+        "/daily-reports/import/preview",
+        formData
+      );
+      const pageLines = new Map(lines.map((line) => [Number(line.lineId), line]));
+      const validationErrors = [];
+
+      for (const imported of preview.data || []) {
+        const line = pageLines.get(Number(imported.lineId));
+        const lineState = lineData[imported.lineId];
+        if (!line || !lineState) {
+          validationErrors.push(`Line ${imported.lineNo} is not available on this report page.`);
+          continue;
+        }
+
+        const modelAvailable = lineState.models.some(
+          (model) => Number(model.modelId) === Number(imported.modelId)
+        );
+        if (!modelAvailable) {
+          validationErrors.push(
+            `Model ${imported.modelName} is not available for line ${imported.lineNo} on this page.`
+          );
+        }
+
+        const existingEntry = lineState.entries.find(
+          (entry) => Number(entry.modelId) === Number(imported.modelId)
+        );
+        if (existingEntry?.status === "APPROVED" || existingEntry?.status === "SUBMITTED") {
+          validationErrors.push(
+            `Model ${imported.modelName} on line ${imported.lineNo} has already been submitted and cannot be replaced.`
+          );
+        }
+      }
+
+      if (validationErrors.length) {
+        throw new Error(validationErrors.join(" "));
+      }
+
+      setLineData((current) => {
+        const next = { ...current };
+        const grouped = new Map();
+
+        for (const imported of preview.data || []) {
+          const lineId = Number(imported.lineId);
+          const entries = grouped.get(lineId) || [];
+          entries.push(imported);
+          grouped.set(lineId, entries);
+        }
+
+        for (const [lineId, importedEntries] of grouped) {
+          const currentLine = next[lineId];
+          const entries = [...currentLine.entries];
+
+          for (const imported of importedEntries) {
+            const existingIndex = entries.findIndex(
+              (entry) => Number(entry.modelId) === Number(imported.modelId)
+            );
+            if (existingIndex >= 0) {
+              const existing = entries[existingIndex];
+              entries[existingIndex] = {
+                ...existing,
+                form: { ...EMPTY_FORM, ...imported.form },
+                status: "DRAFT",
+              };
+            } else {
+              entries.push({
+                entryId: `import-${lineId}-${imported.modelId}-${Date.now()}-${entries.length}`,
+                dailyReportId: null,
+                modelId: String(imported.modelId),
+                modelName: imported.modelName,
+                status: "DRAFT",
+                isActive: true,
+                rejectionReason: "",
+                form: { ...EMPTY_FORM, ...imported.form },
+                isNew: true,
+              });
+            }
+          }
+
+          next[lineId] = { ...currentLine, status: "IN_PROGRESS", entries };
+        }
+
+        return next;
+      });
+
+      setNotice(
+        `Excel imported successfully — ${preview.lines} lines, ${preview.models} models. Please review the data before submitting.`
+      );
+    } catch (e) {
+      setError(
+        e.message?.startsWith("Excel import failed")
+          ? e.message
+          : `Excel import failed: ${e.message || "Unable to read the workbook."}`
+      );
+    } finally {
+      setIsImporting(false);
+      event.target.value = "";
+    }
+  };
+
   const columns = useMemo(() => {
     const result = [];
     lines.forEach((line) => (lineData[line.lineId]?.entries || []).forEach((entry) => result.push({ lineId: line.lineId, entry })));
@@ -295,7 +431,24 @@ export default function DailyReport({ session, onSignOut }) {
 
           <header className="report-title-row">
             <div className="report-title-icon"><ClipboardList size={25} /></div>
-            <div><h1>FATP Daily Report</h1><p>Enter all Plan, Target, Installed and Actual values manually for each model.</p></div>
+            <div><h1>{category?.categoryName || "Daily"} Daily Report</h1><p>Enter all Plan, Target, Installed and Actual values manually for each model.</p></div>
+            <button
+              className="secondary-action report-excel-upload"
+              type="button"
+              style={{ marginLeft: "auto", flexShrink: 0 }}
+              disabled={isImporting || Boolean(busy)}
+              onClick={() => excelFileInput.current?.click()}
+            >
+              {isImporting ? <Loader2 size={14} className="spin" /> : <Upload size={14} />}
+              {isImporting ? "Reading Excel..." : "Upload Excel"}
+            </button>
+            <input
+              ref={excelFileInput}
+              type="file"
+              accept=".xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+              hidden
+              onChange={importExcel}
+            />
           </header>
 
           <div className="report-context-bar">
@@ -351,7 +504,7 @@ export default function DailyReport({ session, onSignOut }) {
                     </tr>
                   </thead>
                   <tbody>
-                    {GROUPS.map((group) => <MatrixGroup key={group.title} group={group} columns={columns} lineData={lineData} onChange={updateEntry} />)}
+                    {reportGroups.map((group) => <MatrixGroup key={group.title} group={group} columns={columns} lineData={lineData} onChange={updateEntry} />)}
                   </tbody>
                 </table>
               </div>

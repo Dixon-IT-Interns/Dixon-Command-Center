@@ -311,6 +311,9 @@ public sealed class ApprovalController(
                 dr.UPPHInstalled,
                 dr.UPPHActual,
 
+                dr.CPHTarget,
+                dr.CPHActual,
+
                 dr.FPYTarget,
                 dr.FPYActual,
 
@@ -432,56 +435,59 @@ public sealed class ApprovalController(
                 upphInstalled = GetDecimal(reader, 18),
                 upphActual = GetDecimal(reader, 19),
 
-                fpyTarget = GetDecimal(reader, 20),
-                fpyActual = GetDecimal(reader, 21),
+                cphTarget = GetDecimal(reader, 20),
+                cphActual = GetDecimal(reader, 21),
 
-                ftyTarget = GetDecimal(reader, 22),
-                ftyActual = GetDecimal(reader, 23),
+                fpyTarget = GetDecimal(reader, 22),
+                fpyActual = GetDecimal(reader, 23),
 
-                rtyTarget = GetDecimal(reader, 24),
-                rtyActual = GetDecimal(reader, 25),
+                ftyTarget = GetDecimal(reader, 24),
+                ftyActual = GetDecimal(reader, 25),
+
+                rtyTarget = GetDecimal(reader, 26),
+                rtyActual = GetDecimal(reader, 27),
 
                 osdReportingDateValue =
-                    GetDecimal(reader, 26),
-
-                osdReportingDatePercent =
-                    GetDecimal(reader, 27),
-
-                osdMtdValue =
                     GetDecimal(reader, 28),
 
-                osdMtdPercent =
+                osdReportingDatePercent =
                     GetDecimal(reader, 29),
 
-                plannedOTManhours =
+                osdMtdValue =
                     GetDecimal(reader, 30),
 
-                unplannedOTManhours =
+                osdMtdPercent =
                     GetDecimal(reader, 31),
 
-                actualOTManhours =
+                plannedOTManhours =
                     GetDecimal(reader, 32),
 
+                unplannedOTManhours =
+                    GetDecimal(reader, 33),
+
+                actualOTManhours =
+                    GetDecimal(reader, 34),
+
                 openWOQty =
-                    GetInt(reader, 33),
-
-                over7DaysWOBalanceQty =
-                    GetInt(reader, 34),
-
-                dailyTRCInQty =
                     GetInt(reader, 35),
 
-                dailyTRCOutQty =
+                over7DaysWOBalanceQty =
                     GetInt(reader, 36),
 
+                dailyTRCInQty =
+                    GetInt(reader, 37),
+
+                dailyTRCOutQty =
+                    GetInt(reader, 38),
+
                 trcOverallFailureInflowPercent =
-                    GetDecimal(reader, 37),
+                    GetDecimal(reader, 39),
 
                 trcLyingOver3DaysCr =
-                    GetDecimal(reader, 38),
+                    GetDecimal(reader, 40),
 
                 issueDescription =
-                    GetString(reader, 39)
+                    GetString(reader, 41)
             }
         });
     }
@@ -908,6 +914,8 @@ public sealed class ApprovalController(
 
                     UPPHInstalled = dr.UPPHInstalled,
                     UPPHActual = dr.UPPHActual,
+                    CPHTarget = dr.CPHTarget,
+                    CPHActual = dr.CPHActual,
 
                     FPYTarget = dr.FPYTarget,
                     FPYActual = dr.FPYActual,
@@ -965,6 +973,9 @@ public sealed class ApprovalController(
                     UPPHInstalled,
                     UPPHActual,
 
+                    CPHTarget,
+                    CPHActual,
+
                     FPYTarget,
                     FPYActual,
 
@@ -1013,6 +1024,9 @@ public sealed class ApprovalController(
 
                     dr.UPPHInstalled,
                     dr.UPPHActual,
+
+                    dr.CPHTarget,
+                    dr.CPHActual,
 
                     dr.FPYTarget,
                     dr.FPYActual,
