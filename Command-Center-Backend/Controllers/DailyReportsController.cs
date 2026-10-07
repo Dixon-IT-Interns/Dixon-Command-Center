@@ -1,6 +1,7 @@
 using System.Data;
 using System.Security.Claims;
 using Dixon.CommandCenter.API.Data;
+using Dixon.CommandCenter.API.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
@@ -10,7 +11,9 @@ namespace Dixon.CommandCenter.API.Controllers;
 [ApiController]
 [Authorize]
 [Route("api/daily-reports")]
-public sealed class DailyReportsController(SqlConnectionFactory connectionFactory) : ControllerBase
+public sealed class DailyReportsController(
+    SqlConnectionFactory connectionFactory,
+    DailyReportExcelImportService excelImportService) : ControllerBase
 {
     // ============================================================
     // CONFIG
@@ -145,6 +148,86 @@ public sealed class DailyReportsController(SqlConnectionFactory connectionFactor
             // Monthly/default KPI master is intentionally not used.
             targets = (object?)null
         });
+    }
+
+    // ============================================================
+    // EXCEL IMPORT PREVIEW
+    // ============================================================
+
+    [HttpPost("import/preview")]
+    [Consumes("multipart/form-data")]
+    [RequestSizeLimit(20 * 1024 * 1024)]
+    public async Task<IActionResult> PreviewExcelImport(
+        [FromForm] DailyReportExcelImportRequest request,
+        CancellationToken cancellationToken)
+    {
+        if (request.File is null || request.File.Length == 0)
+        {
+            return BadRequest(new
+            {
+                valid = false,
+                message = "Excel import failed: Select an .xlsx file to upload."
+            });
+        }
+
+        if (!string.Equals(
+                Path.GetExtension(request.File.FileName),
+                ".xlsx",
+                StringComparison.OrdinalIgnoreCase))
+        {
+            return BadRequest(new
+            {
+                valid = false,
+                message = "Excel import failed: Only .xlsx files are supported."
+            });
+        }
+
+        if (request.CustomerId <= 0
+            || request.CategoryId <= 0
+            || request.ReportDate == default)
+        {
+            return BadRequest(new
+            {
+                valid = false,
+                message = "Excel import failed: Brand, category and report date are required."
+            });
+        }
+
+        if (request.ReportDate.Date > DateTime.Today)
+        {
+            return BadRequest(new
+            {
+                valid = false,
+                message = "Excel import failed: A future reporting date is not valid."
+            });
+        }
+
+        if (!await HasCustomerAccessAsync(
+                request.CustomerId,
+                cancellationToken))
+        {
+            return Forbid();
+        }
+
+        await using var stream = request.File.OpenReadStream();
+        var preview = await excelImportService.PreviewAsync(
+            stream,
+            request.CustomerId,
+            request.CategoryId,
+            request.ReportDate,
+            cancellationToken);
+
+        return preview.Valid
+            ? Ok(preview)
+            : BadRequest(new
+            {
+                valid = false,
+                reportDate = preview.ReportDate,
+                lines = preview.Lines,
+                models = preview.Models,
+                errors = preview.Errors,
+                message = $"Excel import failed: {string.Join(" ", preview.Errors)}"
+            });
     }
 
 
@@ -655,6 +738,8 @@ public sealed class DailyReportsController(SqlConnectionFactory connectionFactor
 
                 dr.UPPHInstalled,
                 dr.UPPHActual,
+                dr.CPHTarget,
+                dr.CPHActual,
 
                 dr.FPYTarget,
                 dr.FPYActual,
@@ -761,60 +846,62 @@ public sealed class DailyReportsController(SqlConnectionFactory connectionFactor
 
                 upphInstalled = GetDecimal(reader, 11),
                 upphActual = GetDecimal(reader, 12),
+                cphTarget = GetDecimal(reader, 13),
+                cphActual = GetDecimal(reader, 14),
 
-                fpyTarget = GetDecimal(reader, 13),
-                fpyActual = GetDecimal(reader, 14),
+                fpyTarget = GetDecimal(reader, 15),
+                fpyActual = GetDecimal(reader, 16),
 
-                ftyTarget = GetDecimal(reader, 15),
-                ftyActual = GetDecimal(reader, 16),
+                ftyTarget = GetDecimal(reader, 17),
+                ftyActual = GetDecimal(reader, 18),
 
-                rtyTarget = GetDecimal(reader, 17),
-                rtyActual = GetDecimal(reader, 18),
+                rtyTarget = GetDecimal(reader, 19),
+                rtyActual = GetDecimal(reader, 20),
 
                 osdReportingDateValue =
-                    GetDecimal(reader, 19),
-
-                osdReportingDatePercent =
-                    GetDecimal(reader, 20),
-
-                osdMtdValue =
                     GetDecimal(reader, 21),
 
-                osdMtdPercent =
+                osdReportingDatePercent =
                     GetDecimal(reader, 22),
 
-                plannedOTManhours =
+                osdMtdValue =
                     GetDecimal(reader, 23),
 
-                unplannedOTManhours =
+                osdMtdPercent =
                     GetDecimal(reader, 24),
 
-                actualOTManhours =
+                plannedOTManhours =
                     GetDecimal(reader, 25),
 
+                unplannedOTManhours =
+                    GetDecimal(reader, 26),
+
+                actualOTManhours =
+                    GetDecimal(reader, 27),
+
                 openWOQty =
-                    GetInt(reader, 26),
-
-                over7DaysWOBalanceQty =
-                    GetInt(reader, 27),
-
-                dailyTRCInQty =
                     GetInt(reader, 28),
 
-                dailyTRCOutQty =
+                over7DaysWOBalanceQty =
                     GetInt(reader, 29),
 
+                dailyTRCInQty =
+                    GetInt(reader, 30),
+
+                dailyTRCOutQty =
+                    GetInt(reader, 31),
+
                 trcOverallFailureInflowPercent =
-                    GetDecimal(reader, 30),
+                    GetDecimal(reader, 32),
 
                 trcLyingOver3DaysCr =
-                    GetDecimal(reader, 31),
+                    GetDecimal(reader, 33),
 
                 issueDescription =
-                    GetString(reader, 32),
+                    GetString(reader, 34),
 
                 rejectionReason =
-                    GetString(reader, 33)
+                    GetString(reader, 35)
             });
         }
 
@@ -860,6 +947,8 @@ public sealed class DailyReportsController(SqlConnectionFactory connectionFactor
 
                 dr.UPPHInstalled,
                 dr.UPPHActual,
+                dr.CPHTarget,
+                dr.CPHActual,
 
                 dr.FPYTarget,
                 dr.FPYActual,
@@ -958,64 +1047,66 @@ public sealed class DailyReportsController(SqlConnectionFactory connectionFactor
 
             upphInstalled = GetDecimal(reader, 7),
             upphActual = GetDecimal(reader, 8),
+            cphTarget = GetDecimal(reader, 9),
+            cphActual = GetDecimal(reader, 10),
 
-            fpyTarget = GetDecimal(reader, 9),
-            fpyActual = GetDecimal(reader, 10),
+            fpyTarget = GetDecimal(reader, 11),
+            fpyActual = GetDecimal(reader, 12),
 
-            ftyTarget = GetDecimal(reader, 11),
-            ftyActual = GetDecimal(reader, 12),
+            ftyTarget = GetDecimal(reader, 13),
+            ftyActual = GetDecimal(reader, 14),
 
-            rtyTarget = GetDecimal(reader, 13),
-            rtyActual = GetDecimal(reader, 14),
+            rtyTarget = GetDecimal(reader, 15),
+            rtyActual = GetDecimal(reader, 16),
 
             osdReportingDateValue =
-                GetDecimal(reader, 15),
-
-            osdReportingDatePercent =
-                GetDecimal(reader, 16),
-
-            osdMtdValue =
                 GetDecimal(reader, 17),
 
-            osdMtdPercent =
+            osdReportingDatePercent =
                 GetDecimal(reader, 18),
 
-            plannedOTManhours =
+            osdMtdValue =
                 GetDecimal(reader, 19),
 
-            unplannedOTManhours =
+            osdMtdPercent =
                 GetDecimal(reader, 20),
 
-            actualOTManhours =
+            plannedOTManhours =
                 GetDecimal(reader, 21),
 
+            unplannedOTManhours =
+                GetDecimal(reader, 22),
+
+            actualOTManhours =
+                GetDecimal(reader, 23),
+
             openWOQty =
-                GetInt(reader, 22),
-
-            over7DaysWOBalanceQty =
-                GetInt(reader, 23),
-
-            dailyTRCInQty =
                 GetInt(reader, 24),
 
-            dailyTRCOutQty =
+            over7DaysWOBalanceQty =
                 GetInt(reader, 25),
 
+            dailyTRCInQty =
+                GetInt(reader, 26),
+
+            dailyTRCOutQty =
+                GetInt(reader, 27),
+
             trcOverallFailureInflowPercent =
-                GetDecimal(reader, 26),
+                GetDecimal(reader, 28),
 
             trcLyingOver3DaysCr =
-                GetDecimal(reader, 27),
+                GetDecimal(reader, 29),
 
             issueDescription =
-                GetString(reader, 28),
+                GetString(reader, 30),
 
-            status = reader.GetString(29),
+            status = reader.GetString(31),
 
-            dailyReportId = reader.GetInt32(30),
+            dailyReportId = reader.GetInt32(32),
 
             rejectionReason =
-                GetString(reader, 31)
+                GetString(reader, 33)
         });
     }
 
@@ -1528,6 +1619,8 @@ public sealed class DailyReportsController(SqlConnectionFactory connectionFactor
 
                 UPPHInstalled = @UPPHInstalled,
                 UPPHActual = @UPPHActual,
+                CPHTarget = @CPHTarget,
+                CPHActual = @CPHActual,
 
                 FPYTarget = @FPYTarget,
                 FPYActual = @FPYActual,
@@ -1646,6 +1739,18 @@ public sealed class DailyReportsController(SqlConnectionFactory connectionFactor
             "@UPPHActual",
             SqlDbType.Decimal,
             request.UpphActual);
+
+        Add(
+            command,
+            "@CPHTarget",
+            SqlDbType.Decimal,
+            request.CPHTarget);
+
+        Add(
+            command,
+            "@CPHActual",
+            SqlDbType.Decimal,
+            request.CPHActual);
 
         Add(
             command,
@@ -2000,6 +2105,17 @@ public sealed class DailyReportsController(SqlConnectionFactory connectionFactor
     }
 }
 
+public sealed class DailyReportExcelImportRequest
+{
+    public IFormFile? File { get; set; }
+
+    public int CustomerId { get; set; }
+
+    public int CategoryId { get; set; }
+
+    public DateTime ReportDate { get; set; }
+}
+
 
 // ==================================================================
 // LINE STATUS REQUEST
@@ -2070,6 +2186,10 @@ public sealed class DailyReportRequest
     public decimal? UpphInstalled { get; set; }
 
     public decimal? UpphActual { get; set; }
+
+    public decimal? CPHTarget { get; set; }
+
+    public decimal? CPHActual { get; set; }
 
 
     // ==============================================================

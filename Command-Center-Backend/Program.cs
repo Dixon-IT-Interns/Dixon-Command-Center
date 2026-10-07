@@ -41,6 +41,7 @@ builder.Services.AddSingleton(new TokenIssuer(signingKey));
 builder.Services.AddSingleton<SqlConnectionFactory>();
 builder.Services.AddScoped<UserRepository>();
 builder.Services.AddScoped<CatalogRepository>();
+builder.Services.AddScoped<DailyReportExcelImportService>();
 
 var app = builder.Build();
 
