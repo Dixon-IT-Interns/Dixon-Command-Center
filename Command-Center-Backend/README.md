@@ -1,6 +1,6 @@
 # Dixon Command Center API
 
-The API uses the existing SQL Server schema in `Dixon_Command_Center`. Create or verify tables with `Database/schema.sql`, then use `Database/seed.sql` for the roles, plant, customers, categories, models, and production lines. The seed is rerunnable and includes a guarded correction for the existing Acer-SMT/Gigabyte-FATP line mapping error. The first account is created through the login page's one-time administrator setup; the `Admin` role and at least one active plant must already exist.
+The API uses the existing SQL Server schema in `Dixon_Command_Center`. Create or verify tables with `Database/schema.sql`. For an existing database, run `Database/007_plant_customer.sql`, then `Database/008_super_admin_hierarchy.sql`, before `Database/seed.sql` or starting the updated API. The first migration backfills plant/customer mappings. The second adds the `SuperAdmin` role and promotes the first existing Admin to SuperAdmin; remaining Admins are plant-scoped. Then use `Database/seed.sql` for the roles, plant, plant/customer assignments, categories, models, and production lines. The seed is rerunnable and includes a guarded correction for the existing Acer-SMT/Gigabyte-FATP line mapping error. On a new database, run `Database/schema.sql` and `Database/seed.sql`; initial setup creates the first SuperAdmin.
 
 ## Local configuration
 
@@ -10,7 +10,7 @@ Set the SQL Server connection string in the environment so credentials are not c
 $env:ConnectionStrings__DixonDb = "Server=YOUR_SERVER;Database=Dixon_Command_Center;Trusted_Connection=True;TrustServerCertificate=True"
 ```
 
-The API uses the `http` launch profile at `http://localhost:5210`. In development, it generates a temporary signing key if `Jwt:Secret` is not configured, so issued tokens expire or become invalid after the API restarts. For a stable local key, set a random secret before starting:
+The API uses the `http` launch profile at `http://localhost:5211`. In development, it generates a temporary signing key if `Jwt:Secret` is not configured, so issued tokens expire or become invalid after the API restarts. For a stable local key, set a random secret before starting:
 
 ```powershell
 $env:Jwt__Secret = "replace-with-a-long-random-secret"
@@ -26,8 +26,9 @@ Outside development, `Jwt:Secret` is required. Configure `Frontend:Origin` if Vi
 - `POST /api/auth/login` returns a 30-minute bearer token.
 - `GET /api/auth/me` returns the authenticated identity.
 - `GET /api/catalog/customers` returns customers with models, categories, and production lines.
-- `GET /api/admin/users`, `/roles`, and `/plants` require the `Admin` role.
-- `POST /api/admin/users` adds an account with a PBKDF2 password hash.
+- `GET /api/admin/catalog/plants/{id}/customers` and `PUT /api/admin/catalog/plants/{id}/customers` manage a plant's customer associations (Admin role).
+- `GET /api/admin/users`, `/roles`, and `/plants` are scoped to the Admin's plant; SuperAdmins can manage users across plants.
+- `POST /api/admin/users` lets SuperAdmins create plant Admins. Plant Admins can create only non-admin roles in their own plant.
 
 Run the frontend from `Command-Center-Frontend` with `npm run dev`. Set `VITE_API_URL` if the API is hosted at a different URL.
 
@@ -43,4 +44,4 @@ API:
 - `POST /api/approvals/{id}/reject` — reject with a required comment.
 - `GET /api/contributor/dashboard?days=7` — contributor activity/history.
 
-Brand access is controlled by `UserCustomer` and enforced by the backend catalog/reporting APIs.
+Plant customer access is controlled by `PlantCustomer`; individual user assignments remain controlled by `UserCustomer`. Both are enforced by the backend catalog/reporting APIs.

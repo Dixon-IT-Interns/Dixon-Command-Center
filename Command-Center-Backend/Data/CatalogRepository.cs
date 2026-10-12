@@ -5,7 +5,7 @@ namespace Dixon.CommandCenter.API.Data;
 
 public sealed class CatalogRepository(SqlConnectionFactory connectionFactory)
 {
-    public async Task<IReadOnlyList<CustomerResponse>> GetCustomersAsync(int userId, string roleName, CancellationToken cancellationToken)
+    public async Task<IReadOnlyList<CustomerResponse>> GetCustomersAsync(int userId, int plantId, string roleName, CancellationToken cancellationToken)
     {
         var customers = new Dictionary<int, CustomerBuilder>();
         var categories = new Dictionary<int, CategoryBuilder>();
@@ -14,21 +14,22 @@ public sealed class CatalogRepository(SqlConnectionFactory connectionFactory)
         await using (var command = new SqlCommand("""
             SELECT c.CustomerId, c.CustomerName
             FROM Customer c
+            INNER JOIN PlantCustomer pc ON pc.CustomerId = c.CustomerId
             WHERE c.IsActive = 1
+              AND pc.PlantId = @PlantId
               AND (@IsAdmin = 1 OR EXISTS (SELECT 1 FROM UserCustomer uc WHERE uc.CustomerId = c.CustomerId AND uc.UserId = @UserId))
             ORDER BY c.CustomerName
             """, connection))
         {
-            command.Parameters.AddWithValue("@IsAdmin", roleName == "Admin" ? 1 : 0);
+            command.Parameters.AddWithValue("@IsAdmin", roleName is "Admin" or "SuperAdmin" ? 1 : 0);
             command.Parameters.AddWithValue("@UserId", userId);
-        await using (var reader = await command.ExecuteReaderAsync(cancellationToken))
-        {
+            command.Parameters.AddWithValue("@PlantId", plantId);
+            await using var reader = await command.ExecuteReaderAsync(cancellationToken);
             while (await reader.ReadAsync(cancellationToken))
             {
                 var customer = new CustomerBuilder(reader.GetInt32(0), reader.GetString(1));
                 customers.Add(customer.Id, customer);
             }
-        }
         }
 
         await using (var command = new SqlCommand("SELECT CategoryId, CustomerId, CategoryName FROM Category WHERE IsActive = 1 ORDER BY CategoryName", connection))

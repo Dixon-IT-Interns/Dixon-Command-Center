@@ -79,7 +79,7 @@ public sealed class UserRepository(SqlConnectionFactory connectionFactory)
                 WHERE IsActive = 1
                 ORDER BY PlantId
             ) p
-            WHERE r.RoleName = 'Admin'
+            WHERE r.RoleName = 'SuperAdmin'
             """,
             connection,
             transaction);
@@ -104,7 +104,7 @@ public sealed class UserRepository(SqlConnectionFactory connectionFactory)
             await transaction.RollbackAsync(cancellationToken);
 
             throw new InvalidOperationException(
-                "Seed the Admin role and at least one active plant before initial setup.");
+                "Seed the SuperAdmin role and at least one active plant before initial setup.");
         }
 
         await transaction.CommitAsync(cancellationToken);
@@ -138,7 +138,10 @@ public sealed class UserRepository(SqlConnectionFactory connectionFactory)
             WHERE
                 u.Email = @Email
                 AND u.IsActive = 1
-                AND p.IsActive = 1
+                -- Super Admin is global: deactivating its originally assigned plant
+                -- must not disable the Super Admin account. Other users still require
+                -- an active plant to sign in.
+                AND (r.RoleName = 'SuperAdmin' OR p.IsActive = 1)
             """,
             connection);
 
@@ -169,6 +172,8 @@ public sealed class UserRepository(SqlConnectionFactory connectionFactory)
     }
 
     public async Task<IReadOnlyList<UserResponse>> GetUsersAsync(
+        int? plantId,
+        bool includeSuperAdmins,
         CancellationToken cancellationToken)
     {
         var users = new List<UserResponse>();
@@ -196,10 +201,15 @@ public sealed class UserRepository(SqlConnectionFactory connectionFactory)
                 ON r.RoleId = u.RoleId
             INNER JOIN Plant p
                 ON p.PlantId = u.PlantId
+            WHERE (@PlantId IS NULL OR u.PlantId = @PlantId)
+              AND (@IncludeSuperAdmins = 1 OR r.RoleName NOT IN ('Admin', 'SuperAdmin'))
+              AND r.RoleName <> 'SuperAdmin'
             ORDER BY u.FullName
             """,
             connection))
         {
+            command.Parameters.AddWithValue("@PlantId", (object?)plantId ?? DBNull.Value);
+            command.Parameters.AddWithValue("@IncludeSuperAdmins", includeSuperAdmins);
             await using var reader =
                 await command.ExecuteReaderAsync(cancellationToken);
 
@@ -236,6 +246,11 @@ public sealed class UserRepository(SqlConnectionFactory connectionFactory)
                 c.CustomerId,
                 c.CustomerName
             FROM UserCustomer uc
+            INNER JOIN [User] u
+                ON u.UserId = uc.UserId
+            INNER JOIN PlantCustomer pc
+                ON pc.PlantId = u.PlantId
+               AND pc.CustomerId = uc.CustomerId
             INNER JOIN Customer c
                 ON c.CustomerId = uc.CustomerId
             ORDER BY c.CustomerName
@@ -280,6 +295,8 @@ public sealed class UserRepository(SqlConnectionFactory connectionFactory)
 
     public async Task<UserResponse?> GetUserAsync(
         int id,
+        int? plantId,
+        bool includeSuperAdmins,
         CancellationToken cancellationToken)
     {
         await using var connection =
@@ -302,12 +319,17 @@ public sealed class UserRepository(SqlConnectionFactory connectionFactory)
             INNER JOIN Plant p
                 ON p.PlantId = u.PlantId
             WHERE u.UserId = @UserId
+              AND (@PlantId IS NULL OR u.PlantId = @PlantId)
+              AND (@IncludeSuperAdmins = 1 OR r.RoleName NOT IN ('Admin', 'SuperAdmin'))
+              AND r.RoleName <> 'SuperAdmin'
             """,
             connection);
 
         command.Parameters.AddWithValue(
             "@UserId",
             id);
+        command.Parameters.AddWithValue("@PlantId", (object?)plantId ?? DBNull.Value);
+        command.Parameters.AddWithValue("@IncludeSuperAdmins", includeSuperAdmins);
 
         await using var reader =
             await command.ExecuteReaderAsync(cancellationToken);
@@ -342,6 +364,11 @@ public sealed class UserRepository(SqlConnectionFactory connectionFactory)
                 c.CustomerId,
                 c.CustomerName
             FROM UserCustomer uc
+            INNER JOIN [User] u
+                ON u.UserId = uc.UserId
+            INNER JOIN PlantCustomer pc
+                ON pc.PlantId = u.PlantId
+               AND pc.CustomerId = uc.CustomerId
             INNER JOIN Customer c
                 ON c.CustomerId = uc.CustomerId
             WHERE uc.UserId = @UserId
@@ -376,6 +403,7 @@ public sealed class UserRepository(SqlConnectionFactory connectionFactory)
     }
 
     public async Task<IReadOnlyList<RoleResponse>> GetRolesAsync(
+        bool superAdmin,
         CancellationToken cancellationToken)
     {
         var roles = new List<RoleResponse>();
@@ -389,9 +417,12 @@ public sealed class UserRepository(SqlConnectionFactory connectionFactory)
                 RoleId,
                 RoleName
             FROM Role
+            WHERE RoleName <> 'SuperAdmin'
+              AND (@SuperAdmin = 1 OR RoleName <> 'Admin')
             ORDER BY RoleName
             """,
             connection);
+        command.Parameters.AddWithValue("@SuperAdmin", superAdmin);
 
         await using var reader =
             await command.ExecuteReaderAsync(cancellationToken);
@@ -408,6 +439,7 @@ public sealed class UserRepository(SqlConnectionFactory connectionFactory)
     }
 
     public async Task<IReadOnlyList<PlantResponse>> GetPlantsAsync(
+        int? plantId,
         CancellationToken cancellationToken)
     {
         var plants = new List<PlantResponse>();
@@ -423,9 +455,11 @@ public sealed class UserRepository(SqlConnectionFactory connectionFactory)
                 Location
             FROM Plant
             WHERE IsActive = 1
+              AND (@PlantId IS NULL OR PlantId = @PlantId)
             ORDER BY PlantName
             """,
             connection);
+        command.Parameters.AddWithValue("@PlantId", (object?)plantId ?? DBNull.Value);
 
         await using var reader =
             await command.ExecuteReaderAsync(cancellationToken);
@@ -444,9 +478,11 @@ public sealed class UserRepository(SqlConnectionFactory connectionFactory)
         return plants;
     }
 
-    public async Task UpdateCustomerAssignmentsAsync(
+    public async Task<bool> UpdateCustomerAssignmentsAsync(
         int userId,
         IReadOnlyList<int> customerIds,
+        int? plantScope,
+        bool superAdmin,
         CancellationToken cancellationToken)
     {
         await using var connection =
@@ -458,6 +494,37 @@ public sealed class UserRepository(SqlConnectionFactory connectionFactory)
 
         try
         {
+            await using var userCommand = new SqlCommand(
+                """
+                SELECT u.PlantId
+                FROM [User] u
+                INNER JOIN Role r ON r.RoleId = u.RoleId
+                WHERE u.UserId = @UserId
+                  AND (@PlantScope IS NULL OR u.PlantId = @PlantScope)
+                  AND r.RoleName <> 'SuperAdmin'
+                  AND (@SuperAdmin = 1 OR r.RoleName <> 'Admin')
+                """,
+                connection,
+                transaction);
+            userCommand.Parameters.AddWithValue("@UserId", userId);
+            userCommand.Parameters.AddWithValue("@PlantScope", (object?)plantScope ?? DBNull.Value);
+            userCommand.Parameters.AddWithValue("@SuperAdmin", superAdmin);
+            var plantResult = await userCommand.ExecuteScalarAsync(cancellationToken);
+            int? plantId = plantResult is null or DBNull ? null : Convert.ToInt32(plantResult);
+
+            if (plantId is null)
+            {
+                await transaction.RollbackAsync(cancellationToken);
+                return false;
+            }
+
+            await EnsureCustomersBelongToPlantAsync(
+                connection,
+                transaction,
+                plantId.Value,
+                customerIds,
+                cancellationToken);
+
             await using (var clear = new SqlCommand(
                 """
                 DELETE FROM UserCustomer
@@ -506,6 +573,7 @@ public sealed class UserRepository(SqlConnectionFactory connectionFactory)
 
             await transaction.CommitAsync(
                 cancellationToken);
+            return true;
         }
         catch
         {
@@ -520,6 +588,8 @@ public sealed class UserRepository(SqlConnectionFactory connectionFactory)
         int userId,
         UpdateUserRequest request,
         string? passwordHash,
+        int? plantScope,
+        bool superAdmin,
         CancellationToken cancellationToken)
     {
         await using var connection =
@@ -532,6 +602,20 @@ public sealed class UserRepository(SqlConnectionFactory connectionFactory)
 
         try
         {
+            await EnsureCustomersBelongToPlantAsync(
+                connection,
+                transaction,
+                request.PlantId,
+                request.CustomerIds,
+                cancellationToken);
+
+            await ValidateRoleAssignmentAsync(
+                connection,
+                transaction,
+                request.RoleId,
+                superAdmin,
+                cancellationToken);
+
             var sql = passwordHash is null
                 ? """
                   UPDATE [User]
@@ -541,6 +625,16 @@ public sealed class UserRepository(SqlConnectionFactory connectionFactory)
                       RoleId = @RoleId,
                       PlantId = @PlantId
                   WHERE UserId = @UserId
+                    AND (@PlantScope IS NULL OR UserId IN (SELECT UserId FROM [User] WHERE PlantId = @PlantScope))
+                    AND (@SuperAdmin = 1 OR UserId IN
+                    (
+                        SELECT u.UserId FROM [User] u
+                        INNER JOIN Role r ON r.RoleId = u.RoleId
+                        WHERE r.RoleName NOT IN ('Admin', 'SuperAdmin')
+                    ))
+                    AND (@PlantScope IS NULL OR PlantId = @PlantScope)
+                    AND (@SuperAdmin = 1 OR RoleId <> (SELECT RoleId FROM Role WHERE RoleName = 'Admin'))
+                    AND RoleId <> (SELECT RoleId FROM Role WHERE RoleName = 'SuperAdmin')
                   """
                 : """
                   UPDATE [User]
@@ -551,6 +645,9 @@ public sealed class UserRepository(SqlConnectionFactory connectionFactory)
                       PlantId = @PlantId,
                       PasswordHash = @PasswordHash
                   WHERE UserId = @UserId
+                    AND (@PlantScope IS NULL OR PlantId = @PlantScope)
+                    AND (@SuperAdmin = 1 OR RoleId <> (SELECT RoleId FROM Role WHERE RoleName = 'Admin'))
+                    AND RoleId <> (SELECT RoleId FROM Role WHERE RoleName = 'SuperAdmin')
                   """;
 
             await using var command = new SqlCommand(
@@ -561,6 +658,8 @@ public sealed class UserRepository(SqlConnectionFactory connectionFactory)
             command.Parameters.AddWithValue(
                 "@UserId",
                 userId);
+            command.Parameters.AddWithValue("@PlantScope", (object?)plantScope ?? DBNull.Value);
+            command.Parameters.AddWithValue("@SuperAdmin", superAdmin);
 
             command.Parameters.AddWithValue(
                 "@FullName",
@@ -639,7 +738,6 @@ public sealed class UserRepository(SqlConnectionFactory connectionFactory)
                 add.Parameters.AddWithValue(
                     "@UserId",
                     userId);
-
                 add.Parameters.AddWithValue(
                     "@CustomerId",
                     customerId);
@@ -653,6 +751,8 @@ public sealed class UserRepository(SqlConnectionFactory connectionFactory)
 
             return await GetUserAsync(
                 userId,
+                plantScope,
+                superAdmin,
                 cancellationToken);
         }
         catch
@@ -667,6 +767,8 @@ public sealed class UserRepository(SqlConnectionFactory connectionFactory)
     public async Task<bool> SetActiveAsync(
         int userId,
         bool isActive,
+        int? plantScope,
+        bool superAdmin,
         CancellationToken cancellationToken)
     {
         await using var connection =
@@ -677,6 +779,9 @@ public sealed class UserRepository(SqlConnectionFactory connectionFactory)
             UPDATE [User]
             SET IsActive = @IsActive
             WHERE UserId = @UserId
+              AND (@PlantScope IS NULL OR PlantId = @PlantScope)
+              AND RoleId <> (SELECT RoleId FROM Role WHERE RoleName = 'SuperAdmin')
+              AND (@SuperAdmin = 1 OR RoleId <> (SELECT RoleId FROM Role WHERE RoleName = 'Admin'))
             """,
             connection);
 
@@ -687,6 +792,8 @@ public sealed class UserRepository(SqlConnectionFactory connectionFactory)
         command.Parameters.AddWithValue(
             "@UserId",
             userId);
+        command.Parameters.AddWithValue("@PlantScope", (object?)plantScope ?? DBNull.Value);
+        command.Parameters.AddWithValue("@SuperAdmin", superAdmin);
 
         return await command.ExecuteNonQueryAsync(
             cancellationToken) > 0;
@@ -695,6 +802,7 @@ public sealed class UserRepository(SqlConnectionFactory connectionFactory)
     public async Task<int> CreateAsync(
         CreateUserRequest request,
         string passwordHash,
+        bool superAdmin,
         CancellationToken cancellationToken)
     {
         await using var connection =
@@ -706,6 +814,20 @@ public sealed class UserRepository(SqlConnectionFactory connectionFactory)
 
         try
         {
+            await ValidateRoleAssignmentAsync(
+                connection,
+                transaction,
+                request.RoleId,
+                superAdmin,
+                cancellationToken);
+
+            await EnsureCustomersBelongToPlantAsync(
+                connection,
+                transaction,
+                request.PlantId,
+                request.CustomerIds,
+                cancellationToken);
+
             // -------------------------------------------------
             // 1. CREATE USER
             // -------------------------------------------------
@@ -721,13 +843,19 @@ public sealed class UserRepository(SqlConnectionFactory connectionFactory)
                     PlantId
                 )
                 OUTPUT INSERTED.UserId
-                VALUES
-                (
+                SELECT
                     @FullName,
                     @Email,
                     @PasswordHash,
                     @RoleId,
                     @PlantId
+                WHERE EXISTS
+                (
+                    SELECT 1
+                    FROM Role
+                    WHERE RoleId = @RoleId
+                      AND RoleName <> 'SuperAdmin'
+                      AND (@SuperAdmin = 1 OR RoleName NOT IN ('Admin', 'SuperAdmin'))
                 )
                 """,
                 connection,
@@ -752,14 +880,14 @@ public sealed class UserRepository(SqlConnectionFactory connectionFactory)
             userCommand.Parameters.AddWithValue(
                 "@PlantId",
                 request.PlantId);
+            userCommand.Parameters.AddWithValue("@SuperAdmin", superAdmin);
 
             var result = await userCommand.ExecuteScalarAsync(
                 cancellationToken);
 
             if (result is null)
             {
-                throw new InvalidOperationException(
-                    "User could not be created.");
+                throw new UserRoleAssignmentException();
             }
 
             var userId = Convert.ToInt32(result);
@@ -817,8 +945,101 @@ public sealed class UserRepository(SqlConnectionFactory connectionFactory)
             throw;
         }
     }
+
+    private static async Task EnsureCustomersBelongToPlantAsync(
+        SqlConnection connection,
+        SqlTransaction transaction,
+        int plantId,
+        IReadOnlyList<int> customerIds,
+        CancellationToken cancellationToken)
+    {
+        var distinctCustomerIds = customerIds.Distinct().ToArray();
+        if (distinctCustomerIds.Length == 0)
+        {
+            return;
+        }
+
+        if (distinctCustomerIds.Any(customerId => customerId <= 0))
+        {
+            throw new PlantCustomerAssignmentException();
+        }
+
+        var parameters = distinctCustomerIds
+            .Select((_, index) => $"@CustomerId{index}")
+            .ToArray();
+        var sql = $"""
+            SELECT COUNT(DISTINCT pc.CustomerId)
+            FROM PlantCustomer pc
+            INNER JOIN Customer c ON c.CustomerId = pc.CustomerId
+            WHERE pc.PlantId = @PlantId
+              AND c.IsActive = 1
+              AND NOT EXISTS
+              (
+                  SELECT 1
+                  FROM PlantCustomer otherPlant
+                  WHERE otherPlant.CustomerId = pc.CustomerId
+                    AND otherPlant.PlantId <> pc.PlantId
+              )
+              AND pc.CustomerId IN ({string.Join(", ", parameters)})
+            """;
+
+        await using var command = new SqlCommand(sql, connection, transaction);
+        command.Parameters.AddWithValue("@PlantId", plantId);
+        for (var index = 0; index < distinctCustomerIds.Length; index++)
+        {
+            command.Parameters.AddWithValue(parameters[index], distinctCustomerIds[index]);
+        }
+
+        var count = Convert.ToInt32(await command.ExecuteScalarAsync(cancellationToken));
+        if (count != distinctCustomerIds.Length)
+        {
+            throw new PlantCustomerAssignmentException();
+        }
+    }
+
+    private static async Task ValidateRoleAssignmentAsync(
+        SqlConnection connection,
+        SqlTransaction transaction,
+        int roleId,
+        bool superAdmin,
+        CancellationToken cancellationToken)
+    {
+        await using var command = new SqlCommand(
+            """
+            SELECT COUNT(1)
+            FROM Role
+            WHERE RoleId = @RoleId
+              AND RoleName <> 'SuperAdmin'
+              AND (@SuperAdmin = 1 OR RoleName NOT IN ('Admin', 'SuperAdmin'))
+            """,
+            connection,
+            transaction);
+        command.Parameters.AddWithValue("@RoleId", roleId);
+        command.Parameters.AddWithValue("@SuperAdmin", superAdmin);
+
+        if (Convert.ToInt32(await command.ExecuteScalarAsync(cancellationToken)) != 1)
+        {
+            throw new UserRoleAssignmentException();
+        }
+    }
 }
 
 public sealed record StoredUser(
     AuthenticatedUser User,
     string? PasswordHash);
+
+public sealed class PlantCustomerAssignmentException : Exception
+{
+    public PlantCustomerAssignmentException()
+        : base("One or more selected customers are not assigned to the selected plant.")
+    {
+    }
+}
+
+public sealed class UserRoleAssignmentException : Exception
+{
+    public UserRoleAssignmentException()
+        : base("You are not permitted to assign that role.")
+    {
+    }
+}

@@ -6,7 +6,7 @@ BEGIN TRANSACTION;
 
 INSERT INTO Role (RoleName)
 SELECT names.RoleName
-FROM (VALUES ('Admin'), ('Approver'), ('Contributor'), ('Viewer')) AS names(RoleName)
+FROM (VALUES ('SuperAdmin'), ('Admin'), ('Approver'), ('Contributor'), ('Viewer')) AS names(RoleName)
 WHERE NOT EXISTS (SELECT 1 FROM Role r WHERE r.RoleName = names.RoleName);
 
 INSERT INTO Plant (PlantName, Location)
@@ -17,6 +17,18 @@ INSERT INTO Customer (CustomerName)
 SELECT names.CustomerName
 FROM (VALUES ('HP'), ('ASUS'), ('Acer'), ('Gigabyte')) AS names(CustomerName)
 WHERE NOT EXISTS (SELECT 1 FROM Customer c WHERE c.CustomerName = names.CustomerName);
+
+INSERT INTO PlantCustomer (PlantId, CustomerId)
+SELECT p.PlantId, c.CustomerId
+FROM Plant p
+CROSS JOIN Customer c
+WHERE p.PlantName = 'Dixon Chennai'
+  AND c.CustomerName IN ('HP', 'ASUS', 'Acer', 'Gigabyte')
+  AND NOT EXISTS (
+      SELECT 1 FROM PlantCustomer existing
+      WHERE existing.PlantId = p.PlantId
+        AND existing.CustomerId = c.CustomerId
+  );
 
 INSERT INTO Category (CustomerId, CategoryName)
 SELECT c.CustomerId, names.CategoryName

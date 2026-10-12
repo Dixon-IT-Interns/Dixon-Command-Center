@@ -1985,12 +1985,10 @@ public sealed class DailyReportsController(
         int customerId,
         CancellationToken cancellationToken)
     {
-        if (User.IsInRole("Admin"))
-            return true;
-
         var userId = GetUserId();
+        var plantId = GetPlantId();
 
-        if (userId <= 0)
+        if (userId <= 0 || plantId <= 0)
             return false;
 
         await using var connection =
@@ -2001,11 +1999,35 @@ public sealed class DailyReportsController(
             new SqlCommand(
                 """
                 SELECT COUNT(1)
-                FROM UserCustomer
-                WHERE UserId = @UserId
-                  AND CustomerId = @CustomerId
+                FROM PlantCustomer pc
+                WHERE pc.PlantId = @PlantId
+                  AND pc.CustomerId = @CustomerId
+                  AND NOT EXISTS
+                  (
+                      SELECT 1
+                      FROM PlantCustomer otherPlant
+                      WHERE otherPlant.CustomerId = pc.CustomerId
+                        AND otherPlant.PlantId <> pc.PlantId
+                  )
+                  AND
+                  (
+                      @IsAdmin = 1
+                      OR EXISTS
+                      (
+                          SELECT 1
+                          FROM UserCustomer uc
+                          WHERE uc.UserId = @UserId
+                            AND uc.CustomerId = pc.CustomerId
+                      )
+                  )
                 """,
                 connection);
+
+        Add(
+            command,
+            "@PlantId",
+            SqlDbType.Int,
+            plantId);
 
         Add(
             command,
@@ -2018,6 +2040,12 @@ public sealed class DailyReportsController(
             "@CustomerId",
             SqlDbType.Int,
             customerId);
+
+        Add(
+            command,
+            "@IsAdmin",
+            SqlDbType.Bit,
+            User.IsInRole("Admin"));
 
         return Convert.ToInt32(
             await command.ExecuteScalarAsync(
@@ -2039,6 +2067,13 @@ public sealed class DailyReportsController(
             value,
             out var id)
             ? id
+            : 0;
+    }
+
+    private int GetPlantId()
+    {
+        return int.TryParse(User.FindFirstValue("plantId"), out var plantId)
+            ? plantId
             : 0;
     }
 
