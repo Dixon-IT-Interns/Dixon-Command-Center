@@ -63,9 +63,12 @@ function AppRoutes() {
     setSession(null);
   };
 
+  const roleName = session?.user?.roleName;
+  const isAdministrator = ["Admin", "SuperAdmin"].includes(roleName);
   const home = session
-    ? session.user.roleName === "Contributor" ? "/contributor/dashboard"
-      : session.user.roleName === "Approver" ? "/approvals/overview"
+    ? roleName === "Contributor" ? "/contributor/dashboard"
+      : roleName === "Approver" ? "/approvals/overview"
+      : isAdministrator ? "/admin"
       : "/dashboard"
     : "/";
 
@@ -93,7 +96,7 @@ function AppRoutes() {
       <Route path="/line-selection" element={<Navigate to="/contributor/brands" replace />} />
       <Route path="/daily-report" element={<Navigate to="/contributor/brands" replace />} />
 
-      <Route path="/dashboard" element={<ProtectedRoute session={session}><DashboardPage session={session} onSignOut={signOut}/></ProtectedRoute>} />
+      <Route path="/dashboard" element={<ProtectedRoute session={session}>{session && ["Admin", "SuperAdmin"].includes(session.user.roleName) ? <Navigate to="/admin" replace /> : <DashboardPage session={session} onSignOut={signOut}/>}</ProtectedRoute>} />
       <Route path="/admin" element={<AdminRoute session={session}><AdminPage session={session} onSignOut={signOut}/></AdminRoute>} />
       <Route path="*" element={<Navigate to={home} replace />} />
     </Routes>

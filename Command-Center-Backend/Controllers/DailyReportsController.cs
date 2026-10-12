@@ -2002,13 +2002,6 @@ public sealed class DailyReportsController(
                 FROM PlantCustomer pc
                 WHERE pc.PlantId = @PlantId
                   AND pc.CustomerId = @CustomerId
-                  AND NOT EXISTS
-                  (
-                      SELECT 1
-                      FROM PlantCustomer otherPlant
-                      WHERE otherPlant.CustomerId = pc.CustomerId
-                        AND otherPlant.PlantId <> pc.PlantId
-                  )
                   AND
                   (
                       @IsAdmin = 1
