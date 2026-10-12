@@ -32,7 +32,7 @@ function ApproverRoute({ session, children }) {
 
 function AdminRoute({ session, children }) {
   if (!session) return <Navigate to="/" replace />;
-  if (session.user.roleName !== "Admin") return <Navigate to="/dashboard" replace />;
+  if (!["Admin", "SuperAdmin"].includes(session.user.roleName)) return <Navigate to="/dashboard" replace />;
   return children;
 }
 

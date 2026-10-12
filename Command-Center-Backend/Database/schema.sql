@@ -37,8 +37,21 @@ BEGIN
     (
         CustomerId INT IDENTITY(1,1) PRIMARY KEY,
         CustomerName VARCHAR(100) NOT NULL,
-        IsActive BIT NOT NULL CONSTRAINT DF_Customer_IsActive DEFAULT 1,
-        CONSTRAINT UQ_Customer_Name UNIQUE (CustomerName)
+        IsActive BIT NOT NULL CONSTRAINT DF_Customer_IsActive DEFAULT 1
+    );
+END;
+GO
+
+IF OBJECT_ID(N'dbo.PlantCustomer', N'U') IS NULL
+BEGIN
+    CREATE TABLE dbo.PlantCustomer
+    (
+        PlantId INT NOT NULL,
+        CustomerId INT NOT NULL,
+        CreatedAt DATETIME2(7) NOT NULL CONSTRAINT DF_PlantCustomer_CreatedAt DEFAULT (SYSUTCDATETIME()),
+        CONSTRAINT PK_PlantCustomer PRIMARY KEY (PlantId, CustomerId),
+        CONSTRAINT FK_PlantCustomer_Plant FOREIGN KEY (PlantId) REFERENCES dbo.Plant(PlantId),
+        CONSTRAINT FK_PlantCustomer_Customer FOREIGN KEY (CustomerId) REFERENCES dbo.Customer(CustomerId)
     );
 END;
 GO

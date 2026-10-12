@@ -16,7 +16,7 @@ export default function Header({ user, onSignOut }) {
         {user?.roleName === "Approver" && <Link className="header-nav-link" to="/approvals/overview">Overview</Link>}
         {user?.roleName === "Approver" && <Link className="header-nav-link" to="/approvals">Approval Queue</Link>}
         {user?.roleName === "Approver" && <Link className="header-nav-link" to="/approvals/history">History</Link>}
-        {user?.roleName === "Admin" && <Link className="header-nav-link" to="/admin">Administration</Link>}
+        {["Admin", "SuperAdmin"].includes(user?.roleName) && <Link className="header-nav-link" to="/admin">Administration</Link>}
         {user && <div className="header-user"><span className="header-avatar">{user.fullName?.slice(0,1).toUpperCase()}</span><span>{user.fullName}<small>{user.roleName}</small></span></div>}
         <button className="header-icon" title="Notifications"><Bell size={16}/></button>
         <button className="header-signout" onClick={() => { onSignOut?.(); navigate("/"); }}><LogOut size={15}/><span>Sign out</span></button>
