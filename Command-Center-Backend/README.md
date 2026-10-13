@@ -26,6 +26,9 @@ Outside development, `Jwt:Secret` is required. Configure `Frontend:Origin` if Vi
 - `POST /api/auth/login` returns a 30-minute bearer token.
 - `GET /api/auth/me` returns the authenticated identity.
 - `GET /api/catalog/customers` returns customers with models, categories, and production lines.
+- `GET /api/viewer/progress?reportDate=YYYY-MM-DD&customerId={id}&process=ALL|FATP|SMT` returns read-only line progress for assigned customers (Viewer role).
+- `GET /api/viewer/trend?startDate=YYYY-MM-DD&endDate=YYYY-MM-DD&customerId={id}&process=ALL|FATP|SMT` returns the production plan/actual trend (Viewer role).
+- `GET /api/viewer/export?reportDate=YYYY-MM-DD&customerId={id}&process=ALL|FATP|SMT` downloads the filtered progress as an Excel workbook (Viewer role).
 - `GET /api/admin/catalog/plants/{id}/customers` and `PUT /api/admin/catalog/plants/{id}/customers` manage a plant's customer associations (Admin role).
 - `GET /api/admin/users`, `/roles`, and `/plants` are scoped to the Admin's plant; SuperAdmins can manage users across plants.
 - `POST /api/admin/users` lets SuperAdmins create plant Admins. Plant Admins can create only non-admin roles in their own plant.

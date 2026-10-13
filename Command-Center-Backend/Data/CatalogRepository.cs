@@ -15,7 +15,9 @@ public sealed class CatalogRepository(SqlConnectionFactory connectionFactory)
             SELECT c.CustomerId, c.CustomerName
             FROM Customer c
             INNER JOIN PlantCustomer pc ON pc.CustomerId = c.CustomerId
+            INNER JOIN Plant p ON p.PlantId = pc.PlantId
             WHERE c.IsActive = 1
+              AND p.IsActive = 1
               AND pc.PlantId = @PlantId
               AND (@IsAdmin = 1 OR EXISTS (SELECT 1 FROM UserCustomer uc WHERE uc.CustomerId = c.CustomerId AND uc.UserId = @UserId))
             ORDER BY c.CustomerName
@@ -32,9 +34,21 @@ public sealed class CatalogRepository(SqlConnectionFactory connectionFactory)
             }
         }
 
-        await using (var command = new SqlCommand("SELECT CategoryId, CustomerId, CategoryName FROM Category WHERE IsActive = 1 ORDER BY CategoryName", connection))
-        await using (var reader = await command.ExecuteReaderAsync(cancellationToken))
+        await using (var command = new SqlCommand("""
+            SELECT cat.CategoryId, cat.CustomerId, cat.CategoryName
+            FROM Category cat
+            INNER JOIN PlantCustomer pc
+                ON pc.PlantId = cat.PlantId
+               AND pc.CustomerId = cat.CustomerId
+            INNER JOIN Plant p ON p.PlantId = pc.PlantId
+            WHERE cat.PlantId = @PlantId
+              AND cat.IsActive = 1
+              AND p.IsActive = 1
+            ORDER BY CategoryName
+            """, connection))
         {
+            command.Parameters.AddWithValue("@PlantId", plantId);
+            await using var reader = await command.ExecuteReaderAsync(cancellationToken);
             while (await reader.ReadAsync(cancellationToken))
             {
                 if (customers.TryGetValue(reader.GetInt32(1), out var customer))
@@ -50,11 +64,16 @@ public sealed class CatalogRepository(SqlConnectionFactory connectionFactory)
             SELECT l.LineId, l.CategoryId, l.LineName, l.SAPLocation
             FROM ProductionLine l
             INNER JOIN Category c ON c.CategoryId = l.CategoryId AND c.IsActive = 1
+            INNER JOIN PlantCustomer pc ON pc.PlantId = c.PlantId AND pc.CustomerId = c.CustomerId
+            INNER JOIN Plant p ON p.PlantId = pc.PlantId
             WHERE l.IsActive = 1
+              AND l.PlantId = @PlantId
+              AND p.IsActive = 1
             ORDER BY l.LineName
             """, connection))
-        await using (var reader = await command.ExecuteReaderAsync(cancellationToken))
         {
+            command.Parameters.AddWithValue("@PlantId", plantId);
+            await using var reader = await command.ExecuteReaderAsync(cancellationToken);
             while (await reader.ReadAsync(cancellationToken))
             {
                 if (categories.TryGetValue(reader.GetInt32(1), out var category))

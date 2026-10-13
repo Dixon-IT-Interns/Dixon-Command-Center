@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Dixon.CommandCenter.API")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+fa0cbd4cdc23910bf73c13476f37c7ae6c37f6a0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+611189c9f6fddf71262c10933dbee17b874c470d")]
 [assembly: System.Reflection.AssemblyProductAttribute("Dixon.CommandCenter.API")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Dixon.CommandCenter.API")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
