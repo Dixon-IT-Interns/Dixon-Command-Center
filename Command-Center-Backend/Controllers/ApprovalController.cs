@@ -26,6 +26,9 @@ public sealed class ApprovalController(
 
         if (userId <= 0)
             return Unauthorized();
+        var plantId = GetPlantId();
+        if (plantId <= 0)
+            return Unauthorized();
 
         await using var connection =
             await connectionFactory.OpenAsync(cancellationToken);
@@ -40,12 +43,17 @@ public sealed class ApprovalController(
             INNER JOIN UserCustomer uc
                 ON uc.CustomerId = dr.CustomerId
                AND uc.UserId = @UserId
+            INNER JOIN PlantCustomer pc
+                ON pc.PlantId = dr.PlantId
+               AND pc.CustomerId = dr.CustomerId
+            WHERE dr.PlantId = @PlantId
             GROUP BY aq.Status;
             """;
 
         await using var command = new SqlCommand(sql, connection);
 
         Add(command, "@UserId", SqlDbType.Int, userId);
+        Add(command, "@PlantId", SqlDbType.Int, plantId);
 
         var counts = new Dictionary<string, int>(
             StringComparer.OrdinalIgnoreCase);
@@ -82,6 +90,9 @@ public sealed class ApprovalController(
 
         if (userId <= 0)
             return Unauthorized();
+        var plantId = GetPlantId();
+        if (plantId <= 0)
+            return Unauthorized();
 
         await using var connection =
             await connectionFactory.OpenAsync(cancellationToken);
@@ -113,14 +124,19 @@ public sealed class ApprovalController(
             INNER JOIN UserCustomer uc
                 ON uc.CustomerId = dr.CustomerId
                AND uc.UserId = @UserId
+            INNER JOIN PlantCustomer pc
+                ON pc.PlantId = dr.PlantId
+               AND pc.CustomerId = dr.CustomerId
             WHERE aq.Status = 'PENDING'
               AND dr.Status = 'SUBMITTED'
+              AND dr.PlantId = @PlantId
             ORDER BY aq.SubmittedAt ASC;
             """;
 
         await using var command = new SqlCommand(sql, connection);
 
         Add(command, "@UserId", SqlDbType.Int, userId);
+        Add(command, "@PlantId", SqlDbType.Int, plantId);
 
         var rows = new List<object>();
 
@@ -165,6 +181,9 @@ public sealed class ApprovalController(
 
         if (userId <= 0)
             return Unauthorized();
+        var plantId = GetPlantId();
+        if (plantId <= 0)
+            return Unauthorized();
 
         await using var connection =
             await connectionFactory.OpenAsync(cancellationToken);
@@ -196,9 +215,13 @@ public sealed class ApprovalController(
             INNER JOIN UserCustomer uc
                 ON uc.CustomerId = dr.CustomerId
                AND uc.UserId = @UserId
+            INNER JOIN PlantCustomer pc
+                ON pc.PlantId = dr.PlantId
+               AND pc.CustomerId = dr.CustomerId
             LEFT JOIN [User] reviewer
                 ON reviewer.UserId = aq.ReviewedBy
             WHERE aq.Status <> 'PENDING'
+              AND dr.PlantId = @PlantId
             ORDER BY COALESCE(
                 aq.ReviewedAt,
                 aq.SubmittedAt
@@ -208,6 +231,7 @@ public sealed class ApprovalController(
         await using var command = new SqlCommand(sql, connection);
 
         Add(command, "@UserId", SqlDbType.Int, userId);
+        Add(command, "@PlantId", SqlDbType.Int, plantId);
 
         var rows = new List<object>();
 
@@ -266,6 +290,9 @@ public sealed class ApprovalController(
         var userId = GetUserId();
 
         if (userId <= 0)
+            return Unauthorized();
+        var plantId = GetPlantId();
+        if (plantId <= 0)
             return Unauthorized();
 
         await using var connection =
@@ -342,7 +369,11 @@ public sealed class ApprovalController(
                 dr.TRCOverallFailureInflowPercent,
                 dr.TRCLyingOver3DaysCr,
 
-                dr.IssueDescription
+                dr.IssueDescription,
+
+                dr.UPPHTarget,
+                dr.OSDTarget,
+                dr.OTTarget
 
             FROM ApprovalQueue aq
 
@@ -367,8 +398,12 @@ public sealed class ApprovalController(
             INNER JOIN UserCustomer uc
                 ON uc.CustomerId = dr.CustomerId
                AND uc.UserId = @UserId
+            INNER JOIN PlantCustomer pc
+                ON pc.PlantId = dr.PlantId
+               AND pc.CustomerId = dr.CustomerId
 
-            WHERE aq.ApprovalQueueId = @Id;
+            WHERE aq.ApprovalQueueId = @Id
+              AND dr.PlantId = @PlantId;
             """;
 
         await using var command =
@@ -376,6 +411,7 @@ public sealed class ApprovalController(
 
         Add(command, "@Id", SqlDbType.Int, id);
         Add(command, "@UserId", SqlDbType.Int, userId);
+        Add(command, "@PlantId", SqlDbType.Int, plantId);
 
         await using var reader =
             await command.ExecuteReaderAsync(cancellationToken);
@@ -487,7 +523,20 @@ public sealed class ApprovalController(
                     GetDecimal(reader, 40),
 
                 issueDescription =
-                    GetString(reader, 41)
+                    GetString(reader, 41),
+
+                plan = new
+                {
+                    productionPlan = GetDecimal(reader, 14),
+                    uphTarget = GetDecimal(reader, 16),
+                    upphTarget = GetDecimal(reader, 42),
+                    cphTarget = GetDecimal(reader, 20),
+                    fpyTarget = GetDecimal(reader, 22),
+                    ftyTarget = GetDecimal(reader, 24),
+                    rtyTarget = GetDecimal(reader, 26),
+                    osdTarget = GetDecimal(reader, 43),
+                    otTarget = GetDecimal(reader, 44)
+                }
             }
         });
     }
@@ -550,6 +599,9 @@ public sealed class ApprovalController(
 
         if (userId <= 0)
             return Unauthorized();
+        var plantId = GetPlantId();
+        if (plantId <= 0)
+            return Unauthorized();
 
         await using var connection =
             await connectionFactory.OpenAsync(cancellationToken);
@@ -580,8 +632,12 @@ public sealed class ApprovalController(
                 INNER JOIN UserCustomer uc
                     ON uc.CustomerId = dr.CustomerId
                    AND uc.UserId = @UserId
+                INNER JOIN PlantCustomer pc
+                    ON pc.PlantId = dr.PlantId
+                   AND pc.CustomerId = dr.CustomerId
 
-                WHERE aq.ApprovalQueueId = @Id;
+                WHERE aq.ApprovalQueueId = @Id
+                  AND dr.PlantId = @PlantId;
                 """;
 
             await using var checkCommand =
@@ -601,6 +657,11 @@ public sealed class ApprovalController(
                 "@UserId",
                 SqlDbType.Int,
                 userId);
+            Add(
+                checkCommand,
+                "@PlantId",
+                SqlDbType.Int,
+                plantId);
 
             await using var reader =
                 await checkCommand.ExecuteReaderAsync(
@@ -912,6 +973,7 @@ public sealed class ApprovalController(
                     UPHTarget = dr.UPHTarget,
                     UPHActual = dr.UPHActual,
 
+                    UPPHTarget = dr.UPPHTarget,
                     UPPHInstalled = dr.UPPHInstalled,
                     UPPHActual = dr.UPPHActual,
                     CPHTarget = dr.CPHTarget,
@@ -931,9 +993,11 @@ public sealed class ApprovalController(
 
                     OSDMTDValue = dr.OSDMTDValue,
                     OSDMTDPercent = dr.OSDMTDPercent,
+                    OSDTarget = dr.OSDTarget,
 
                     PlannedOTManhours = dr.PlannedOTManhours,
                     UnplannedOTManhours = dr.UnplannedOTManhours,
+                    OTTarget = dr.OTTarget,
                     ActualOTManhours = dr.ActualOTManhours,
 
                     OpenWOQty = dr.OpenWOQty,
@@ -970,6 +1034,7 @@ public sealed class ApprovalController(
                     UPHTarget,
                     UPHActual,
 
+                    UPPHTarget,
                     UPPHInstalled,
                     UPPHActual,
 
@@ -990,9 +1055,11 @@ public sealed class ApprovalController(
 
                     OSDMTDValue,
                     OSDMTDPercent,
+                    OSDTarget,
 
                     PlannedOTManhours,
                     UnplannedOTManhours,
+                    OTTarget,
                     ActualOTManhours,
 
                     OpenWOQty,
@@ -1022,6 +1089,7 @@ public sealed class ApprovalController(
                     dr.UPHTarget,
                     dr.UPHActual,
 
+                    dr.UPPHTarget,
                     dr.UPPHInstalled,
                     dr.UPPHActual,
 
@@ -1042,9 +1110,11 @@ public sealed class ApprovalController(
 
                     dr.OSDMTDValue,
                     dr.OSDMTDPercent,
+                    dr.OSDTarget,
 
                     dr.PlannedOTManhours,
                     dr.UnplannedOTManhours,
+                    dr.OTTarget,
                     dr.ActualOTManhours,
 
                     dr.OpenWOQty,
@@ -1093,6 +1163,13 @@ public sealed class ApprovalController(
                 ClaimTypes.NameIdentifier),
             out var id)
             ? id
+            : 0;
+    }
+
+    private int GetPlantId()
+    {
+        return int.TryParse(User.FindFirstValue("plantId"), out var plantId)
+            ? plantId
             : 0;
     }
 

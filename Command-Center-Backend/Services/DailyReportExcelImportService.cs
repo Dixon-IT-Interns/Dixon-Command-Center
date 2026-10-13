@@ -21,6 +21,7 @@ public sealed class DailyReportExcelImportService(
 
     public async Task<DailyReportExcelImportPreview> PreviewAsync(
         Stream workbookStream,
+        int plantId,
         int customerId,
         int categoryId,
         DateTime selectedReportDate,
@@ -34,6 +35,7 @@ public sealed class DailyReportExcelImportService(
             FROM Customer c
             INNER JOIN Category cat
                 ON cat.CustomerId = c.CustomerId
+               AND cat.PlantId = @PlantId
             WHERE c.CustomerId = @CustomerId
               AND cat.CategoryId = @CategoryId
               AND c.IsActive = 1
@@ -44,6 +46,7 @@ public sealed class DailyReportExcelImportService(
             new SqlCommand(contextSql, connection);
         contextCommand.Parameters.AddWithValue("@CustomerId", customerId);
         contextCommand.Parameters.AddWithValue("@CategoryId", categoryId);
+        contextCommand.Parameters.AddWithValue("@PlantId", plantId);
 
         string? customerName = null;
         string? categoryName = null;
@@ -81,6 +84,7 @@ public sealed class DailyReportExcelImportService(
 
         var catalog = await LoadCatalogAsync(
             connection,
+            plantId,
             customerId,
             categoryId,
             cancellationToken);
@@ -130,27 +134,50 @@ public sealed class DailyReportExcelImportService(
                     "The report date is missing or invalid in the Excel workbook.");
             }
 
-            if (reportDate.Value.Date != selectedReportDate.Date)
-            {
-                return Failure(
-                    selectedReportDate,
-                    $"The Excel report date is {reportDate.Value:yyyy-MM-dd}, but the selected report date is {selectedReportDate:yyyy-MM-dd}.");
-            }
-
             var selectedSections = dailySheets
                 .Where(section => string.Equals(
                     section.Metric,
                     expectedMetric,
                     StringComparison.OrdinalIgnoreCase))
+                .Where(section => !string.Equals(categoryName, "FATP", StringComparison.OrdinalIgnoreCase)
+                    || section.Columns.CapacityTarget > 0
+                    && Normalize(section.Worksheet.Cell(
+                        section.HeaderRow + 1,
+                        section.Columns.CapacityTarget).GetString()) == "INSTALLED")
                 .ToArray();
 
             if (selectedSections.Length == 0)
             {
+                if (string.Equals(categoryName, "FATP", StringComparison.OrdinalIgnoreCase)
+                    && dailySheets.Any(section => section.Metric == "UPPH"))
+                {
+                    return Failure(
+                        reportDate.Value,
+                        "The workbook has a UPPH section, but its FATP production table must use the 'Installed' subheading. The available UPPH section does not match the FATP layout.");
+                }
+
                 var otherMetric = expectedMetric == "CPH" ? "UPPH" : "CPH";
                 var mismatchCategory = expectedMetric == "CPH" ? "FATP" : "SMT";
                 return Failure(
                     reportDate.Value,
                     $"Selected category is {categoryName}, but the workbook contains no {expectedMetric} section for it. The available {otherMetric} section is for {mismatchCategory}.");
+            }
+
+            if (string.Equals(categoryName, "FATP", StringComparison.OrdinalIgnoreCase))
+            {
+                return PreviewFATP(
+                    selectedSections,
+                    reportDate.Value,
+                    selectedReportDate,
+                    customerName,
+                    catalog);
+            }
+
+            if (reportDate.Value.Date != selectedReportDate.Date)
+            {
+                return Failure(
+                    selectedReportDate,
+                    $"The Excel report date is {reportDate.Value:yyyy-MM-dd}, but the selected report date is {selectedReportDate:yyyy-MM-dd}.");
             }
 
             var errors = new List<string>();
@@ -238,12 +265,9 @@ public sealed class DailyReportExcelImportService(
                     }
 
                     var model = modelMatches[0];
-                    if (!catalog.LineModels.Contains((line.Id, model.Id)))
-                    {
-                        errors.Add($"{rowLabel}: Model '{modelName}' is not mapped with line {lineNo}.");
-                        continue;
-                    }
 
+                    // Models are selected by customer, not by LineModel mapping.
+                    // A model may be reported on any active line in the selected category.
                     var values = ReadValues(section, rowNumber, rowLabel, errors);
                     if (values is null)
                         continue;
@@ -299,59 +323,38 @@ public sealed class DailyReportExcelImportService(
 
     private static async Task<ImportCatalog> LoadCatalogAsync(
         SqlConnection connection,
+        int plantId,
         int customerId,
         int categoryId,
         CancellationToken cancellationToken)
     {
-        const string sql = """
-            SELECT
-                pl.LineId,
-                pl.LineName,
-                pl.SAPLocation,
-                m.ModelId,
-                m.ModelName
-            FROM ProductionLine pl
-            LEFT JOIN LineModel lm
-                ON lm.LineId = pl.LineId
-               AND lm.IsActive = 1
-            LEFT JOIN Model m
-                ON m.ModelId = lm.ModelId
-               AND m.IsActive = 1
-               AND m.CustomerId = @CustomerId
-            WHERE pl.CategoryId = @CategoryId
-              AND pl.IsActive = 1;
+        const string lineSql = """
+            SELECT LineId, LineName, SAPLocation
+            FROM ProductionLine
+            WHERE CategoryId = @CategoryId
+              AND PlantId = @PlantId
+              AND IsActive = 1;
             """;
 
-        await using var command = new SqlCommand(sql, connection);
-        command.Parameters.AddWithValue("@CustomerId", customerId);
-        command.Parameters.AddWithValue("@CategoryId", categoryId);
+        await using var lineCommand = new SqlCommand(lineSql, connection);
+        lineCommand.Parameters.AddWithValue("@CategoryId", categoryId);
+        lineCommand.Parameters.AddWithValue("@PlantId", plantId);
 
-        var lines = new Dictionary<int, CatalogLine>();
-        var models = new Dictionary<int, CatalogModel>();
-        var lineModels = new HashSet<(int LineId, int ModelId)>();
-
+        var lines = new List<CatalogLine>();
+        await using (var lineReader =
+                     await lineCommand.ExecuteReaderAsync(cancellationToken))
         {
-            await using var reader =
-                await command.ExecuteReaderAsync(cancellationToken);
-            while (await reader.ReadAsync(cancellationToken))
+            while (await lineReader.ReadAsync(cancellationToken))
             {
-                var lineId = reader.GetInt32(0);
-                lines.TryAdd(
-                    lineId,
-                    new CatalogLine(
-                        lineId,
-                        reader.GetString(1),
-                        reader.IsDBNull(2) ? null : reader.GetString(2)));
-
-                if (reader.IsDBNull(3))
-                    continue;
-
-                var modelId = reader.GetInt32(3);
-                models.TryAdd(modelId, new CatalogModel(modelId, reader.GetString(4)));
-                lineModels.Add((lineId, modelId));
+                lines.Add(new CatalogLine(
+                    lineReader.GetInt32(0),
+                    lineReader.GetString(1),
+                    lineReader.IsDBNull(2) ? null : lineReader.GetString(2)));
             }
         }
 
+        // All active models belonging to the selected customer are valid choices.
+        // Do not require a LineModel row for Daily Report or Excel import.
         const string modelSql = """
             SELECT ModelId, ModelName
             FROM Model
@@ -361,18 +364,360 @@ public sealed class DailyReportExcelImportService(
 
         await using var modelCommand = new SqlCommand(modelSql, connection);
         modelCommand.Parameters.AddWithValue("@CustomerId", customerId);
-        await using var modelReader =
-            await modelCommand.ExecuteReaderAsync(cancellationToken);
-        while (await modelReader.ReadAsync(cancellationToken))
+
+        var models = new List<CatalogModel>();
+        await using (var modelReader =
+                     await modelCommand.ExecuteReaderAsync(cancellationToken))
         {
-            var modelId = modelReader.GetInt32(0);
-            models.TryAdd(modelId, new CatalogModel(modelId, modelReader.GetString(1)));
+            while (await modelReader.ReadAsync(cancellationToken))
+            {
+                models.Add(new CatalogModel(
+                    modelReader.GetInt32(0),
+                    modelReader.GetString(1)));
+            }
         }
 
-        return new ImportCatalog(
-            lines.Values.ToArray(),
-            models.Values.ToArray(),
-            lineModels);
+        const string otherCategoryLineSql = """
+            SELECT pl.LineName, pl.SAPLocation, cat.CategoryName
+            FROM ProductionLine pl
+            INNER JOIN Category cat
+                ON cat.CategoryId = pl.CategoryId
+               AND cat.PlantId = pl.PlantId
+               AND cat.IsActive = 1
+            WHERE pl.PlantId = @PlantId
+              AND cat.CustomerId = @CustomerId
+              AND cat.CategoryId <> @CategoryId
+              AND pl.IsActive = 1;
+            """;
+
+        await using var otherLineCommand = new SqlCommand(otherCategoryLineSql, connection);
+        otherLineCommand.Parameters.AddWithValue("@PlantId", plantId);
+        otherLineCommand.Parameters.AddWithValue("@CustomerId", customerId);
+        otherLineCommand.Parameters.AddWithValue("@CategoryId", categoryId);
+
+        var otherCategoryLines = new List<CatalogOtherLine>();
+        await using (var otherLineReader =
+                     await otherLineCommand.ExecuteReaderAsync(cancellationToken))
+        {
+            while (await otherLineReader.ReadAsync(cancellationToken))
+            {
+                otherCategoryLines.Add(new CatalogOtherLine(
+                    otherLineReader.GetString(0),
+                    otherLineReader.IsDBNull(1) ? null : otherLineReader.GetString(1),
+                    otherLineReader.GetString(2)));
+            }
+        }
+
+        return new ImportCatalog(lines, models, otherCategoryLines);
+    }
+
+    private static void ValidateFATPColumns(
+        DailySection section,
+        List<string> errors)
+    {
+        var columns = section.Columns;
+        var required = new (string Name, int Column)[]
+        {
+            ("Line No.", columns.LineNo),
+            ("SAP Location", columns.SapLocation),
+            ("Customer", columns.Customer),
+            ("Model", columns.Model),
+            ("Month Plan / Plan", columns.MonthPlan),
+            ("Month Plan / Actual", columns.MonthActual),
+            ("Production / Plan", columns.ProductionPlan),
+            ("Production / Actual", columns.ProductionActual),
+            ("UPH / Target", columns.UphTarget),
+            ("UPH / Actual", columns.UphActual),
+            ("UPPH / Installed", columns.CapacityTarget),
+            ("UPPH / Actual", columns.CapacityActual),
+            ("OS&D Reporting Date / Value (INR)", columns.OsdReportingDateValue),
+            ("OS&D Reporting Date / %", columns.OsdReportingDatePercent),
+            ("OS&D MTD / Value (INR)", columns.OsdMtdValue),
+            ("OS&D MTD / %", columns.OsdMtdPercent),
+            ("Open WO (Qty)", columns.OpenWoQty),
+            (">7 Days WO (Qty)", columns.Over7DaysWoQty),
+            ("Issue description", columns.IssueDescription)
+        };
+
+        var missing = required.Where(item => item.Column == 0)
+            .Select(item => item.Name)
+            .ToArray();
+        if (missing.Length > 0)
+            errors.Add($"The FATP production table is missing expected columns: {string.Join(", ", missing)}.");
+    }
+
+    private static DailyReportExcelImportPreview PreviewFATP(
+        IReadOnlyList<DailySection> sections,
+        DateTime workbookDate,
+        DateTime selectedReportDate,
+        string customerName,
+        ImportCatalog catalog)
+    {
+        var errors = new List<string>();
+        foreach (var section in sections)
+            ValidateFATPColumns(section, errors);
+
+        if (errors.Count > 0)
+            return Failure(workbookDate, string.Join(" ", errors));
+
+        var rows = new List<DailyReportExcelImportRow>();
+        foreach (var section in sections)
+        {
+            for (var rowNumber = section.HeaderRow + 2;
+                 rowNumber <= section.LastDataRow;
+                 rowNumber++)
+            {
+                var lineNo = ReadSourceText(section.Worksheet, rowNumber, section.Columns.LineNo);
+                var sapLocation = ReadSourceText(section.Worksheet, rowNumber, section.Columns.SapLocation);
+                var rowCustomer = ReadSourceText(section.Worksheet, rowNumber, section.Columns.Customer);
+                var modelName = ReadSourceText(section.Worksheet, rowNumber, section.Columns.Model);
+                if (string.IsNullOrWhiteSpace(lineNo)
+                    && string.IsNullOrWhiteSpace(sapLocation)
+                    && string.IsNullOrWhiteSpace(rowCustomer)
+                    && string.IsNullOrWhiteSpace(modelName)
+                    && !section.Worksheet.Row(rowNumber).CellsUsed().Any(cell => !cell.IsEmpty()))
+                    continue;
+                if (string.Equals(lineNo?.Trim(), "Total", StringComparison.OrdinalIgnoreCase))
+                    break;
+
+                if (!string.IsNullOrWhiteSpace(rowCustomer)
+                    && NormalizeMatchName(rowCustomer!) != NormalizeMatchName(customerName))
+                {
+                    continue;
+                }
+
+                if (!catalog.Lines.Any(line =>
+                        NormalizeMatchName(line.LineName) == NormalizeMatchName(lineNo ?? ""))
+                    && !string.IsNullOrWhiteSpace(rowCustomer)
+                    && catalog.OtherCategoryLines.Any(line =>
+                        !string.Equals(line.CategoryName, "FATP", StringComparison.OrdinalIgnoreCase)
+                        &&
+                        !string.IsNullOrWhiteSpace(sapLocation)
+                        && !string.IsNullOrWhiteSpace(line.SapLocation)
+                        &&
+                        NormalizeMatchName(line.LineName) == NormalizeMatchName(lineNo ?? "")
+                        && NormalizeMatchName(line.SapLocation ?? "") == NormalizeMatchName(sapLocation!)))
+                {
+                    continue;
+                }
+
+                var reasonParts = new List<string>();
+                int? lineId = null;
+                string? mappedLineName = null;
+                if (string.IsNullOrWhiteSpace(lineNo))
+                {
+                    reasonParts.Add("Line number is blank.");
+                }
+                else
+                {
+                    var lineMatches = catalog.Lines
+                        .Where(line => NormalizeMatchName(line.LineName) == NormalizeMatchName(lineNo ?? ""))
+                        .ToArray();
+                    if (lineMatches.Length == 0)
+                        reasonParts.Add($"Line '{lineNo}' is not an active line in this plant and FATP category.");
+                    else if (lineMatches.Length > 1)
+                        reasonParts.Add($"Line '{lineNo}' matches more than one active FATP line.");
+                    else
+                    {
+                        lineId = lineMatches[0].Id;
+                        mappedLineName = lineMatches[0].LineName;
+                        if (string.IsNullOrWhiteSpace(sapLocation)
+                            || NormalizeMatchName(lineMatches[0].SapLocation ?? "") != NormalizeMatchName(sapLocation!))
+                        {
+                            reasonParts.Add($"SAP location '{sapLocation ?? "(blank)"}' does not match line '{lineMatches[0].LineName}'.");
+                        }
+                    }
+                }
+
+                int? modelId = null;
+                string? mappedModelName = null;
+                if (string.IsNullOrWhiteSpace(modelName))
+                {
+                    reasonParts.Add("Model is blank.");
+                }
+                else
+                {
+                    var modelMatches = catalog.Models
+                        .Where(model => NormalizeMatchName(model.Name) == NormalizeMatchName(modelName))
+                        .ToArray();
+                    if (modelMatches.Length == 0)
+                        reasonParts.Add($"Model '{modelName}' is not active for the selected brand.");
+                    else if (modelMatches.Length > 1)
+                        reasonParts.Add($"Model '{modelName}' matches more than one active model for the selected brand.");
+                    else
+                    {
+                        modelId = modelMatches[0].Id;
+                        mappedModelName = modelMatches[0].Name;
+                    }
+                }
+
+                if (string.IsNullOrWhiteSpace(rowCustomer))
+                    reasonParts.Add("Customer is blank; confirm this row belongs to the selected brand before mapping.");
+
+                var valueErrors = new List<string>();
+                var values = ReadFATPValues(section, rowNumber, valueErrors);
+                reasonParts.AddRange(valueErrors);
+
+                var status = valueErrors.Count > 0
+                    ? "invalid"
+                    : reasonParts.Count > 0
+                        ? "unmatched"
+                        : "matched";
+
+                rows.Add(new DailyReportExcelImportRow(
+                    rowNumber,
+                    lineNo ?? "",
+                    sapLocation,
+                    rowCustomer,
+                    modelName,
+                    status,
+                    reasonParts.Count == 0 ? null : string.Join(" ", reasonParts),
+                    lineId,
+                    mappedLineName,
+                    modelId,
+                    mappedModelName,
+                    values));
+            }
+        }
+
+        var duplicateGroups = rows
+            .Where(row => row.Status != "invalid")
+            .Where(row => row.LineId.HasValue && row.ModelId.HasValue
+                || !string.IsNullOrWhiteSpace(row.LineNo)
+                && !string.IsNullOrWhiteSpace(row.ModelName))
+            .GroupBy(row => row.LineId.HasValue && row.ModelId.HasValue
+                ? $"ID:{row.LineId}:{row.ModelId}"
+                : $"NAME:{NormalizeMatchName(row.LineNo)}:{NormalizeMatchName(row.ModelName ?? "")}")
+            .Where(group => group.Count() > 1);
+        foreach (var duplicateGroup in duplicateGroups)
+        {
+            var duplicateRows = duplicateGroup.Select(row => row.RowNumber).ToHashSet();
+            for (var index = 0; index < rows.Count; index++)
+            {
+                if (duplicateRows.Contains(rows[index].RowNumber))
+                {
+                    rows[index] = rows[index] with
+                    {
+                        Status = "duplicate",
+                        Reason = "More than one Excel row refers to the same line and model. Include at most one of these rows."
+                    };
+                }
+            }
+        }
+
+        var mismatch = workbookDate.Date != selectedReportDate.Date;
+        if (workbookDate.Date > DateTime.Today)
+            return Failure(workbookDate, "The workbook report date is in the future and cannot be applied.");
+
+        var matched = rows.Where(row => row.Status == "matched").ToArray();
+        return new DailyReportExcelImportPreview(
+            true,
+            workbookDate.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture),
+            matched.Select(row => row.LineId!.Value).Distinct().Count(),
+            matched.Length,
+            mismatch
+                ? [$"The workbook date is {workbookDate:yyyy-MM-dd}; the selected report date is {selectedReportDate:yyyy-MM-dd}. Confirm the workbook date before applying."]
+                : [],
+            matched.Select(row => new DailyReportExcelImportEntry(
+                row.LineId!.Value,
+                row.LineNo,
+                row.SapLocation,
+                row.ModelId!.Value,
+                row.MappedModelName!,
+                row.Form!)).ToArray(),
+            rows);
+    }
+
+    private static DailyReportExcelImportValues? ReadFATPValues(
+        DailySection section,
+        int row,
+        List<string> errors)
+    {
+        var columns = section.Columns;
+        var decimals = new Dictionary<string, decimal?>();
+        var decimalFields = new (string Name, int Column)[]
+        {
+            ("Month Plan", columns.MonthPlan),
+            ("Month Actual", columns.MonthActual),
+            ("Production Plan", columns.ProductionPlan),
+            ("Production Actual", columns.ProductionActual),
+            ("UPH Target", columns.UphTarget),
+            ("UPH Actual", columns.UphActual),
+            ("UPPH Installed", columns.CapacityTarget),
+            ("UPPH Actual", columns.CapacityActual),
+            ("OS&D reporting-date value", columns.OsdReportingDateValue),
+            ("OS&D reporting-date percent", columns.OsdReportingDatePercent),
+            ("OS&D MTD value", columns.OsdMtdValue),
+            ("OS&D MTD percent", columns.OsdMtdPercent)
+        };
+
+        foreach (var (name, column) in decimalFields)
+        {
+            if (!TryReadFATPNumber(section.Worksheet.Cell(row, column), out var value))
+            {
+                errors.Add($"'{name}' is not a valid number (Excel errors are not imported).");
+                decimals[name] = null;
+            }
+            else
+                decimals[name] = value;
+        }
+
+        var integers = new Dictionary<string, int?>();
+        var integerFields = new (string Name, int Column)[]
+        {
+            ("Open WO quantity", columns.OpenWoQty),
+            (">7 Days WO quantity", columns.Over7DaysWoQty)
+        };
+        foreach (var (name, column) in integerFields)
+        {
+            if (!TryReadFATPNumber(section.Worksheet.Cell(row, column), out var value)
+                || value.HasValue
+                && (decimal.Truncate(value.Value) != value.Value
+                    || value.Value < int.MinValue
+                    || value.Value > int.MaxValue))
+            {
+                errors.Add($"'{name}' is not a valid whole number (Excel errors are not imported).");
+                integers[name] = null;
+            }
+            else
+            {
+                integers[name] = value.HasValue ? decimal.ToInt32(value.Value) : null;
+            }
+        }
+
+        decimal? Get(string name) => decimals[name];
+        int? GetInt(string name) => integers[name];
+        return new DailyReportExcelImportValues(
+            Get("Month Plan"),
+            Get("Month Actual"),
+            Get("Production Plan"),
+            Get("Production Actual"),
+            Get("UPH Target"),
+            Get("UPH Actual"),
+            Get("UPPH Installed"),
+            Get("UPPH Actual"),
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            Get("OS&D reporting-date value"),
+            Get("OS&D reporting-date percent"),
+            Get("OS&D MTD value"),
+            Get("OS&D MTD percent"),
+            null,
+            null,
+            null,
+            GetInt("Open WO quantity"),
+            GetInt(">7 Days WO quantity"),
+            null,
+            null,
+            null,
+            null,
+            ReadText(section.Worksheet, row, columns.IssueDescription));
     }
 
     private static IReadOnlyList<DailySection> FindSections(IXLWorksheet worksheet)
@@ -671,6 +1016,17 @@ public sealed class DailyReportExcelImportService(
         return true;
     }
 
+    private static bool TryReadFATPNumber(IXLCell cell, out decimal? value)
+    {
+        if (string.Equals(cell.GetString().Trim(), "No Plan", StringComparison.OrdinalIgnoreCase))
+        {
+            value = null;
+            return true;
+        }
+
+        return TryReadNumber(cell, out value);
+    }
+
     private static DateTime? ReadReportDate(IXLWorksheet worksheet)
     {
         var lastColumn = worksheet.LastColumnUsed()?.ColumnNumber() ?? 0;
@@ -721,6 +1077,17 @@ public sealed class DailyReportExcelImportService(
         return value.Length == 0 ? null : value;
     }
 
+    private static string? ReadSourceText(
+        IXLWorksheet worksheet,
+        int row,
+        int column)
+    {
+        if (column <= 0)
+            return null;
+        var value = worksheet.Cell(row, column).GetString();
+        return string.IsNullOrWhiteSpace(value) ? null : value;
+    }
+
     private static int FindColumn(
         IXLWorksheet worksheet,
         int row,
@@ -761,6 +1128,10 @@ public sealed class DailyReportExcelImportService(
             .Select(char.ToUpperInvariant)
             .ToArray());
 
+    private static string NormalizeMatchName(string value) =>
+        string.Join(' ', value.Split((char[]?)null, StringSplitOptions.RemoveEmptyEntries))
+            .ToUpperInvariant();
+
     private static DailyReportExcelImportPreview Failure(
         DateTime reportDate,
         string error) =>
@@ -779,7 +1150,11 @@ public sealed class DailyReportExcelImportService(
     private sealed record ImportCatalog(
         IReadOnlyList<CatalogLine> Lines,
         IReadOnlyList<CatalogModel> Models,
-        HashSet<(int LineId, int ModelId)> LineModels);
+        IReadOnlyList<CatalogOtherLine> OtherCategoryLines);
+    private sealed record CatalogOtherLine(
+        string LineName,
+        string? SapLocation,
+        string CategoryName);
     private sealed record DailySection(
         IXLWorksheet Worksheet,
         int HeaderRow,
@@ -827,7 +1202,22 @@ public sealed record DailyReportExcelImportPreview(
     int Lines,
     int Models,
     IReadOnlyList<string> Errors,
-    IReadOnlyList<DailyReportExcelImportEntry> Data);
+    IReadOnlyList<DailyReportExcelImportEntry> Data,
+    IReadOnlyList<DailyReportExcelImportRow>? Rows = null);
+
+public sealed record DailyReportExcelImportRow(
+    int RowNumber,
+    string LineNo,
+    string? SapLocation,
+    string? Customer,
+    string? ModelName,
+    string Status,
+    string? Reason,
+    int? LineId,
+    string? MappedLineName,
+    int? ModelId,
+    string? MappedModelName,
+    DailyReportExcelImportValues? Form);
 
 public sealed record DailyReportExcelImportEntry(
     int LineId,
