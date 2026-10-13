@@ -15,6 +15,20 @@ public sealed class DailyReportsController(
     SqlConnectionFactory connectionFactory,
     DailyReportExcelImportService excelImportService) : ControllerBase
 {
+    private static readonly IReadOnlyDictionary<string, (string Column, int Scale)> EditableKpiPlanFields =
+        new Dictionary<string, (string Column, int Scale)>(StringComparer.OrdinalIgnoreCase)
+        {
+            ["productionPlan"] = ("ProductionPlan", 2),
+            ["uphTarget"] = ("UPHTarget", 2),
+            ["upphTarget"] = ("UPPHTarget", 2),
+            ["cphTarget"] = ("CPHTarget", 2),
+            ["fpyTarget"] = ("FPYTarget", 4),
+            ["ftyTarget"] = ("FTYTarget", 4),
+            ["rtyTarget"] = ("RTYTarget", 4),
+            ["osdTarget"] = ("OSDTarget", 2),
+            ["otTarget"] = ("OTTarget", 2)
+        };
+
     // ============================================================
     // CONFIG
     // ============================================================
@@ -46,9 +60,11 @@ public sealed class DailyReportsController(
             FROM Customer c
             INNER JOIN Category cat
                 ON cat.CustomerId = c.CustomerId
+               AND cat.PlantId = @PlantId
                AND cat.IsActive = 1
             INNER JOIN ProductionLine pl
                 ON pl.CategoryId = cat.CategoryId
+               AND pl.PlantId = cat.PlantId
                AND pl.IsActive = 1
             WHERE c.CustomerId = @CustomerId
               AND cat.CategoryId = @CategoryId
@@ -61,6 +77,7 @@ public sealed class DailyReportsController(
         Add(contextCommand, "@CustomerId", SqlDbType.Int, customerId);
         Add(contextCommand, "@CategoryId", SqlDbType.Int, categoryId);
         Add(contextCommand, "@LineId", SqlDbType.Int, lineId);
+        Add(contextCommand, "@PlantId", SqlDbType.Int, GetPlantId());
 
         await using var contextReader =
             await contextCommand.ExecuteReaderAsync(cancellationToken);
@@ -98,22 +115,25 @@ public sealed class DailyReportsController(
 
         var models = new List<object>();
 
+        // Models belong to a customer, not to a production line.
+        // Every active model for the selected customer is available on each
+        // active line inside the selected customer/category context.
         const string modelSql = """
-            SELECT DISTINCT
+            SELECT
                 m.ModelId,
                 m.ModelName
-            FROM LineModel lm
-            INNER JOIN ProductionLine pl
-                ON pl.LineId = lm.LineId
-            INNER JOIN Category cat
-                ON cat.CategoryId = pl.CategoryId
-            INNER JOIN Model m
-                ON m.ModelId = lm.ModelId
-            WHERE lm.LineId = @LineId
-              AND cat.CategoryId = @CategoryId
-              AND cat.CustomerId = @CustomerId
-              AND lm.IsActive = 1
+            FROM Model m
+            WHERE m.CustomerId = @CustomerId
               AND m.IsActive = 1
+              AND EXISTS
+              (
+                  SELECT 1
+                  FROM Category cat
+                  WHERE cat.CategoryId = @CategoryId
+                    AND cat.CustomerId = m.CustomerId
+                    AND cat.PlantId = @PlantId
+                    AND cat.IsActive = 1
+              )
             ORDER BY m.ModelName;
             """;
 
@@ -122,7 +142,7 @@ public sealed class DailyReportsController(
 
         Add(modelCommand, "@CustomerId", SqlDbType.Int, customerId);
         Add(modelCommand, "@CategoryId", SqlDbType.Int, categoryId);
-        Add(modelCommand, "@LineId", SqlDbType.Int, lineId);
+        Add(modelCommand, "@PlantId", SqlDbType.Int, GetPlantId());
 
         await using var modelReader =
             await modelCommand.ExecuteReaderAsync(cancellationToken);
@@ -149,6 +169,105 @@ public sealed class DailyReportsController(
             targets = (object?)null
         });
     }
+
+    [HttpGet("kpi-plan")]
+    public async Task<IActionResult> GetKpiPlan(
+        [FromQuery] int customerId,
+        [FromQuery] int categoryId,
+        [FromQuery] int lineId,
+        [FromQuery] int modelId,
+        [FromQuery] DateTime reportDate,
+        CancellationToken cancellationToken)
+    {
+        if (reportDate == default)
+        {
+            return BadRequest(new { message = "A reporting date is required." });
+        }
+
+        if (!await HasCustomerAccessAsync(customerId, cancellationToken))
+            return Forbid();
+
+        await using var connection =
+            await connectionFactory.OpenAsync(cancellationToken);
+
+        const string sql = """
+            SELECT
+                km.KPI_MasterId,
+                km.ProductionPlan,
+                km.UPHTarget,
+                km.UPPHTarget,
+                km.CPHTarget,
+                km.FPYTarget,
+                km.FTYTarget,
+                km.RTYTarget,
+                km.OSDTarget,
+                km.OTTarget,
+                km.UpdatedAt
+            FROM Customer c
+            INNER JOIN Category cat
+                ON cat.CustomerId = c.CustomerId
+               AND cat.PlantId = @PlantId
+               AND cat.IsActive = 1
+            INNER JOIN ProductionLine pl
+                ON pl.CategoryId = cat.CategoryId
+               AND pl.PlantId = cat.PlantId
+               AND pl.IsActive = 1
+            INNER JOIN Model m
+                ON m.CustomerId = c.CustomerId
+               AND m.IsActive = 1
+            LEFT JOIN KPI_Master km
+                ON km.PlantId = cat.PlantId
+               AND km.CustomerId = c.CustomerId
+               AND km.CategoryId = cat.CategoryId
+               AND km.LineId = pl.LineId
+               AND km.ModelId = m.ModelId
+               AND km.KPIYEAR = @Year
+               AND km.KPIMonth = @Month
+               AND km.IsActive = 1
+            WHERE c.CustomerId = @CustomerId
+              AND cat.CategoryId = @CategoryId
+              AND pl.LineId = @LineId
+              AND m.ModelId = @ModelId
+              AND c.IsActive = 1;
+            """;
+
+        await using var command = new SqlCommand(sql, connection);
+        Add(command, "@PlantId", SqlDbType.Int, GetPlantId());
+        Add(command, "@CustomerId", SqlDbType.Int, customerId);
+        Add(command, "@CategoryId", SqlDbType.Int, categoryId);
+        Add(command, "@LineId", SqlDbType.Int, lineId);
+        Add(command, "@ModelId", SqlDbType.Int, modelId);
+        Add(command, "@Year", SqlDbType.Int, reportDate.Year);
+        Add(command, "@Month", SqlDbType.Int, reportDate.Month);
+
+        await using var reader = await command.ExecuteReaderAsync(cancellationToken);
+        if (!await reader.ReadAsync(cancellationToken))
+            return NotFound(new { message = "Invalid brand, category, line or model." });
+
+        if (reader.IsDBNull(0))
+            return Ok(new { plan = (object?)null });
+
+        var plan = new
+        {
+            planId = reader.GetInt32(0),
+            productionPlan = GetDecimal(reader, 1),
+            uphTarget = GetDecimal(reader, 2),
+            upphTarget = GetDecimal(reader, 3),
+            cphTarget = GetDecimal(reader, 4),
+            fpyTarget = GetDecimal(reader, 5),
+            ftyTarget = GetDecimal(reader, 6),
+            rtyTarget = GetDecimal(reader, 7),
+            osdTarget = GetDecimal(reader, 8),
+            otTarget = GetDecimal(reader, 9),
+            updatedAt = reader.IsDBNull(10) ? (DateTime?)null : reader.GetDateTime(10)
+        };
+
+        if (await reader.ReadAsync(cancellationToken))
+            return Conflict(new { message = "More than one monthly KPI plan matches this reporting context." });
+
+        return Ok(new { plan });
+    }
+
 
     // ============================================================
     // EXCEL IMPORT PREVIEW
@@ -212,6 +331,7 @@ public sealed class DailyReportsController(
         await using var stream = request.File.OpenReadStream();
         var preview = await excelImportService.PreviewAsync(
             stream,
+            GetPlantId(),
             request.CustomerId,
             request.CategoryId,
             request.ReportDate,
@@ -339,6 +459,7 @@ public sealed class DailyReportsController(
                 FROM DailyReport dr
 
                 WHERE dr.LineId = pl.LineId
+                  AND dr.PlantId = pl.PlantId
                   AND dr.CustomerId = cat.CustomerId
                   AND dr.CategoryId = cat.CategoryId
                   AND dr.ReportDate = @ReportDate
@@ -346,6 +467,8 @@ public sealed class DailyReportsController(
 
             WHERE cat.CustomerId = @CustomerId
               AND cat.CategoryId = @CategoryId
+              AND cat.PlantId = @PlantId
+              AND pl.PlantId = cat.PlantId
               AND pl.IsActive = 1
               AND cat.IsActive = 1
 
@@ -358,6 +481,7 @@ public sealed class DailyReportsController(
         Add(command, "@CustomerId", SqlDbType.Int, customerId);
         Add(command, "@CategoryId", SqlDbType.Int, categoryId);
         Add(command, "@ReportDate", SqlDbType.Date, reportDate.Date);
+        Add(command, "@PlantId", SqlDbType.Int, GetPlantId());
 
         var lines = new List<object>();
 
@@ -452,7 +576,9 @@ public sealed class DailyReportsController(
                     ON c.CustomerId = cat.CustomerId
                 WHERE c.CustomerId = @CustomerId
                   AND cat.CategoryId = @CategoryId
+                  AND cat.PlantId = @PlantId
                   AND pl.LineId = @LineId
+                  AND pl.PlantId = cat.PlantId
                   AND c.IsActive = 1
                   AND cat.IsActive = 1
                   AND pl.IsActive = 1;
@@ -481,6 +607,7 @@ public sealed class DailyReportsController(
                 "@LineId",
                 SqlDbType.Int,
                 request.LineId);
+            Add(validate, "@PlantId", SqlDbType.Int, GetPlantId());
 
             if (Convert.ToInt32(
                     await validate.ExecuteScalarAsync(
@@ -507,6 +634,7 @@ public sealed class DailyReportsController(
                             Status = 'INACTIVE',
                             UpdatedAt = SYSUTCDATETIME()
                         WHERE ReportDate = @ReportDate
+                          AND PlantId = @PlantId
                           AND CustomerId = @CustomerId
                           AND CategoryId = @CategoryId
                           AND LineId = @LineId;
@@ -519,6 +647,7 @@ public sealed class DailyReportsController(
                     "@ReportDate",
                     SqlDbType.Date,
                     request.ReportDate.Date);
+                Add(deactivate, "@PlantId", SqlDbType.Int, GetPlantId());
 
                 Add(
                     deactivate,
@@ -548,7 +677,8 @@ public sealed class DailyReportsController(
                         (
                             SELECT 1
                             FROM DailyReport
-                            WHERE ReportDate = @ReportDate
+                            WHERE PlantId = @PlantId
+                              AND ReportDate = @ReportDate
                               AND CustomerId = @CustomerId
                               AND CategoryId = @CategoryId
                               AND LineId = @LineId
@@ -560,6 +690,7 @@ public sealed class DailyReportsController(
                                 CustomerId,
                                 CategoryId,
                                 LineId,
+                                PlantId,
                                 ModelId,
                                 CreatedBy,
                                 Status,
@@ -573,6 +704,7 @@ public sealed class DailyReportsController(
                                 @CustomerId,
                                 @CategoryId,
                                 @LineId,
+                                @PlantId,
                                 NULL,
                                 @CreatedBy,
                                 'INACTIVE',
@@ -590,6 +722,7 @@ public sealed class DailyReportsController(
                     "@ReportDate",
                     SqlDbType.Date,
                     request.ReportDate.Date);
+                Add(marker, "@PlantId", SqlDbType.Int, GetPlantId());
 
                 Add(
                     marker,
@@ -625,6 +758,7 @@ public sealed class DailyReportsController(
                         """
                         DELETE FROM DailyReport
                         WHERE ReportDate = @ReportDate
+                          AND PlantId = @PlantId
                           AND CustomerId = @CustomerId
                           AND CategoryId = @CategoryId
                           AND LineId = @LineId
@@ -641,6 +775,7 @@ public sealed class DailyReportsController(
                                 END,
                             UpdatedAt = SYSUTCDATETIME()
                         WHERE ReportDate = @ReportDate
+                          AND PlantId = @PlantId
                           AND CustomerId = @CustomerId
                           AND CategoryId = @CategoryId
                           AND LineId = @LineId;
@@ -653,6 +788,7 @@ public sealed class DailyReportsController(
                     "@ReportDate",
                     SqlDbType.Date,
                     request.ReportDate.Date);
+                Add(activate, "@PlantId", SqlDbType.Int, GetPlantId());
 
                 Add(
                     activate,
@@ -770,7 +906,11 @@ public sealed class DailyReportsController(
                 dr.TRCLyingOver3DaysCr,
 
                 dr.IssueDescription,
-                dr.RejectionReason
+                dr.RejectionReason,
+
+                dr.UPPHTarget,
+                dr.OSDTarget,
+                dr.OTTarget
 
             FROM DailyReport dr
 
@@ -778,6 +918,7 @@ public sealed class DailyReportsController(
                 ON m.ModelId = dr.ModelId
 
             WHERE dr.CustomerId = @CustomerId
+              AND dr.PlantId = @PlantId
               AND dr.CategoryId = @CategoryId
               AND dr.LineId = @LineId
               AND dr.ReportDate = @ReportDate
@@ -806,6 +947,12 @@ public sealed class DailyReportsController(
             "@LineId",
             SqlDbType.Int,
             lineId);
+
+        Add(
+            command,
+            "@PlantId",
+            SqlDbType.Int,
+            GetPlantId());
 
         Add(
             command,
@@ -901,7 +1048,11 @@ public sealed class DailyReportsController(
                     GetString(reader, 34),
 
                 rejectionReason =
-                    GetString(reader, 35)
+                    GetString(reader, 35),
+
+                upphTarget = GetDecimal(reader, 36),
+                osdTarget = GetDecimal(reader, 37),
+                otTarget = GetDecimal(reader, 38)
             });
         }
 
@@ -982,11 +1133,16 @@ public sealed class DailyReportsController(
 
                 dr.Status,
                 dr.DailyReportId,
-                dr.RejectionReason
+                dr.RejectionReason,
+
+                dr.UPPHTarget,
+                dr.OSDTarget,
+                dr.OTTarget
 
             FROM DailyReport dr
 
             WHERE dr.CustomerId = @CustomerId
+              AND dr.PlantId = @PlantId
               AND dr.CategoryId = @CategoryId
               AND dr.LineId = @LineId
               AND dr.ReportDate = @ReportDate
@@ -1025,6 +1181,7 @@ public sealed class DailyReportsController(
             "@ReportDate",
             SqlDbType.Date,
             reportDate.Date);
+        Add(command, "@PlantId", SqlDbType.Int, GetPlantId());
 
         await using var reader =
             await command.ExecuteReaderAsync(cancellationToken);
@@ -1106,7 +1263,11 @@ public sealed class DailyReportsController(
             dailyReportId = reader.GetInt32(32),
 
             rejectionReason =
-                GetString(reader, 33)
+                GetString(reader, 33),
+
+            upphTarget = GetDecimal(reader, 34),
+            osdTarget = GetDecimal(reader, 35),
+            otTarget = GetDecimal(reader, 36)
         });
     }
 
@@ -1159,6 +1320,7 @@ public sealed class DailyReportsController(
 
         if (!await ValidateConfiguration(
                 request,
+                GetPlantId(),
                 cancellationToken))
         {
             return BadRequest(new
@@ -1184,6 +1346,19 @@ public sealed class DailyReportsController(
                 cancellationToken))
         {
             return Forbid();
+        }
+
+        var planEditsError = ValidateKpiPlanEdits(request.PlanEdits);
+        if (planEditsError is not null)
+            return BadRequest(new { message = planEditsError });
+
+        if (request.PlanEdits is { Count: > 0 })
+        {
+            if (!User.IsInRole("Contributor"))
+                return Forbid();
+
+            if (request.KpiPlanId is null)
+                return BadRequest(new { message = "A matching monthly KPI plan is required to save plan edits." });
         }
 
         await using var connection =
@@ -1284,6 +1459,7 @@ public sealed class DailyReportsController(
                         """
                         INSERT INTO DailyReport
                         (
+                            PlantId,
                             ReportDate,
                             CustomerId,
                             CategoryId,
@@ -1300,6 +1476,7 @@ public sealed class DailyReportsController(
 
                         VALUES
                         (
+                            @PlantId,
                             @ReportDate,
                             @CustomerId,
                             @CategoryId,
@@ -1321,6 +1498,12 @@ public sealed class DailyReportsController(
                         """,
                         connection,
                         transaction);
+
+                Add(
+                    insert,
+                    "@PlantId",
+                    SqlDbType.Int,
+                    GetPlantId());
 
                 Add(
                     insert,
@@ -1368,6 +1551,20 @@ public sealed class DailyReportsController(
                     Convert.ToInt32(
                         await insert.ExecuteScalarAsync(
                             cancellationToken));
+            }
+
+            if (request.PlanEdits is { Count: > 0 }
+                && !await UpdateKpiPlanAsync(
+                    connection,
+                    transaction,
+                    request,
+                    cancellationToken))
+            {
+                await transaction.RollbackAsync(cancellationToken);
+                return Conflict(new
+                {
+                    message = "The monthly KPI plan changed or no longer matches this report. Reload the report before saving your plan edits."
+                });
             }
 
             // ====================================================
@@ -1535,7 +1732,8 @@ public sealed class DailyReportsController(
 
                 FROM DailyReport WITH (UPDLOCK, HOLDLOCK)
 
-                WHERE ReportDate = @ReportDate
+                WHERE PlantId = @PlantId
+                  AND ReportDate = @ReportDate
                   AND CustomerId = @CustomerId
                   AND CategoryId = @CategoryId
                   AND LineId = @LineId
@@ -1543,6 +1741,12 @@ public sealed class DailyReportsController(
                 """,
                 connection,
                 transaction);
+
+        Add(
+            command,
+            "@PlantId",
+            SqlDbType.Int,
+            GetPlantId());
 
         Add(
             command,
@@ -1590,6 +1794,115 @@ public sealed class DailyReportsController(
         );
     }
 
+    private static string? ValidateKpiPlanEdits(
+        IReadOnlyList<DailyReportKpiPlanFieldEdit?>? edits)
+    {
+        if (edits is null || edits.Count == 0)
+            return null;
+
+        if (edits.Count > EditableKpiPlanFields.Count)
+            return "Too many KPI plan fields were supplied.";
+
+        var fields = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        foreach (var edit in edits)
+        {
+            if (edit is null
+                || string.IsNullOrWhiteSpace(edit.Field)
+                || !EditableKpiPlanFields.TryGetValue(edit.Field, out var definition))
+            {
+                return "One or more KPI plan fields are not editable.";
+            }
+
+            if (!fields.Add(edit.Field))
+                return "A KPI plan field cannot be supplied more than once.";
+
+            if (edit.Value is decimal value)
+            {
+                var maximum = definition.Scale == 2
+                    ? 9999999999999999.99m
+                    : 999999.9999m;
+                if (value < 0
+                    || value > maximum
+                    || decimal.Round(value, definition.Scale) != value)
+                {
+                    return $"The {edit.Field} value is outside the allowed range or precision.";
+                }
+            }
+        }
+
+        return null;
+    }
+
+    private async Task<bool> UpdateKpiPlanAsync(
+        SqlConnection connection,
+        SqlTransaction transaction,
+        DailyReportRequest request,
+        CancellationToken cancellationToken)
+    {
+        var assignments = new List<string>();
+        await using var command = new SqlCommand
+        {
+            Connection = connection,
+            Transaction = transaction
+        };
+
+        for (var index = 0; index < request.PlanEdits!.Count; index++)
+        {
+            var edit = request.PlanEdits[index]!;
+            if (!EditableKpiPlanFields.TryGetValue(edit.Field!, out var definition))
+                return false;
+
+            var parameterName = $"@PlanValue{index}";
+            assignments.Add($"[{definition.Column}] = {parameterName}");
+            Add(command, parameterName, SqlDbType.Decimal, edit.Value);
+        }
+
+        command.CommandText = $"""
+            UPDATE KPI_Master WITH (UPDLOCK, HOLDLOCK)
+            SET {string.Join(", ", assignments)},
+                UpdatedAt = SYSUTCDATETIME()
+            WHERE KPI_MasterId = @PlanId
+              AND PlantId = @PlantId
+              AND CustomerId = @CustomerId
+              AND CategoryId = @CategoryId
+              AND LineId = @LineId
+              AND ModelId = @ModelId
+              AND KPIYEAR = @Year
+              AND KPIMonth = @Month
+              AND IsActive = 1
+              AND 1 =
+              (
+                  SELECT COUNT(1)
+                  FROM KPI_Master matchingPlan WITH (UPDLOCK, HOLDLOCK)
+                  WHERE matchingPlan.PlantId = @PlantId
+                    AND matchingPlan.CustomerId = @CustomerId
+                    AND matchingPlan.CategoryId = @CategoryId
+                    AND matchingPlan.LineId = @LineId
+                    AND matchingPlan.ModelId = @ModelId
+                    AND matchingPlan.KPIYEAR = @Year
+                    AND matchingPlan.KPIMonth = @Month
+                    AND matchingPlan.IsActive = 1
+              )
+              AND
+              (
+                  (UpdatedAt = @ExpectedUpdatedAt)
+                  OR (UpdatedAt IS NULL AND @ExpectedUpdatedAt IS NULL)
+              );
+            """;
+
+        Add(command, "@PlanId", SqlDbType.Int, request.KpiPlanId);
+        Add(command, "@PlantId", SqlDbType.Int, GetPlantId());
+        Add(command, "@CustomerId", SqlDbType.Int, request.CustomerId);
+        Add(command, "@CategoryId", SqlDbType.Int, request.CategoryId);
+        Add(command, "@LineId", SqlDbType.Int, request.LineId);
+        Add(command, "@ModelId", SqlDbType.Int, request.ModelId);
+        Add(command, "@Year", SqlDbType.Int, request.ReportDate.Year);
+        Add(command, "@Month", SqlDbType.Int, request.ReportDate.Month);
+        Add(command, "@ExpectedUpdatedAt", SqlDbType.DateTime2, request.KpiPlanUpdatedAt);
+
+        return await command.ExecuteNonQueryAsync(cancellationToken) == 1;
+    }
+
 
     // ============================================================
     // SAVE ALL DAILY REPORT VALUES
@@ -1617,6 +1930,7 @@ public sealed class DailyReportsController(
                 UPHTarget = @UPHTarget,
                 UPHActual = @UPHActual,
 
+                UPPHTarget = @UPPHTarget,
                 UPPHInstalled = @UPPHInstalled,
                 UPPHActual = @UPPHActual,
                 CPHTarget = @CPHTarget,
@@ -1643,11 +1957,15 @@ public sealed class DailyReportsController(
                 OSDMTDPercent =
                     @OSDMTDPercent,
 
+                OSDTarget = @OSDTarget,
+
                 PlannedOTManhours =
                     @PlannedOTManhours,
 
                 UnplannedOTManhours =
                     @UnplannedOTManhours,
+
+                OTTarget = @OTTarget,
 
                 ActualOTManhours =
                     @ActualOTManhours,
@@ -1727,6 +2045,12 @@ public sealed class DailyReportsController(
             "@UPHActual",
             SqlDbType.Decimal,
             request.UphActual);
+
+        Add(
+            command,
+            "@UPPHTarget",
+            SqlDbType.Decimal,
+            request.UpphTarget);
 
         Add(
             command,
@@ -1816,6 +2140,12 @@ public sealed class DailyReportsController(
             SqlDbType.Decimal,
             request.OsdMtdPercent);
 
+        Add(
+            command,
+            "@OSDTarget",
+            SqlDbType.Decimal,
+            request.OsdTarget);
+
         // ========================================================
         // OT
         // ========================================================
@@ -1831,6 +2161,12 @@ public sealed class DailyReportsController(
             "@UnplannedOTManhours",
             SqlDbType.Decimal,
             request.UnplannedOTManhours);
+
+        Add(
+            command,
+            "@OTTarget",
+            SqlDbType.Decimal,
+            request.OtTarget);
 
         Add(
             command,
@@ -1909,35 +2245,31 @@ public sealed class DailyReportsController(
 
     private async Task<bool> ValidateConfiguration(
         DailyReportRequest request,
+        int plantId,
         CancellationToken cancellationToken)
     {
         await using var connection =
             await connectionFactory.OpenAsync(
                 cancellationToken);
 
+        // Validate each relationship directly. LineModel is intentionally not
+        // required: an active model belongs to a customer, and any active line
+        // under that customer's selected category can report that model.
         const string sql = """
             SELECT COUNT(1)
-
-            FROM LineModel lm
-
-            INNER JOIN ProductionLine pl
-                ON pl.LineId = lm.LineId
-
+            FROM Customer c
             INNER JOIN Category cat
-                ON cat.CategoryId = pl.CategoryId
-
-            INNER JOIN Customer c
-                ON c.CustomerId = cat.CustomerId
-
+                ON cat.CustomerId = c.CustomerId
+               AND cat.PlantId = @PlantId
+            INNER JOIN ProductionLine pl
+                ON pl.CategoryId = cat.CategoryId
+               AND pl.PlantId = cat.PlantId
             INNER JOIN Model m
-                ON m.ModelId = lm.ModelId
-
+                ON m.CustomerId = c.CustomerId
             WHERE c.CustomerId = @CustomerId
               AND cat.CategoryId = @CategoryId
               AND pl.LineId = @LineId
-              AND lm.ModelId = @ModelId
-
-              AND lm.IsActive = 1
+              AND m.ModelId = @ModelId
               AND c.IsActive = 1
               AND cat.IsActive = 1
               AND pl.IsActive = 1
@@ -1971,6 +2303,8 @@ public sealed class DailyReportsController(
             SqlDbType.Int,
             request.ModelId);
 
+        Add(command, "@PlantId", SqlDbType.Int, plantId);
+
         return Convert.ToInt32(
             await command.ExecuteScalarAsync(
                 cancellationToken)) == 1;
@@ -2000,15 +2334,12 @@ public sealed class DailyReportsController(
                 """
                 SELECT COUNT(1)
                 FROM PlantCustomer pc
+                INNER JOIN Customer c ON c.CustomerId = pc.CustomerId
+                INNER JOIN Plant p ON p.PlantId = pc.PlantId
                 WHERE pc.PlantId = @PlantId
                   AND pc.CustomerId = @CustomerId
-                  AND NOT EXISTS
-                  (
-                      SELECT 1
-                      FROM PlantCustomer otherPlant
-                      WHERE otherPlant.CustomerId = pc.CustomerId
-                        AND otherPlant.PlantId <> pc.PlantId
-                  )
+                  AND c.IsActive = 1
+                  AND p.IsActive = 1
                   AND
                   (
                       @IsAdmin = 1
@@ -2186,6 +2517,12 @@ public sealed class DailyReportRequest
 
     public int? ModelId { get; set; }
 
+    public int? KpiPlanId { get; set; }
+
+    public DateTime? KpiPlanUpdatedAt { get; set; }
+
+    public List<DailyReportKpiPlanFieldEdit?>? PlanEdits { get; set; }
+
 
     // ==============================================================
     // MONTH
@@ -2221,6 +2558,8 @@ public sealed class DailyReportRequest
     public decimal? UpphInstalled { get; set; }
 
     public decimal? UpphActual { get; set; }
+
+    public decimal? UpphTarget { get; set; }
 
     public decimal? CPHTarget { get; set; }
 
@@ -2266,6 +2605,8 @@ public sealed class DailyReportRequest
 
     public decimal? OsdMtdPercent { get; set; }
 
+    public decimal? OsdTarget { get; set; }
+
 
     // ==============================================================
     // OT
@@ -2274,6 +2615,8 @@ public sealed class DailyReportRequest
     public decimal? PlannedOTManhours { get; set; }
 
     public decimal? UnplannedOTManhours { get; set; }
+
+    public decimal? OtTarget { get; set; }
 
     public decimal? ActualOTManhours { get; set; }
 
@@ -2306,3 +2649,5 @@ public sealed class DailyReportRequest
 
     public string? IssueDescription { get; set; }
 }
+
+public sealed record DailyReportKpiPlanFieldEdit(string? Field, decimal? Value);

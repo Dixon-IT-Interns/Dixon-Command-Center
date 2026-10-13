@@ -1,36 +1,44 @@
-# Command Center Admin / KPI Plan setup
+# Command Center administration setup
 
-## 1. Run database migration
-Run `Database/004_admin_catalog_and_line_model.sql` after the existing schema and approval queue scripts. For an existing database, run `Database/007_plant_customer.sql` followed by `Database/008_super_admin_hierarchy.sql` before starting the updated API. The latter promotes the first existing Admin to SuperAdmin; subsequent Admins remain plant-scoped. New databases get the table from `Database/schema.sql`, and the initial setup creates the first SuperAdmin.
+## Database migrations
 
-It creates `dbo.LineModel`, preserves existing line/model relationships found in `KPI_Master`, and ensures the monthly KPI plan columns exist.
+For an existing database, review and apply the required scripts manually, in order:
 
-## 2. What is stored where
-- `KPI_Master`: monthly production plans and target configuration.
-- `DailyReport`: contributor staging/manual daily entry.
-- `KPI_Daily`: daily KPI values used by the current reporting/approval flow.
-- `ApprovalQueue`: submitted reports waiting for an approver.
-- `LineModel`: controls which models can appear under each production line.
+1. `Database/004_admin_catalog_and_line_model.sql` for the existing admin catalog and compatibility table.
+2. `Database/007_plant_customer.sql` for the many-to-many plant/customer mapping.
+3. `Database/008_super_admin_hierarchy.sql` for SuperAdmin role setup.
+4. `Database/009_plant_scoped_operational_configuration.sql` for plant ownership of categories, production lines, KPI plans and daily reports.
 
-The contributor Daily Report does **not** fetch its manual daily Plan/Target/Actual inputs from `KPI_Master`.
+Do not run these scripts from application startup. Back up the database first. Run migration 009 as a whole in one SSMS query window. If its preflight reports ambiguous categories, use the candidate plant IDs it returns and verified historical ownership to add rows to `#CategoryPlantOverrides`; add report overrides only when creator/current-plant evidence is not reliable. The migration stops before data backfill when preflight fails. Its nullable `PlantId` columns may remain after such a failure; rerunning the script is supported. Run the verification queries after a successful execution. No migration script has been run by the application or this change.
 
-## 3. Admin APIs
+## Data relationships
+
+- `PlantCustomer` is the many-to-many source of truth for plant/customer access.
+- `UserCustomer` limits a user to customer records within their assigned plant.
+- Customers and models are global master data. Categories, production lines, KPI plans and daily reports are plant-scoped.
+- `LineModel` remains in the database for compatibility/history only. Daily Report, KPI plan and Excel-import runtime flows load models from the selected customer.
+- `DailyReport` and approval history are retained and receive plant ownership during migration.
+
+## Administration access
+
+- SuperAdmin manages plants, plant/customer assignments and global customer/model records, and can manage configuration across plants.
+- Plant Admin is restricted to their assigned plant. They can manage users, categories, production lines and KPI plans, and view assigned customers and active models read-only.
+- Backend APIs validate plant/customer/configuration ownership; UI filtering is not the authorization boundary.
+
+## Relevant APIs
+
 - `GET /api/admin/catalog/overview`
-- SuperAdmin: create/edit/deactivate plants and create Admin users assigned to a plant.
-- SuperAdmin: link each customer to one plant at a time from the Plant Customers section. Resolve any legacy multi-plant customer links here before plant users manage that customer.
-- Plant Admin: manage users and catalog only for their assigned plant; cannot create Admins or change plant records.
-- `POST/PUT/DELETE /api/admin/catalog/plants`
-- `GET/PUT /api/admin/catalog/plants/{id}/customers`
-- `POST/PUT/DELETE /api/admin/catalog/customers`
+- `GET/PUT /api/admin/catalog/plants/{id}/customers` (SuperAdmin)
+- `POST/PUT/DELETE /api/admin/catalog/plants` (SuperAdmin)
+- `POST/PUT/DELETE /api/admin/catalog/customers` (SuperAdmin)
 - `POST/PUT/DELETE /api/admin/catalog/categories`
-- `POST/PUT/DELETE /api/admin/catalog/models`
+- `POST/PUT/DELETE /api/admin/catalog/models` (SuperAdmin)
 - `POST/PUT/DELETE /api/admin/catalog/lines`
-- `POST/DELETE /api/admin/catalog/line-models`
 - `GET/POST/DELETE /api/admin/catalog/plans`
 - `GET/PUT/DELETE /api/admin/users`
 
-## 4. Approval plan reference
-`GET /api/approvals/{id}` returns the submitted daily values plus the active monthly `KPI_Master` plan for the same customer/category/line/model/year/month. The approval UI shows both sections separately.
+There is no runtime LineModel administration endpoint. Daily report and Excel import verify the customer, plant, category, line and active model independently.
 
-## 5. Frontend
-Run `npm install` in `Command-Center-Frontend`, then `npm run dev`.
+## Frontend
+
+Run `npm install` from `Command-Center-Frontend`, then `npm run dev`.

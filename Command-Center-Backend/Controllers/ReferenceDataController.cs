@@ -52,8 +52,19 @@ public sealed class ReferenceDataController(SqlConnectionFactory connectionFacto
             SELECT c.CustomerId, c.CustomerName
             FROM PlantCustomer pc
             INNER JOIN Customer c ON c.CustomerId = pc.CustomerId
+            INNER JOIN Plant p ON p.PlantId = pc.PlantId
             WHERE pc.PlantId = @PlantId
               AND c.IsActive = 1
+              AND p.IsActive = 1
+              AND
+              (
+                  @CanViewAll = 1
+                  OR EXISTS
+                  (
+                      SELECT 1 FROM UserCustomer uc
+                      WHERE uc.UserId = @UserId AND uc.CustomerId = c.CustomerId
+                  )
+              )
             ORDER BY c.CustomerName
             """,
             reader => new
@@ -62,7 +73,9 @@ public sealed class ReferenceDataController(SqlConnectionFactory connectionFacto
                 customerName = reader.GetString(1)
             },
             cancellationToken,
-            new SqlParameter("@PlantId", plantId));
+            new SqlParameter("@PlantId", plantId),
+            new SqlParameter("@CanViewAll", CanViewAllPlantCustomers),
+            new SqlParameter("@UserId", GetUserId()));
 
         return Ok(customers);
     }
@@ -86,10 +99,23 @@ public sealed class ReferenceDataController(SqlConnectionFactory connectionFacto
             """
             SELECT cat.CategoryId, cat.CustomerId, cat.CategoryName
             FROM Category cat
-            INNER JOIN PlantCustomer pc ON pc.CustomerId = cat.CustomerId
+            INNER JOIN PlantCustomer pc ON pc.PlantId = cat.PlantId AND pc.CustomerId = cat.CustomerId
+            INNER JOIN Customer c ON c.CustomerId = pc.CustomerId
+            INNER JOIN Plant p ON p.PlantId = pc.PlantId
             WHERE cat.IsActive = 1
               AND cat.CustomerId = @CustomerId
-              AND pc.PlantId = @PlantId
+              AND cat.PlantId = @PlantId
+              AND c.IsActive = 1
+              AND p.IsActive = 1
+              AND
+              (
+                  @CanViewAll = 1
+                  OR EXISTS
+                  (
+                      SELECT 1 FROM UserCustomer uc
+                      WHERE uc.UserId = @UserId AND uc.CustomerId = c.CustomerId
+                  )
+              )
             ORDER BY cat.CategoryName
             """,
             reader => new
@@ -100,7 +126,9 @@ public sealed class ReferenceDataController(SqlConnectionFactory connectionFacto
             },
             cancellationToken,
             new SqlParameter("@CustomerId", customerId),
-            new SqlParameter("@PlantId", plantId));
+            new SqlParameter("@PlantId", plantId),
+            new SqlParameter("@CanViewAll", CanViewAllPlantCustomers),
+            new SqlParameter("@UserId", GetUserId()));
 
         return Ok(categories);
     }
@@ -125,11 +153,25 @@ public sealed class ReferenceDataController(SqlConnectionFactory connectionFacto
             SELECT pl.LineId, pl.CategoryId, pl.LineName, pl.SAPLocation
             FROM ProductionLine pl
             INNER JOIN Category cat ON cat.CategoryId = pl.CategoryId
-            INNER JOIN PlantCustomer pc ON pc.CustomerId = cat.CustomerId
+            INNER JOIN PlantCustomer pc ON pc.PlantId = cat.PlantId AND pc.CustomerId = cat.CustomerId
+            INNER JOIN Customer c ON c.CustomerId = pc.CustomerId
+            INNER JOIN Plant p ON p.PlantId = pc.PlantId
             WHERE pl.IsActive = 1
               AND cat.IsActive = 1
               AND cat.CategoryId = @CategoryId
-              AND pc.PlantId = @PlantId
+              AND cat.PlantId = @PlantId
+              AND pl.PlantId = @PlantId
+              AND c.IsActive = 1
+              AND p.IsActive = 1
+              AND
+              (
+                  @CanViewAll = 1
+                  OR EXISTS
+                  (
+                      SELECT 1 FROM UserCustomer uc
+                      WHERE uc.UserId = @UserId AND uc.CustomerId = c.CustomerId
+                  )
+              )
             ORDER BY pl.LineName
             """,
             reader => new
@@ -141,7 +183,9 @@ public sealed class ReferenceDataController(SqlConnectionFactory connectionFacto
             },
             cancellationToken,
             new SqlParameter("@CategoryId", categoryId),
-            new SqlParameter("@PlantId", plantId));
+            new SqlParameter("@PlantId", plantId),
+            new SqlParameter("@CanViewAll", CanViewAllPlantCustomers),
+            new SqlParameter("@UserId", GetUserId()));
 
         return Ok(lines);
     }
@@ -166,9 +210,22 @@ public sealed class ReferenceDataController(SqlConnectionFactory connectionFacto
             SELECT m.ModelId, m.CustomerId, m.ModelName
             FROM Model m
             INNER JOIN PlantCustomer pc ON pc.CustomerId = m.CustomerId
+            INNER JOIN Customer c ON c.CustomerId = pc.CustomerId
+            INNER JOIN Plant p ON p.PlantId = pc.PlantId
             WHERE m.IsActive = 1
               AND m.CustomerId = @CustomerId
               AND pc.PlantId = @PlantId
+              AND c.IsActive = 1
+              AND p.IsActive = 1
+              AND
+              (
+                  @CanViewAll = 1
+                  OR EXISTS
+                  (
+                      SELECT 1 FROM UserCustomer uc
+                      WHERE uc.UserId = @UserId AND uc.CustomerId = c.CustomerId
+                  )
+              )
             ORDER BY m.ModelName
             """,
             reader => new
@@ -179,7 +236,9 @@ public sealed class ReferenceDataController(SqlConnectionFactory connectionFacto
             },
             cancellationToken,
             new SqlParameter("@CustomerId", customerId),
-            new SqlParameter("@PlantId", plantId));
+            new SqlParameter("@PlantId", plantId),
+            new SqlParameter("@CanViewAll", CanViewAllPlantCustomers),
+            new SqlParameter("@UserId", GetUserId()));
 
         return Ok(models);
     }
@@ -210,4 +269,10 @@ public sealed class ReferenceDataController(SqlConnectionFactory connectionFacto
 
     private bool TryGetPlantId(out int plantId) =>
         int.TryParse(User.FindFirstValue("plantId"), out plantId) && plantId > 0;
+
+    private int GetUserId() =>
+        int.TryParse(User.FindFirstValue(ClaimTypes.NameIdentifier), out var userId) ? userId : 0;
+
+    private bool CanViewAllPlantCustomers =>
+        User.IsInRole("Admin") || User.IsInRole("SuperAdmin");
 }

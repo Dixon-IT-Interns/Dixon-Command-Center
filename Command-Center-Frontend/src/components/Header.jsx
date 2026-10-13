@@ -5,9 +5,16 @@ import "./Header.css";
 
 export default function Header({ user, onSignOut }) {
   const navigate = useNavigate();
+  const brandHome = ["Admin", "SuperAdmin"].includes(user?.roleName)
+    ? "/admin"
+    : user?.roleName === "Approver"
+      ? "/approvals/overview"
+      : user?.roleName === "Contributor"
+        ? "/contributor/dashboard"
+        : "/";
   return (
     <header className="header">
-      <Link className="header-brand" to="/dashboard">
+      <Link className="header-brand" to={brandHome}>
         <img src={dixonLogo} alt="Dixon" />
         <span className="header-brand-divider" />
         <span>Dixon <strong>Command Center</strong></span>

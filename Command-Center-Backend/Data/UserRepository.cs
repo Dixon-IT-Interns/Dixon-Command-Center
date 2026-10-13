@@ -973,13 +973,6 @@ public sealed class UserRepository(SqlConnectionFactory connectionFactory)
             INNER JOIN Customer c ON c.CustomerId = pc.CustomerId
             WHERE pc.PlantId = @PlantId
               AND c.IsActive = 1
-              AND NOT EXISTS
-              (
-                  SELECT 1
-                  FROM PlantCustomer otherPlant
-                  WHERE otherPlant.CustomerId = pc.CustomerId
-                    AND otherPlant.PlantId <> pc.PlantId
-              )
               AND pc.CustomerId IN ({string.Join(", ", parameters)})
             """;
 
