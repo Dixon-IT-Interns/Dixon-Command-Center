@@ -4,6 +4,7 @@ using Dixon.CommandCenter.API.Data;
 using Dixon.CommandCenter.API.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
+using Dixon.CommandCenter.API.Data;
 var builder = WebApplication.CreateBuilder(args);
 
 var jwtSecret = builder.Configuration["Jwt:Secret"];
@@ -42,6 +43,7 @@ builder.Services.AddSingleton<SqlConnectionFactory>();
 builder.Services.AddScoped<UserRepository>();
 builder.Services.AddScoped<CatalogRepository>();
 builder.Services.AddScoped<DailyReportExcelImportService>();
+builder.Services.AddScoped<ViewerRepository>();
 
 var app = builder.Build();
 

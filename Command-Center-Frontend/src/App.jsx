@@ -12,6 +12,7 @@ import Login from "./pages/Login";
 import BrandSelection from "./pages/contributor/BrandSelection";
 import CategorySelection from "./pages/contributor/CategorySelection";
 import DailyReport from "./pages/contributor/DailyReport";
+import ViewerDashboard from "./pages/viewer/viewerDashboard";
 import "./App.css";
 
 function ProtectedRoute({ session, children }) {
@@ -33,6 +34,12 @@ function ApproverRoute({ session, children }) {
 function AdminRoute({ session, children }) {
   if (!session) return <Navigate to="/" replace />;
   if (!["Admin", "SuperAdmin"].includes(session.user.roleName)) return <Navigate to="/dashboard" replace />;
+  return children;
+}
+
+function ViewerRoute({ session, children }) {
+  if (!session) return <Navigate to="/" replace />;
+  if (session.user.roleName !== "Viewer") return <Navigate to="/dashboard" replace />;
   return children;
 }
 
@@ -69,6 +76,7 @@ function AppRoutes() {
     ? roleName === "Contributor" ? "/contributor/dashboard"
       : roleName === "Approver" ? "/approvals/overview"
       : isAdministrator ? "/admin"
+      : roleName === "Viewer" ? "/viewer"
       : "/dashboard"
     : "/";
 
@@ -82,6 +90,7 @@ function AppRoutes() {
       <Route path="/approvals/overview" element={<ApproverRoute session={session}><ApprovalOverview session={session} onSignOut={signOut}/></ApproverRoute>} />
       <Route path="/approvals" element={<ApproverRoute session={session}><ApprovalPage session={session} onSignOut={signOut}/></ApproverRoute>} />
       <Route path="/approvals/history" element={<ApproverRoute session={session}><ApprovalHistory session={session} onSignOut={signOut}/></ApproverRoute>} />
+      <Route path="/viewer" element={<ViewerRoute session={session}><ViewerDashboard session={session} onSignOut={signOut}/></ViewerRoute>} />
 
       <Route path="/contributor/brands" element={<ContributorRoute session={session}><BrandSelection session={session} onSignOut={signOut}/></ContributorRoute>} />
       <Route path="/contributor/brands/:customerId/categories" element={<ContributorRoute session={session}><CategorySelection session={session} onSignOut={signOut}/></ContributorRoute>} />
@@ -96,7 +105,7 @@ function AppRoutes() {
       <Route path="/line-selection" element={<Navigate to="/contributor/brands" replace />} />
       <Route path="/daily-report" element={<Navigate to="/contributor/brands" replace />} />
 
-      <Route path="/dashboard" element={<ProtectedRoute session={session}>{session && ["Admin", "SuperAdmin"].includes(session.user.roleName) ? <Navigate to="/admin" replace /> : <DashboardPage session={session} onSignOut={signOut}/>}</ProtectedRoute>} />
+      <Route path="/dashboard" element={<ProtectedRoute session={session}>{session && ["Admin", "SuperAdmin"].includes(session.user.roleName) ? <Navigate to="/admin" replace /> : session?.user?.roleName === "Viewer" ? <Navigate to="/viewer" replace /> : <DashboardPage session={session} onSignOut={signOut}/>}</ProtectedRoute>} />
       <Route path="/admin" element={<AdminRoute session={session}><AdminPage session={session} onSignOut={signOut}/></AdminRoute>} />
       <Route path="*" element={<Navigate to={home} replace />} />
     </Routes>
