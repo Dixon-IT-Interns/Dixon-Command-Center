@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { Download, RefreshCw } from "lucide-react";
+import { Download, RefreshCw, X } from "lucide-react";
 import { api } from "../../api";
 import Header from "../../components/Header";
 import AppFooter from "../../components/AppFooter";
@@ -10,6 +10,9 @@ const today = new Date(Date.now() - new Date().getTimezoneOffset() * 60_000).toI
 
 export default function ViewerDashboard({ session, onSignOut }) {
   const [date, setDate] = useState(today);
+  const [plantId, setPlantId] = useState("");
+  const [plants, setPlants] = useState([]);
+  const [plantsLoading, setPlantsLoading] = useState(true);
   const [customerId, setCustomerId] = useState("");
   const [process, setProcess] = useState("ALL");
   const [trendDays, setTrendDays] = useState(7);
@@ -17,13 +20,17 @@ export default function ViewerDashboard({ session, onSignOut }) {
   const [data, setData] = useState({ summary: {}, lines: [] });
   const [trend, setTrend] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [exportOpen, setExportOpen] = useState(false);
+  const [exportPlantId, setExportPlantId] = useState("");
+  const [exporting, setExporting] = useState(false);
   const [error, setError] = useState("");
 
   const query = useMemo(() => {
     const q = new URLSearchParams({ reportDate: date, process });
+    if (plantId) q.set("plantId", plantId);
     if (customerId) q.set("customerId", customerId);
     return q.toString();
-  }, [date, customerId, process]);
+  }, [date, plantId, customerId, process]);
 
   const fetchDashboardData = useCallback(() => {
     const end = new Date(`${date}T00:00:00Z`);
@@ -33,12 +40,13 @@ export default function ViewerDashboard({ session, onSignOut }) {
       endDate: date,
       process,
     });
+    if (plantId) trendQuery.set("plantId", plantId);
     if (customerId) trendQuery.set("customerId", customerId);
     return Promise.all([
       api.get(`/viewer/progress?${query}`),
       api.get(`/viewer/trend?${trendQuery.toString()}`),
     ]);
-  }, [date, trendDays, process, customerId, query]);
+  }, [date, plantId, trendDays, process, customerId, query]);
 
   async function load() {
     setLoading(true);
@@ -52,10 +60,35 @@ export default function ViewerDashboard({ session, onSignOut }) {
   }
 
   useEffect(() => {
-    api.get("/catalog/customers").then(setCustomers).catch(() => {});
-  }, []);
+    api.get("/viewer/plants")
+      .then(rows => {
+        setPlants(rows);
+        const assignedPlant = rows.find(plant => String(plant.plantId) === String(session?.user?.plantId));
+        setPlantId(String(assignedPlant?.plantId || rows[0]?.plantId || ""));
+        if (!rows.length) setLoading(false);
+      })
+      .catch(e => {
+        setError(e.message);
+        setLoading(false);
+      })
+      .finally(() => setPlantsLoading(false));
+  }, [session?.user?.plantId]);
 
   useEffect(() => {
+    if (!plantId) return;
+    let isCurrent = true;
+    api.get(`/viewer/customers?plantId=${encodeURIComponent(plantId)}`)
+      .then(rows => {
+        if (isCurrent) setCustomers(rows);
+      })
+      .catch(e => {
+        if (isCurrent) setError(e.message);
+      });
+    return () => { isCurrent = false; };
+  }, [plantId]);
+
+  useEffect(() => {
+    if (!plantId) return;
     let isCurrent = true;
     fetchDashboardData()
       .then(([progress, trendRows]) => {
@@ -71,19 +104,33 @@ export default function ViewerDashboard({ session, onSignOut }) {
         if (isCurrent) setLoading(false);
       });
     return () => { isCurrent = false; };
-  }, [fetchDashboardData]);
+  }, [fetchDashboardData, plantId]);
 
-  async function downloadExcel() {
+  function openExport() {
+    setExportPlantId(plantId);
+    setExportOpen(true);
+  }
+
+  async function downloadExcel(event) {
+    event.preventDefault();
+    if (!exportPlantId) return;
+    setExporting(true);
     try {
       const token = localStorage.getItem("dcc-token");
       const base = import.meta.env.VITE_API_URL || "http://localhost:5211/api";
-      const response = await fetch(`${base}/viewer/export?${query}`, { headers: { Authorization: `Bearer ${token}` } });
+      const exportQuery = new URLSearchParams({ reportDate: date, process, plantId: exportPlantId });
+      if (exportPlantId === plantId && customerId) exportQuery.set("customerId", customerId);
+      const response = await fetch(`${base}/viewer/export?${exportQuery.toString()}`, { headers: { Authorization: `Bearer ${token}` } });
       if (!response.ok) throw new Error("Excel download failed.");
       const blob = await response.blob();
       const url = URL.createObjectURL(blob);
-      const a = document.createElement("a"); a.href = url; a.download = `Dixon_Viewer_${date.replaceAll("-", "")}.xlsx`; a.click();
+      const selectedPlant = plants.find(plant => String(plant.plantId) === String(exportPlantId));
+      const plantFileName = String(selectedPlant?.plantName || "Plant").replace(/[^a-z0-9-_]+/gi, "_");
+      const a = document.createElement("a"); a.href = url; a.download = `Dixon_${plantFileName}_${date.replaceAll("-", "")}.xlsx`; a.click();
       URL.revokeObjectURL(url);
+      setExportOpen(false);
     } catch (e) { setError(e.message); }
+    finally { setExporting(false); }
   }
 
   const maxTrend = Math.max(1, ...trend.map(x => Math.max(Number(x.productionPlan), Number(x.productionActual))));
@@ -107,11 +154,12 @@ export default function ViewerDashboard({ session, onSignOut }) {
     <Header user={session?.user} onSignOut={onSignOut} />
     <main className="viewer-main">
       <div className="viewer-title-row">
-        <div><span className="eyebrow">READ ONLY</span><h1>FATP & SMT Work Progress</h1><p>Date-wise production and KPI visibility across your accessible brands.</p></div>
-        <div className="viewer-actions"><button className="secondary-btn" onClick={load} disabled={loading}><RefreshCw size={16}/> Refresh</button><button className="primary-btn" onClick={downloadExcel}><Download size={16}/> Excel</button></div>
+        <div><span className="eyebrow">READ ONLY</span><h1>FATP & SMT Work Progress</h1><p>Date-wise production and KPI visibility for the selected plant.</p></div>
+        <div className="viewer-actions"><button className="secondary-btn" onClick={load} disabled={loading||!plantId}><RefreshCw size={16}/> Refresh</button><button className="primary-btn" onClick={openExport} disabled={!plantId}><Download size={16}/> Excel</button></div>
       </div>
 
       <section className="filters">
+        <label>Plant<select value={plantId} onChange={e => { setPlantId(e.target.value); setCustomerId(""); setCustomers([]); setLoading(true); }} disabled={plantsLoading||!plants.length}><option value="">{plantsLoading?"Loading plants…":"Select a plant"}</option>{plants.map(plant => <option key={plant.plantId} value={plant.plantId}>{plant.plantName}</option>)}</select></label>
         <label>Report Date<input type="date" value={date} onChange={e => { setDate(e.target.value); setLoading(true); }} /></label>
         <label>Customer<select value={customerId} onChange={e => { setCustomerId(e.target.value); setLoading(true); }}><option value="">All Customers</option>{customers.map(c => <option key={c.customerId} value={c.customerId}>{c.customerName}</option>)}</select></label>
         <label>Process<select value={process} onChange={e => { setProcess(e.target.value); setLoading(true); }}><option>ALL</option><option>FATP</option><option>SMT</option></select></label>
@@ -119,6 +167,8 @@ export default function ViewerDashboard({ session, onSignOut }) {
       </section>
 
       {error && <div className="viewer-error">{error}</div>}
+
+      {exportOpen&&<div className="viewer-modal-backdrop" role="presentation" onMouseDown={event=>{if(event.target===event.currentTarget&&!exporting)setExportOpen(false);}}><section className="viewer-export-dialog" role="dialog" aria-modal="true" aria-labelledby="viewer-export-title"><div className="viewer-export-heading"><div><span className="eyebrow">EXCEL EXPORT</span><h2 id="viewer-export-title">Choose plant</h2></div><button type="button" className="viewer-export-close" aria-label="Close export dialog" onClick={()=>setExportOpen(false)} disabled={exporting}><X size={18}/></button></div><form onSubmit={downloadExcel}><label className="viewer-export-field">Plant<select required value={exportPlantId} onChange={event=>setExportPlantId(event.target.value)} disabled={exporting}><option value="">Select a plant</option>{plants.map(plant=><option key={plant.plantId} value={plant.plantId}>{plant.plantName}</option>)}</select></label><p>Export date: {date} · Process: {process}{exportPlantId===plantId&&customerId?" · Selected customer only":" · All customers for this plant"}</p><div className="viewer-export-actions"><button type="button" className="secondary-btn" onClick={()=>setExportOpen(false)} disabled={exporting}>Cancel</button><button type="submit" className="primary-btn" disabled={!exportPlantId||exporting}><Download size={16}/>{exporting?"Preparing…":"Download Excel"}</button></div></form></section></div>}
 
       <section className="cards">
         <Card label="Production Plan" value={fmt(s.productionPlan)} />

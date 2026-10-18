@@ -61,10 +61,8 @@ const GROUPS = [
         { key: "osdMtdPercent", label: "%" },
       ] },
       { label: "OT (Hrs)", fields: [
-        { key: "otTarget", label: "Target" },
         { key: "plannedOTManhours", label: "Planned" },
         { key: "unplannedOTManhours", label: "Unplanned" },
-        { key: "actualOTManhours", label: "Actual" },
       ] },
       { label: "Open WO (Qty)", fields: [{ key: "openWOQty", label: "Value" }] },
       { label: ">7 Days WO (Qty)", fields: [{ key: "over7DaysWOBalanceQty", label: "Value" }] },
@@ -139,6 +137,7 @@ export default function DailyReport({ session, onSignOut }) {
   const [isImporting, setIsImporting] = useState(false);
   const [importPreview, setImportPreview] = useState(null);
   const [importDateConfirmed, setImportDateConfirmed] = useState(false);
+  const [pendingProductionImport, setPendingProductionImport] = useState(null);
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
   const excelFileInput = useRef(null);
@@ -426,6 +425,10 @@ export default function DailyReport({ session, onSignOut }) {
 
   const switchReportCategory = (nextCategory) => {
     if (!nextCategory || Number(nextCategory.categoryId) === Number(categoryId)) return;
+    if (importPreview) {
+      setError("Apply or cancel the current Excel preview before switching report categories.");
+      return;
+    }
     const hasUnsavedChanges = Object.values(lineData).some((line) => (
       (line.entries || []).some((entry) => (
         entry.isNew || JSON.stringify(entry.form) !== JSON.stringify(entry.initialForm)
@@ -433,6 +436,24 @@ export default function DailyReport({ session, onSignOut }) {
     ));
     if (hasUnsavedChanges && !window.confirm("You have unsaved changes. Switch report and discard these changes?")) return;
     navigate(`/contributor/brands/${customerId}/categories/${nextCategory.categoryId}/report`);
+  };
+
+  const openPendingProductionImport = () => {
+    const hasUnsavedChanges = Object.values(lineData).some((line) => (
+      (line.entries || []).some((entry) => (
+        entry.isNew || JSON.stringify(entry.form) !== JSON.stringify(entry.initialForm)
+      ))
+    ));
+    if (hasUnsavedChanges) {
+      setError("Save this category's draft before opening the other category's Production import.");
+      return;
+    }
+
+    const nextCategory = reportCategories.find(
+      (item) => Number(item.categoryId) === Number(pendingProductionImport?.categoryId)
+    );
+    if (nextCategory)
+      navigate(`/contributor/brands/${customerId}/categories/${nextCategory.categoryId}/report`);
   };
 
   const buildPayload = (lineId, entry) => ({
@@ -526,6 +547,210 @@ export default function DailyReport({ session, onSignOut }) {
     } finally { setBusy(""); }
   };
 
+  function stageSmtPreview(preview, sequence = loadSequence.current) {
+    const pageLines = new Map(lines.map((line) => [Number(line.lineId), line]));
+    const validationErrors = [];
+
+    for (const imported of preview.data || []) {
+      const line = pageLines.get(Number(imported.lineId));
+      const lineState = lineData[imported.lineId];
+      if (!line || !lineState) {
+        validationErrors.push(`Line ${imported.lineNo} is not available on this report page.`);
+        continue;
+      }
+
+      const modelAvailable = lineState.models.some(
+        (model) => Number(model.modelId) === Number(imported.modelId)
+      );
+      if (!modelAvailable) {
+        validationErrors.push(
+          `Model ${imported.modelName} is not available for line ${imported.lineNo} on this page.`
+        );
+      }
+
+      const existingEntry = lineState.entries.find(
+        (entry) => Number(entry.modelId) === Number(imported.modelId)
+      );
+      if (existingEntry?.status === "APPROVED" || existingEntry?.status === "SUBMITTED") {
+        validationErrors.push(
+          `Model ${imported.modelName} on line ${imported.lineNo} has already been submitted and cannot be replaced.`
+        );
+      }
+    }
+
+    if (validationErrors.length) throw new Error(validationErrors.join(" "));
+
+    const importedNewModels = (preview.data || []).filter((imported) => (
+      !lineData[imported.lineId]?.entries.some(
+        (entry) => Number(entry.modelId) === Number(imported.modelId)
+      )
+    ));
+    const importedEntryIds = new Map(importedNewModels.map((imported) => [
+      `${imported.lineId}:${imported.modelId}`,
+      `import-${imported.lineId}-${imported.modelId}-${++entryIdSequence.current}`,
+    ]));
+
+    setLineData((current) => {
+      const next = { ...current };
+      const grouped = new Map();
+
+      for (const imported of preview.data || []) {
+        const lineId = Number(imported.lineId);
+        const entries = grouped.get(lineId) || [];
+        entries.push(imported);
+        grouped.set(lineId, entries);
+      }
+
+      for (const [lineId, importedEntries] of grouped) {
+        const currentLine = next[lineId];
+        const entries = [...currentLine.entries];
+
+        for (const imported of importedEntries) {
+          const existingIndex = entries.findIndex(
+            (entry) => Number(entry.modelId) === Number(imported.modelId)
+          );
+          if (existingIndex >= 0) {
+            const existing = entries[existingIndex];
+            const presentFields = new Set(imported.form?.presentFields || Object.keys(imported.form || {}));
+            const formValues = Object.fromEntries(Object.entries(imported.form || {}).filter(([field]) => (
+              field !== "presentFields" && presentFields.has(field)
+            )));
+            const editedFields = new Set(existing.planEditedFields || []);
+            for (const field of KPI_PLAN_FIELDS) {
+              if (formValues[field] === null || formValues[field] === undefined || formValues[field] === "")
+                delete formValues[field];
+              else if (asNumber(formValues[field]) === asNumber(existing.initialForm?.[field]))
+                editedFields.delete(field);
+              else
+                editedFields.add(field);
+            }
+            entries[existingIndex] = {
+              ...existing,
+              form: { ...existing.form, ...formValues },
+              status: "DRAFT",
+              planEditedFields: [...editedFields],
+            }
+          } else {
+            const presentFields = new Set(imported.form?.presentFields || Object.keys(imported.form || {}));
+            const importedForm = Object.fromEntries(Object.entries(imported.form || {}).filter(([field]) => (
+              field !== "presentFields" && presentFields.has(field)
+            )));
+            const form = { ...EMPTY_FORM, ...importedForm };
+            entries.push({
+              entryId: importedEntryIds.get(`${lineId}:${imported.modelId}`),
+              dailyReportId: null,
+              modelId: String(imported.modelId),
+              modelName: imported.modelName,
+              status: "DRAFT",
+              isActive: true,
+              rejectionReason: "",
+              form,
+              initialForm: { ...EMPTY_FORM },
+              isNew: true,
+              plan: null,
+              planStatus: "loading",
+              planError: "",
+              planEditedFields: KPI_PLAN_FIELDS.filter((field) => (
+                form[field] !== null && form[field] !== undefined && form[field] !== ""
+              )),
+            });
+          }
+        }
+
+        next[lineId] = { ...currentLine, status: "IN_PROGRESS", entries };
+      }
+
+      return next;
+    });
+
+    for (const imported of importedNewModels) {
+      const entryId = importedEntryIds.get(`${imported.lineId}:${imported.modelId}`);
+      fetchKpiPlan(imported.lineId, imported.modelId).then(({ plan }) => {
+        if (sequence === loadSequence.current)
+          setEntryPlan(imported.lineId, entryId, plan || null, plan ? "ready" : "missing");
+      }).catch((e) => {
+        if (sequence === loadSequence.current)
+          setEntryPlan(
+            imported.lineId,
+            entryId,
+            null,
+            /more than one|ambiguous/i.test(e.message || "") ? "ambiguous" : "error",
+            e.message || "Unable to load this monthly KPI plan."
+          );
+      });
+    }
+
+    const importWarnings = (preview.errors || []).slice(0, 3);
+    const remainingWarnings = Math.max(0, (preview.errors || []).length - importWarnings.length);
+    setNotice(
+      `Excel imported successfully — ${preview.lines} lines, ${preview.models} models. Review the staged values, then save each line as a draft.`
+      + (importWarnings.length
+        ? ` Import notes: ${importWarnings.join(" ")}${remainingWarnings ? ` And ${remainingWarnings} more row/field note(s).` : ""}`
+        : "")
+    );
+  };
+
+  useEffect(() => {
+    if (!reportLoaded || importPreview) return;
+    const queueKey = `dcc-production-import:${customerId}:${categoryId}`;
+    const stored = sessionStorage.getItem(queueKey);
+    if (!stored) return;
+
+    try {
+      const queued = JSON.parse(stored);
+      if (Number(queued.customerId) !== Number(customerId)
+          || Number(queued.categoryId) !== Number(categoryId)
+          || !queued.preview?.reportDate) {
+        sessionStorage.removeItem(queueKey);
+        return;
+      }
+
+      if (queued.preview.reportDate !== reportDate) {
+        loadSequence.current += 1;
+        setReportDate(queued.preview.reportDate);
+        return;
+      }
+
+      if (isFATPImport) {
+        if (!Array.isArray(queued.preview.rows) || queued.preview.rows.length === 0)
+          throw new Error("The queued FATP production preview contains no rows.");
+        setImportPreview({
+          ...queued.preview,
+          queuedProduction: queued.queuedProduction === true,
+          rows: queued.preview.rows.map((row) => ({
+            ...row,
+            include: row.status === "matched" && !lineData[row.lineId]?.entries?.some(
+              (entry) => Number(entry.modelId) === Number(row.modelId)
+                && ["SUBMITTED", "APPROVED"].includes(entry.status)
+            ),
+            selectedLineId: row.lineId ? String(row.lineId) : "",
+            selectedModelId: row.modelId ? String(row.modelId) : "",
+          })),
+        });
+        setImportDateConfirmed(true);
+        if (queued.queuedProduction === true)
+          setPendingProductionImport(null);
+        setNotice(`FATP rows from the Production workbook are ready for ${queued.preview.reportDate}. Review and apply them; nothing has been saved.`);
+      } else {
+        try {
+          stageSmtPreview(queued.preview);
+          sessionStorage.removeItem(queueKey);
+          if (queued.queuedProduction === true)
+            setPendingProductionImport(null);
+        } catch (e) {
+          sessionStorage.removeItem(queueKey);
+          if (queued.queuedProduction === true)
+            setPendingProductionImport(null);
+          throw e;
+        }
+      }
+    } catch (e) {
+      setError(e.message || "Unable to load the queued production import.");
+    }
+    // The helper is local and recreated per render; the other dependencies keep its captured report data current.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [reportLoaded, customerId, categoryId, reportDate, isFATPImport, lineData, importPreview]);
+
   const importExcel = async (event) => {
     const file = event.target.files?.[0];
     if (!file) return;
@@ -536,18 +761,44 @@ export default function DailyReport({ session, onSignOut }) {
     setNotice("");
 
     try {
-      const formData = new FormData();
-      formData.append("file", file);
-      formData.append("customerId", String(customerId));
-      formData.append("categoryId", String(categoryId));
-      formData.append("reportDate", reportDate);
-
-      const preview = await api.postFormData(
-        "/daily-reports/import/preview",
-        formData
-      );
+      const importCategories = fatpCategory && smtCategory
+        ? [fatpCategory, smtCategory]
+        : [category];
+      const previews = await Promise.all(importCategories.map(async (targetCategory) => {
+        const formData = new FormData();
+        formData.append("file", file);
+        formData.append("customerId", String(customerId));
+        formData.append("categoryId", String(targetCategory.categoryId));
+        formData.append("reportDate", reportDate);
+        const result = await api.postFormData("/daily-reports/import/preview", formData);
+        return [Number(targetCategory.categoryId), result];
+      }));
       if (sequence !== loadSequence.current)
         throw new Error("The report context changed while Excel was being read. Please upload the file again.");
+
+      const previewByCategory = new Map(previews);
+      const preview = previewByCategory.get(Number(categoryId));
+      if (!preview) throw new Error("The workbook preview for the selected report category is missing.");
+
+      for (const [targetCategoryId, result] of previews) {
+        if (targetCategoryId === Number(categoryId)) continue;
+        const targetCategory = reportCategories.find(
+          (item) => Number(item.categoryId) === targetCategoryId
+        );
+        const queueKey = `dcc-production-import:${customerId}:${targetCategoryId}`;
+        sessionStorage.setItem(queueKey, JSON.stringify({
+          customerId: Number(customerId),
+          categoryId: targetCategoryId,
+          categoryName: targetCategory?.categoryName || "Production",
+          queuedProduction: true,
+          preview: result,
+        }));
+        setPendingProductionImport({
+          categoryId: targetCategoryId,
+          categoryName: targetCategory?.categoryName || "other category",
+          reportDate: result.reportDate,
+        });
+      }
 
       if (isFATPImport) {
         if (!Array.isArray(preview.rows) || preview.rows.length === 0)
@@ -565,141 +816,35 @@ export default function DailyReport({ session, onSignOut }) {
           })),
         });
         setImportDateConfirmed(preview.reportDate === reportDate);
-        setNotice("Excel preview ready. Review each FATP row; nothing has been saved.");
+        setNotice("Production workbook loaded. Review FATP rows here; SMT rows are ready in the other category. Nothing has been saved.");
         return;
       }
 
-      const pageLines = new Map(lines.map((line) => [Number(line.lineId), line]));
-      const validationErrors = [];
-
-      for (const imported of preview.data || []) {
-        const line = pageLines.get(Number(imported.lineId));
-        const lineState = lineData[imported.lineId];
-        if (!line || !lineState) {
-          validationErrors.push(`Line ${imported.lineNo} is not available on this report page.`);
-          continue;
-        }
-
-        const modelAvailable = lineState.models.some(
-          (model) => Number(model.modelId) === Number(imported.modelId)
-        );
-        if (!modelAvailable) {
-          validationErrors.push(
-            `Model ${imported.modelName} is not available for line ${imported.lineNo} on this page.`
-          );
-        }
-
-        const existingEntry = lineState.entries.find(
-          (entry) => Number(entry.modelId) === Number(imported.modelId)
-        );
-        if (existingEntry?.status === "APPROVED" || existingEntry?.status === "SUBMITTED") {
-          validationErrors.push(
-            `Model ${imported.modelName} on line ${imported.lineNo} has already been submitted and cannot be replaced.`
-          );
-        }
+      if (preview.reportDate !== reportDate) {
+        const queueKey = `dcc-production-import:${customerId}:${categoryId}`;
+        sessionStorage.setItem(queueKey, JSON.stringify({
+          customerId: Number(customerId),
+          categoryId: Number(categoryId),
+          categoryName: category?.categoryName || "SMT",
+          queuedProduction: false,
+          preview,
+        }));
+        loadSequence.current += 1;
+        setReportDate(preview.reportDate);
+        setNotice(`SMT rows were read for ${preview.reportDate}. Loading that report date before staging them.`);
+        return;
       }
 
-      if (validationErrors.length) {
-        throw new Error(validationErrors.join(" "));
-      }
-
-      const importedNewModels = (preview.data || []).filter((imported) => (
-        !lineData[imported.lineId]?.entries.some(
-          (entry) => Number(entry.modelId) === Number(imported.modelId)
-        )
-      ));
-      const importedEntryIds = new Map(importedNewModels.map((imported) => [
-        `${imported.lineId}:${imported.modelId}`,
-        `import-${imported.lineId}-${imported.modelId}-${++entryIdSequence.current}`,
-      ]));
-
-      setLineData((current) => {
-        const next = { ...current };
-        const grouped = new Map();
-
-        for (const imported of preview.data || []) {
-          const lineId = Number(imported.lineId);
-          const entries = grouped.get(lineId) || [];
-          entries.push(imported);
-          grouped.set(lineId, entries);
-        }
-
-        for (const [lineId, importedEntries] of grouped) {
-          const currentLine = next[lineId];
-          const entries = [...currentLine.entries];
-
-          for (const imported of importedEntries) {
-            const existingIndex = entries.findIndex(
-              (entry) => Number(entry.modelId) === Number(imported.modelId)
-            );
-            if (existingIndex >= 0) {
-              const existing = entries[existingIndex];
-              const formValues = { ...imported.form };
-              const editedFields = new Set(existing.planEditedFields || []);
-              for (const field of KPI_PLAN_FIELDS) {
-                if (formValues[field] === null || formValues[field] === undefined || formValues[field] === "")
-                  delete formValues[field];
-                else if (asNumber(formValues[field]) === asNumber(existing.initialForm?.[field]))
-                  editedFields.delete(field);
-                else
-                  editedFields.add(field);
-              }
-              entries[existingIndex] = {
-                ...existing,
-                form: { ...existing.form, ...formValues },
-                status: "DRAFT",
-                planEditedFields: [...editedFields],
-              };
-            } else {
-              const form = { ...EMPTY_FORM, ...imported.form };
-              entries.push({
-                entryId: importedEntryIds.get(`${lineId}:${imported.modelId}`),
-                dailyReportId: null,
-                modelId: String(imported.modelId),
-                modelName: imported.modelName,
-                status: "DRAFT",
-                isActive: true,
-                rejectionReason: "",
-                form,
-                initialForm: { ...EMPTY_FORM },
-                isNew: true,
-                plan: null,
-                planStatus: "loading",
-                planError: "",
-                planEditedFields: KPI_PLAN_FIELDS.filter((field) => (
-                  form[field] !== null && form[field] !== undefined && form[field] !== ""
-                )),
-              });
-            }
-          }
-
-          next[lineId] = { ...currentLine, status: "IN_PROGRESS", entries };
-        }
-
-        return next;
-      });
-
-      for (const imported of importedNewModels) {
-        const entryId = importedEntryIds.get(`${imported.lineId}:${imported.modelId}`);
-        fetchKpiPlan(imported.lineId, imported.modelId).then(({ plan }) => {
-          if (sequence === loadSequence.current)
-            setEntryPlan(imported.lineId, entryId, plan || null, plan ? "ready" : "missing");
-        }).catch((e) => {
-          if (sequence === loadSequence.current)
-            setEntryPlan(
-              imported.lineId,
-              entryId,
-              null,
-              /more than one|ambiguous/i.test(e.message || "") ? "ambiguous" : "error",
-              e.message || "Unable to load this monthly KPI plan."
-            );
-        });
-      }
-
-      setNotice(
-        `Excel imported successfully — ${preview.lines} lines, ${preview.models} models. Please review the data before submitting.`
-      );
+      stageSmtPreview(preview, sequence);
     } catch (e) {
+      const otherCategory = reportCategories.find(
+        (item) => Number(item.categoryId) !== Number(categoryId)
+          && ["FATP", "SMT"].includes(item.categoryName?.trim().toUpperCase())
+      );
+      if (otherCategory) {
+        sessionStorage.removeItem(`dcc-production-import:${customerId}:${otherCategory.categoryId}`);
+        setPendingProductionImport(null);
+      }
       setError(
         e.message?.startsWith("Excel import failed")
           ? e.message
@@ -777,7 +922,9 @@ export default function DailyReport({ session, onSignOut }) {
       lineId,
       modelId,
       modelName: model.modelName,
-      form: Object.fromEntries(Object.entries(row.form || {}).filter(([, value]) => value !== null && value !== undefined && value !== "")),
+      form: Object.fromEntries(Object.entries(row.form || {}).filter(([field, value]) => (
+        field !== "presentFields" && value !== null && value !== undefined && value !== ""
+      ))),
     }));
     const newModels = importedRows.filter((imported) => (
       !lineData[imported.lineId]?.entries.some((entry) => Number(entry.modelId) === imported.modelId)
@@ -865,8 +1012,21 @@ export default function DailyReport({ session, onSignOut }) {
 
     setImportPreview(null);
     setImportDateConfirmed(false);
+    if (importPreview.queuedProduction) {
+      sessionStorage.removeItem(`dcc-production-import:${customerId}:${categoryId}`);
+      setPendingProductionImport(null);
+    }
     setError("");
     setNotice(`Applied ${importedRows.length} reviewed FATP row(s) to the form. Review and save or submit manually.`);
+  };
+
+  const cancelImportPreview = () => {
+    if (importPreview?.queuedProduction) {
+      sessionStorage.removeItem(`dcc-production-import:${customerId}:${categoryId}`);
+      setPendingProductionImport(null);
+    }
+    setImportPreview(null);
+    setImportDateConfirmed(false);
   };
 
   const completed = lines.filter((line) => ["SUBMITTED", "APPROVED", "INACTIVE"].includes(lineData[line.lineId]?.status)).length;
@@ -887,19 +1047,34 @@ export default function DailyReport({ session, onSignOut }) {
             <div className="report-title-icon"><ClipboardList size={25} /></div>
             <div><h1>{category?.categoryName || "Daily"} Daily Report</h1></div>
             {fatpCategory && smtCategory && (
-              <div className="report-category-switch" role="group" aria-label="Select reporting category">
+              <label className="report-category-switch">
                 <span>REPORT TYPE</span>
-                <div>
-                  <button type="button" aria-pressed={!isSmtCategory} className={!isSmtCategory ? "active" : ""} onClick={() => switchReportCategory(fatpCategory)}>FATP</button>
-                  <button type="button" aria-pressed={isSmtCategory} className={isSmtCategory ? "active" : ""} onClick={() => switchReportCategory(smtCategory)}>SMT</button>
-                </div>
-              </div>
+                <select
+                  aria-label="Select FATP or SMT report"
+                  value={String(categoryId)}
+                  onChange={(event) => {
+                    const nextCategory = reportCategories.find(
+                      (item) => Number(item.categoryId) === Number(event.target.value)
+                    );
+                    switchReportCategory(nextCategory);
+                  }}
+                >
+                  <option value={fatpCategory.categoryId}>FATP</option>
+                  <option value={smtCategory.categoryId}>SMT</option>
+                </select>
+              </label>
             )}
+            <label className="report-upload-type">
+              <span>UPLOAD TYPE</span>
+              <select aria-label="Select Excel upload type" defaultValue="production" disabled={isImporting || Boolean(busy)}>
+                <option value="production">Production · SMT + FATP</option>
+              </select>
+            </label>
             <button
               className="secondary-action report-excel-upload"
               type="button"
               style={{ marginLeft: "auto", flexShrink: 0 }}
-              disabled={isImporting || Boolean(busy)}
+              disabled={loading || !reportLoaded || isImporting || Boolean(busy) || Boolean(pendingProductionImport) || Boolean(importPreview)}
               onClick={() => excelFileInput.current?.click()}
             >
               {isImporting ? <Loader2 size={14} className="spin" /> : <Upload size={14} />}
@@ -929,6 +1104,23 @@ export default function DailyReport({ session, onSignOut }) {
             </div>
           )}
 
+          {pendingProductionImport && !importPreview && (
+            <div className="production-import-next">
+              <div>
+                <strong>{pendingProductionImport.categoryName} Production rows are ready</strong>
+                <span>Report date: {pendingProductionImport.reportDate}. Save this category's draft, then review the other category.</span>
+              </div>
+              <button
+                className="secondary-action"
+                type="button"
+                disabled={loading || isImporting}
+                onClick={openPendingProductionImport}
+              >
+                Open {pendingProductionImport.categoryName} report
+              </button>
+            </div>
+          )}
+
           {importPreview && (
             <section className="excel-review" aria-label="FATP Excel import review">
               <div className="excel-review-head">
@@ -937,7 +1129,7 @@ export default function DailyReport({ session, onSignOut }) {
                   <h2>Review imported rows</h2>
                   <p>Previewing {importPreview.rows.length} source row(s) from the FATP production table. Applying only stages values in this form; it does not save or submit.</p>
                 </div>
-                <button className="secondary-action" type="button" onClick={() => { setImportPreview(null); setImportDateConfirmed(false); }}>Cancel preview</button>
+                <button className="secondary-action" type="button" onClick={cancelImportPreview}>Cancel preview</button>
               </div>
               {importPreview.errors?.map((message) => <div className="excel-date-warning" key={message}>{message}</div>)}
               {importPreview.reportDate !== reportDate && (

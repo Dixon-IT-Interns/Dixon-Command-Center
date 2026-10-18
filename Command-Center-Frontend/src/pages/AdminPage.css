@@ -50,3 +50,6 @@
 @media(max-width:480px){.admin-head-actions{width:100%}.admin-refresh-button{flex:1;justify-content:center}.toolbar-controls{display:grid;grid-template-columns:1fr 1fr}.toolbar-select{min-width:0}.toolbar-select select{min-width:0}.toolbar-search{min-width:0}}
 .admin-page .status.active{padding:4px 8px;background:var(--color-success-soft);color:var(--color-success);font-size:9px;font-weight:750}
 .admin-page .status.inactive{padding:4px 8px;background:var(--color-danger-soft);color:var(--color-danger);font-size:9px;font-weight:750}
+.model-add-context{display:flex;align-items:flex-start;gap:8px;margin:0 0 12px;padding:10px;border:1px solid var(--color-border);border-radius:8px;background:var(--color-info-soft);color:var(--color-info);font-size:11px;line-height:1.5}
+.model-add-context svg{flex:0 0 auto;margin-top:1px}
+.model-add-context strong{color:var(--color-secondary)}

@@ -14,9 +14,13 @@ public sealed class DailyReportExcelImportService(
         {
             "",
             "-",
+            "–",
+            "—",
+            "−",
             "NA",
             "N/A",
-            "NP"
+            "NP",
+            "NO PLAN"
         };
 
     public async Task<DailyReportExcelImportPreview> PreviewAsync(
@@ -126,14 +130,6 @@ public sealed class DailyReportExcelImportService(
                     "The workbook does not contain the expected daily operations report sheet.");
             }
 
-            var reportDate = ReadReportDate(dailySheets[0].Worksheet);
-            if (reportDate is null)
-            {
-                return Failure(
-                    selectedReportDate,
-                    "The report date is missing or invalid in the Excel workbook.");
-            }
-
             var selectedSections = dailySheets
                 .Where(section => string.Equals(
                     section.Metric,
@@ -146,66 +142,98 @@ public sealed class DailyReportExcelImportService(
                         section.Columns.CapacityTarget).GetString()) == "INSTALLED")
                 .ToArray();
 
+            if (string.Equals(categoryName, "SMT", StringComparison.OrdinalIgnoreCase)
+                && selectedSections.Length == 0)
+            {
+                selectedSections = dailySheets
+                    .Where(section => string.Equals(
+                        section.Metric,
+                        "UPPH",
+                        StringComparison.OrdinalIgnoreCase))
+                    .Select(section => section with { Metric = "CPH" })
+                    .ToArray();
+            }
+
             if (selectedSections.Length == 0)
             {
                 if (string.Equals(categoryName, "FATP", StringComparison.OrdinalIgnoreCase)
                     && dailySheets.Any(section => section.Metric == "UPPH"))
                 {
                     return Failure(
-                        reportDate.Value,
+                        selectedReportDate,
                         "The workbook has a UPPH section, but its FATP production table must use the 'Installed' subheading. The available UPPH section does not match the FATP layout.");
                 }
 
                 var otherMetric = expectedMetric == "CPH" ? "UPPH" : "CPH";
                 var mismatchCategory = expectedMetric == "CPH" ? "FATP" : "SMT";
                 return Failure(
-                    reportDate.Value,
+                    selectedReportDate,
                     $"Selected category is {categoryName}, but the workbook contains no {expectedMetric} section for it. The available {otherMetric} section is for {mismatchCategory}.");
             }
 
+            var sectionDates = selectedSections
+                .Select(section => ReadReportDate(section.Worksheet))
+                .ToArray();
+            if (sectionDates.Any(date => date is null)
+                || sectionDates.Select(date => date!.Value.Date).Distinct().Count() != 1)
+            {
+                return Failure(
+                    selectedReportDate,
+                    $"The {categoryName} sections must each contain the same valid report date.");
+            }
+
+            var reportDate = sectionDates[0]!.Value.Date;
             if (string.Equals(categoryName, "FATP", StringComparison.OrdinalIgnoreCase))
             {
                 return PreviewFATP(
                     selectedSections,
-                    reportDate.Value,
+                    reportDate,
                     selectedReportDate,
                     customerName,
                     catalog);
             }
 
-            if (reportDate.Value.Date != selectedReportDate.Date)
-            {
-                return Failure(
-                    selectedReportDate,
-                    $"The Excel report date is {reportDate.Value:yyyy-MM-dd}, but the selected report date is {selectedReportDate:yyyy-MM-dd}.");
-            }
-
             var errors = new List<string>();
+            var warnings = new List<string>();
             var imported = new List<DailyReportExcelImportEntry>();
             var availableCustomers = new HashSet<string>(
                 StringComparer.OrdinalIgnoreCase);
 
             foreach (var section in selectedSections)
             {
-                ValidateRequiredColumns(section, errors);
-                if (errors.Count > 0)
-                    continue;
+                var importSection = section;
+                if (string.Equals(categoryName, "SMT", StringComparison.OrdinalIgnoreCase)
+                    && section.Metric == "CPH")
+                {
+                    importSection = section with
+                    {
+                        Columns = section.Columns with
+                        {
+                            CapacityTarget = section.Columns.CapacityTarget > 0
+                                ? section.Columns.CapacityTarget
+                                : section.OtherCapacityTarget,
+                            CapacityActual = section.Columns.CapacityActual > 0
+                                ? section.Columns.CapacityActual
+                                : section.OtherCapacityActual
+                        }
+                    };
+                }
 
-                for (var rowNumber = section.HeaderRow + 2;
-                     rowNumber <= section.LastDataRow;
+                for (var rowNumber = importSection.HeaderRow + 2;
+                     rowNumber <= importSection.LastDataRow;
                      rowNumber++)
                 {
-                    var lineNo = ReadText(section.Worksheet, rowNumber, section.Columns.LineNo);
+                    var lineNo = ReadText(importSection.Worksheet, rowNumber, importSection.Columns.LineNo);
                     if (string.IsNullOrWhiteSpace(lineNo))
                         continue;
 
                     if (string.Equals(lineNo, "Total", StringComparison.OrdinalIgnoreCase))
                         break;
 
-                    var excelCustomer = ReadText(section.Worksheet, rowNumber, section.Columns.Customer);
+                    var excelCustomer = ReadText(importSection.Worksheet, rowNumber, importSection.Columns.Customer);
                     if (string.IsNullOrWhiteSpace(excelCustomer))
                     {
-                        errors.Add($"Excel row {rowNumber} ({lineNo}): Customer is required.");
+                        warnings.Add($"Excel row {rowNumber} ({lineNo}) was skipped because Customer is blank.");
                         continue;
                     }
 
@@ -218,49 +246,93 @@ public sealed class DailyReportExcelImportService(
                         continue;
                     }
 
-                    var sapLocation = ReadText(section.Worksheet, rowNumber, section.Columns.SapLocation);
-                    var modelName = ReadText(section.Worksheet, rowNumber, section.Columns.Model);
+                    var sapLocation = ReadText(importSection.Worksheet, rowNumber, importSection.Columns.SapLocation);
+                    var modelName = ReadText(importSection.Worksheet, rowNumber, importSection.Columns.Model);
                     var rowLabel = $"Excel row {rowNumber} ({lineNo}, {modelName ?? "unknown model"})";
 
                     if (string.IsNullOrWhiteSpace(sapLocation))
-                        errors.Add($"{rowLabel}: SAP Location is required.");
+                        warnings.Add($"{rowLabel}: row skipped because SAP Location is blank.");
                     if (string.IsNullOrWhiteSpace(modelName))
-                        errors.Add($"{rowLabel}: Model is required.");
+                        warnings.Add($"{rowLabel}: row skipped because Model is blank.");
                     if (string.IsNullOrWhiteSpace(sapLocation)
                         || string.IsNullOrWhiteSpace(modelName))
                         continue;
 
-                    var line = catalog.Lines.FirstOrDefault(item =>
-                        string.Equals(item.LineName, lineNo, StringComparison.OrdinalIgnoreCase));
+                    var matchingOtherCategoryLine = catalog.OtherCategoryLines.Any(item =>
+                        NormalizeMatchName(item.LineName) == NormalizeMatchName(lineNo)
+                        && NormalizeMatchName(item.SapLocation ?? "") == NormalizeMatchName(sapLocation));
+                    var matchingSelectedLine = catalog.Lines.Any(item =>
+                        NormalizeMatchName(item.LineName) == NormalizeMatchName(lineNo)
+                        && NormalizeMatchName(item.SapLocation ?? "") == NormalizeMatchName(sapLocation));
+                    if (!matchingSelectedLine && matchingOtherCategoryLine)
+                        continue;
 
-                    if (line is null)
+                    var rowSection = importSection;
+                    if (string.Equals(categoryName, "SMT", StringComparison.OrdinalIgnoreCase)
+                        && section.Metric == "CPH")
                     {
-                        errors.Add($"{rowLabel}: Line {lineNo} does not exist for {categoryName}.");
+                        rowSection = importSection with
+                        {
+                            Columns = importSection.Columns with
+                            {
+                                CapacityTarget = !HasNumericValue(
+                                    importSection.Worksheet,
+                                    rowNumber,
+                                    importSection.Columns.CapacityTarget)
+                                    && HasNumericValue(importSection.Worksheet, rowNumber, section.OtherCapacityTarget)
+                                    ? section.OtherCapacityTarget
+                                    : importSection.Columns.CapacityTarget,
+                                CapacityActual = !HasNumericValue(
+                                    importSection.Worksheet,
+                                    rowNumber,
+                                    importSection.Columns.CapacityActual)
+                                    && HasNumericValue(importSection.Worksheet, rowNumber, section.OtherCapacityActual)
+                                    ? section.OtherCapacityActual
+                                    : importSection.Columns.CapacityActual
+                            }
+                        };
+                    }
+
+                    if (!string.Equals(categoryName, "SMT", StringComparison.OrdinalIgnoreCase)
+                        && !HasCapacityValue(section, rowNumber)
+                        && HasOtherCapacityValue(section, rowNumber))
+                        continue;
+
+                    var lineNameMatches = catalog.Lines
+                        .Where(item => NormalizeMatchName(item.LineName) == NormalizeMatchName(lineNo))
+                        .ToArray();
+                    var lineMatches = lineNameMatches
+                        .Where(item => NormalizeMatchName(item.SapLocation ?? "") == NormalizeMatchName(sapLocation))
+                        .ToArray();
+
+                    if (lineMatches.Length == 0)
+                    {
+                        warnings.Add(lineNameMatches.Length == 0
+                            ? $"{rowLabel}: Line {lineNo} does not exist for {categoryName}."
+                            : $"{rowLabel}: SAP Location '{sapLocation}' is not valid for line {lineNo}.");
                         continue;
                     }
 
-                    if (!string.Equals(
-                            line.SapLocation?.Trim(),
-                            sapLocation.Trim(),
-                            StringComparison.OrdinalIgnoreCase))
+                    if (lineMatches.Length > 1)
                     {
-                        errors.Add($"{rowLabel}: SAP Location '{sapLocation}' is not valid for line {lineNo}.");
+                        warnings.Add($"{rowLabel}: row skipped because line {lineNo} and SAP Location '{sapLocation}' match more than one active {categoryName} line.");
                         continue;
                     }
 
+                    var line = lineMatches[0];
                     var modelMatches = catalog.Models
                         .Where(item => Normalize(item.Name) == Normalize(modelName))
                         .ToArray();
 
                     if (modelMatches.Length == 0)
                     {
-                        errors.Add($"{rowLabel}: Model '{modelName}' does not exist for brand '{customerName}'.");
+                        warnings.Add($"{rowLabel}: row skipped because model '{modelName}' does not exist for brand '{customerName}'.");
                         continue;
                     }
 
                     if (modelMatches.Length > 1)
                     {
-                        errors.Add($"{rowLabel}: Model '{modelName}' is ambiguous in the selected brand.");
+                        warnings.Add($"{rowLabel}: row skipped because model '{modelName}' is ambiguous in the selected brand.");
                         continue;
                     }
 
@@ -268,7 +340,7 @@ public sealed class DailyReportExcelImportService(
 
                     // Models are selected by customer, not by LineModel mapping.
                     // A model may be reported on any active line in the selected category.
-                    var values = ReadValues(section, rowNumber, rowLabel, errors);
+                    var values = ReadValues(rowSection, rowNumber, rowLabel, warnings);
                     if (values is null)
                         continue;
 
@@ -288,6 +360,7 @@ public sealed class DailyReportExcelImportService(
                 errors.Add(
                     $"No {categoryName} rows matched selected brand '{customerName}'."
                     + (customers.Length == 0 ? "" : $" Brands in the workbook: {customers}."));
+                errors.AddRange(warnings);
             }
 
             var duplicates = imported
@@ -304,7 +377,7 @@ public sealed class DailyReportExcelImportService(
             {
                 return new DailyReportExcelImportPreview(
                     false,
-                    reportDate.Value.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture),
+                    reportDate.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture),
                     0,
                     0,
                     errors,
@@ -313,10 +386,10 @@ public sealed class DailyReportExcelImportService(
 
             return new DailyReportExcelImportPreview(
                 true,
-                reportDate.Value.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture),
+                reportDate.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture),
                 imported.Select(entry => entry.LineId).Distinct().Count(),
                 imported.Count,
-                [],
+                warnings,
                 imported);
         }
     }
@@ -486,20 +559,24 @@ public sealed class DailyReportExcelImportService(
                     continue;
                 }
 
-                if (!catalog.Lines.Any(line =>
-                        NormalizeMatchName(line.LineName) == NormalizeMatchName(lineNo ?? ""))
-                    && !string.IsNullOrWhiteSpace(rowCustomer)
-                    && catalog.OtherCategoryLines.Any(line =>
-                        !string.Equals(line.CategoryName, "FATP", StringComparison.OrdinalIgnoreCase)
-                        &&
-                        !string.IsNullOrWhiteSpace(sapLocation)
-                        && !string.IsNullOrWhiteSpace(line.SapLocation)
-                        &&
-                        NormalizeMatchName(line.LineName) == NormalizeMatchName(lineNo ?? "")
-                        && NormalizeMatchName(line.SapLocation ?? "") == NormalizeMatchName(sapLocation!)))
+                var selectedLineMatches = catalog.Lines.Any(line =>
+                    NormalizeMatchName(line.LineName) == NormalizeMatchName(lineNo ?? "")
+                    && NormalizeMatchName(line.SapLocation ?? "") == NormalizeMatchName(sapLocation ?? ""));
+                var otherCategoryLineMatches = catalog.OtherCategoryLines.Any(line =>
+                    !string.Equals(line.CategoryName, "FATP", StringComparison.OrdinalIgnoreCase)
+                    && !string.IsNullOrWhiteSpace(sapLocation)
+                    && !string.IsNullOrWhiteSpace(line.SapLocation)
+                    && NormalizeMatchName(line.LineName) == NormalizeMatchName(lineNo ?? "")
+                    && NormalizeMatchName(line.SapLocation ?? "") == NormalizeMatchName(sapLocation!));
+
+                if (!selectedLineMatches && otherCategoryLineMatches)
                 {
                     continue;
                 }
+
+                if (!HasCapacityValue(section, rowNumber)
+                    && HasOtherCapacityValue(section, rowNumber))
+                    continue;
 
                 var reasonParts = new List<string>();
                 int? lineId = null;
@@ -717,7 +794,8 @@ public sealed class DailyReportExcelImportService(
             null,
             null,
             null,
-            ReadText(section.Worksheet, row, columns.IssueDescription));
+            ReadText(section.Worksheet, row, columns.IssueDescription),
+            GetPresentFields(columns, section.Metric));
     }
 
     private static IReadOnlyList<DailySection> FindSections(IXLWorksheet worksheet)
@@ -732,40 +810,57 @@ public sealed class DailyReportExcelImportService(
             var sapColumn = FindColumn(worksheet, row, lastColumn, "SAP Location");
             var customerColumn = FindColumn(worksheet, row, lastColumn, "Customer");
             var modelColumn = FindColumn(worksheet, row, lastColumn, "Model");
-            var upphColumn = FindColumn(worksheet, row, lastColumn, "UPPH");
-            var cphColumn = FindColumn(worksheet, row, lastColumn, "CPH");
-            var metric = upphColumn > 0 ? "UPPH" : cphColumn > 0 ? "CPH" : null;
+            var metrics = new[] { "UPPH", "CPH" }
+                .Where(metric => FindColumn(worksheet, row, lastColumn, metric) > 0)
+                .ToArray();
 
             if (lineNoColumn == 0
                 || sapColumn == 0
                 || customerColumn == 0
                 || modelColumn == 0
-                || metric is null
+                || metrics.Length == 0
                 || row >= lastRow)
                 continue;
-
-            var columns = BuildColumns(
-                worksheet,
-                row,
-                row + 1,
-                lastColumn,
-                metric,
-                lineNoColumn,
-                sapColumn,
-                customerColumn,
-                modelColumn);
 
             var nextHeader = Enumerable.Range(row + 1, lastRow - row)
                 .FirstOrDefault(candidate =>
                     FindColumn(worksheet, candidate, lastColumn, "Line No.") > 0);
             var lastDataRow = nextHeader > 0 ? nextHeader - 1 : lastRow;
 
-            sections.Add(new DailySection(
-                worksheet,
-                row,
-                lastDataRow,
-                metric,
-                columns));
+            foreach (var metric in metrics)
+            {
+                var columns = BuildColumns(
+                    worksheet,
+                    row,
+                    row + 1,
+                    lastColumn,
+                    metric,
+                    lineNoColumn,
+                    sapColumn,
+                    customerColumn,
+                    modelColumn);
+                var otherMetric = metric == "UPPH" ? "CPH" : "UPPH";
+                var otherCapacityTarget = FindCapacityTarget(
+                    worksheet,
+                    row + 1,
+                    FindColumn(worksheet, row, lastColumn, otherMetric),
+                    otherMetric);
+
+                var otherCapacityActual = FindSubColumn(
+                    worksheet,
+                    row + 1,
+                    FindColumn(worksheet, row, lastColumn, otherMetric),
+                    "Actual");
+
+                sections.Add(new DailySection(
+                    worksheet,
+                    row,
+                    lastDataRow,
+                    metric,
+                    columns,
+                    otherCapacityTarget,
+                    otherCapacityActual));
+            }
         }
 
         return sections;
@@ -785,6 +880,8 @@ public sealed class DailyReportExcelImportService(
         int Group(string label) => FindColumn(worksheet, headerRow, lastColumn, label);
         int Pair(string group, string sub) =>
             FindSubColumn(worksheet, subHeaderRow, Group(group), sub);
+        int CapacityTarget() =>
+            FindCapacityTarget(worksheet, subHeaderRow, Group(metric), metric);
 
         return new DailyReportExcelColumns(
             lineNo,
@@ -797,7 +894,7 @@ public sealed class DailyReportExcelImportService(
             Pair("Production", "Actual"),
             Pair("UPH", "Target"),
             Pair("UPH", "Actual"),
-            Pair(metric, metric == "UPPH" ? "Installed" : "Target"),
+            CapacityTarget(),
             Pair(metric, "Actual"),
             Pair("FPY", "Target"),
             Pair("FPY", "Actual"),
@@ -820,113 +917,78 @@ public sealed class DailyReportExcelImportService(
             Group("Issue description"));
     }
 
-    private static void ValidateRequiredColumns(
-        DailySection section,
-        List<string> errors)
-    {
-        var columns = section.Columns;
-        var required = new (string Name, int Column)[]
-        {
-            ("Month Plan / Plan", columns.MonthPlan),
-            ("Month Plan / Actual", columns.MonthActual),
-            ("Production / Plan", columns.ProductionPlan),
-            ("Production / Actual", columns.ProductionActual),
-            ("UPH / Target", columns.UphTarget),
-            ("UPH / Actual", columns.UphActual),
-            ($"{section.Metric} / {(section.Metric == "UPPH" ? "Installed" : "Target")}", columns.CapacityTarget),
-            ($"{section.Metric} / Actual", columns.CapacityActual),
-            ("FPY / Target", columns.FpyTarget),
-            ("FPY (%)", columns.FpyActual),
-            ("FTY / Target", columns.FtyTarget),
-            ("FTY (%)", columns.FtyActual),
-            ("RTY / Target", columns.RtyTarget),
-            ("RTY (%)", columns.RtyActual),
-            ("OS&D (Reporting Date)", columns.OsdReportingDateValue),
-            ("OS&D (Reporting Date) / %", columns.OsdReportingDatePercent),
-            ("OS&D MTD", columns.OsdMtdValue),
-            ("OS&D MTD / %", columns.OsdMtdPercent),
-            ("Actual OT (Manhours)", columns.PlannedOt),
-            ("Actual OT (Manhours) / Unplanned", columns.UnplannedOt),
-            ("Open WO (Qty)", columns.OpenWoQty),
-            (">7 Days WO (Qty)", columns.Over7DaysWoQty),
-            ("Daily TRC In (Qty)", columns.DailyTrcInQty),
-            ("Daily TRC Out (Qty)", columns.DailyTrcOutQty),
-            ("TRC Overall Failure Inflow %", columns.TrcOverallFailureInflowPercent),
-            ("TRC Lying >3 Days (Cr)", columns.TrcLyingOver3DaysCr),
-            ("Issue description", columns.IssueDescription)
-        };
-
-        var missing = required.Where(item => item.Column == 0)
-            .Select(item => item.Name)
-            .Distinct(StringComparer.OrdinalIgnoreCase)
-            .ToArray();
-
-        if (missing.Length > 0)
-        {
-            errors.Add(
-                $"The {section.Metric} section is missing required Excel columns: {string.Join(", ", missing)}.");
-        }
-    }
-
     private static DailyReportExcelImportValues? ReadValues(
         DailySection section,
         int row,
         string rowLabel,
-        List<string> errors)
+        List<string> warnings)
     {
         var columns = section.Columns;
         var values = new Dictionary<string, decimal?>();
-        var decimalColumns = new (string Name, int Column)[]
+        var skippedFields = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        var decimalColumns = new (string Name, string Field, int Column)[]
         {
-            ("Month Plan", columns.MonthPlan),
-            ("Month Actual", columns.MonthActual),
-            ("Production Plan", columns.ProductionPlan),
-            ("Production Actual", columns.ProductionActual),
-            ("UPH Target", columns.UphTarget),
-            ("UPH Actual", columns.UphActual),
-            (section.Metric == "UPPH" ? "UPPH Installed" : "CPH Target", columns.CapacityTarget),
-            (section.Metric == "UPPH" ? "UPPH Actual" : "CPH Actual", columns.CapacityActual),
-            ("FPY Target", columns.FpyTarget),
-            ("FPY Actual", columns.FpyActual),
-            ("FTY Target", columns.FtyTarget),
-            ("FTY Actual", columns.FtyActual),
-            ("RTY Target", columns.RtyTarget),
-            ("RTY Actual", columns.RtyActual),
-            ("OS&D Reporting Date", columns.OsdReportingDateValue),
-            ("OS&D Reporting Date %", columns.OsdReportingDatePercent),
-            ("OS&D MTD", columns.OsdMtdValue),
-            ("OS&D MTD %", columns.OsdMtdPercent),
-            ("Planned OT", columns.PlannedOt),
-            ("Unplanned OT", columns.UnplannedOt),
-            ("TRC Overall Failure Inflow %", columns.TrcOverallFailureInflowPercent),
-            ("TRC Lying >3 Days (Cr)", columns.TrcLyingOver3DaysCr)
+            ("Month Plan", "monthPlan", columns.MonthPlan),
+            ("Month Actual", "monthActual", columns.MonthActual),
+            ("Production Plan", "productionPlan", columns.ProductionPlan),
+            ("Production Actual", "productionActual", columns.ProductionActual),
+            ("UPH Target", "uphTarget", columns.UphTarget),
+            ("UPH Actual", "uphActual", columns.UphActual),
+            (section.Metric == "UPPH" ? "UPPH Installed" : "CPH Target",
+                section.Metric == "UPPH" ? "upphInstalled" : "cphTarget",
+                columns.CapacityTarget),
+            (section.Metric == "UPPH" ? "UPPH Actual" : "CPH Actual",
+                section.Metric == "UPPH" ? "upphActual" : "cphActual",
+                columns.CapacityActual),
+            ("FPY Target", "fpyTarget", columns.FpyTarget),
+            ("FPY Actual", "fpyActual", columns.FpyActual),
+            ("FTY Target", "ftyTarget", columns.FtyTarget),
+            ("FTY Actual", "ftyActual", columns.FtyActual),
+            ("RTY Target", "rtyTarget", columns.RtyTarget),
+            ("RTY Actual", "rtyActual", columns.RtyActual),
+            ("OS&D Reporting Date", "osdReportingDateValue", columns.OsdReportingDateValue),
+            ("OS&D Reporting Date %", "osdReportingDatePercent", columns.OsdReportingDatePercent),
+            ("OS&D MTD", "osdMtdValue", columns.OsdMtdValue),
+            ("OS&D MTD %", "osdMtdPercent", columns.OsdMtdPercent),
+            ("Planned OT", "plannedOTManhours", columns.PlannedOt),
+            ("Unplanned OT", "unplannedOTManhours", columns.UnplannedOt),
+            ("TRC Overall Failure Inflow %", "trcOverallFailureInflowPercent", columns.TrcOverallFailureInflowPercent),
+            ("TRC Lying >3 Days (Cr)", "trcLyingOver3DaysCr", columns.TrcLyingOver3DaysCr)
         };
 
-        foreach (var (name, column) in decimalColumns)
+        foreach (var (name, field, column) in decimalColumns)
         {
+            if (column <= 0)
+                continue;
+
             if (!TryReadNumber(section.Worksheet.Cell(row, column), out var value))
             {
-                errors.Add($"{rowLabel}: '{name}' must contain a valid number.");
+                skippedFields.Add(field);
+                warnings.Add($"{rowLabel}: '{name}' was skipped because it does not contain a valid number.");
                 continue;
             }
 
             values[name] = value;
         }
 
-        var integerColumns = new (string Name, int Column)[]
+        var integerColumns = new (string Name, string Field, int Column)[]
         {
-            ("Open WO (Qty)", columns.OpenWoQty),
-            (">7 Days WO (Qty)", columns.Over7DaysWoQty),
-            ("Daily TRC In (Qty)", columns.DailyTrcInQty),
-            ("Daily TRC Out (Qty)", columns.DailyTrcOutQty)
+            ("Open WO (Qty)", "openWOQty", columns.OpenWoQty),
+            (">7 Days WO (Qty)", "over7DaysWOBalanceQty", columns.Over7DaysWoQty),
+            ("Daily TRC In (Qty)", "dailyTRCInQty", columns.DailyTrcInQty),
+            ("Daily TRC Out (Qty)", "dailyTRCOutQty", columns.DailyTrcOutQty)
         };
 
         var integers = new Dictionary<string, int?>();
-        foreach (var (name, column) in integerColumns)
+        foreach (var (name, field, column) in integerColumns)
         {
+            if (column <= 0)
+                continue;
+
             if (!TryReadNumber(section.Worksheet.Cell(row, column), out var value))
             {
-                errors.Add($"{rowLabel}: '{name}' must contain a valid whole number.");
+                skippedFields.Add(field);
+                warnings.Add($"{rowLabel}: '{name}' was skipped because it does not contain a valid whole number.");
                 continue;
             }
 
@@ -935,19 +997,16 @@ public sealed class DailyReportExcelImportService(
                     || value.Value < int.MinValue
                     || value.Value > int.MaxValue))
             {
-                errors.Add($"{rowLabel}: '{name}' must contain a valid whole number.");
+                skippedFields.Add(field);
+                warnings.Add($"{rowLabel}: '{name}' was skipped because it does not contain a valid whole number.");
                 continue;
             }
 
             integers[name] = value.HasValue ? decimal.ToInt32(value.Value) : null;
         }
 
-        if (decimalColumns.Any(item => !values.ContainsKey(item.Name))
-            || integerColumns.Any(item => !integers.ContainsKey(item.Name)))
-            return null;
-
-        decimal? Get(string name) => values[name];
-        int? GetInt(string name) => integers[name];
+        decimal? Get(string name) => values.GetValueOrDefault(name);
+        int? GetInt(string name) => integers.GetValueOrDefault(name);
         var plannedOt = Get("Planned OT");
         var unplannedOt = Get("Unplanned OT");
         decimal? actualOt = plannedOt.HasValue || unplannedOt.HasValue
@@ -984,7 +1043,13 @@ public sealed class DailyReportExcelImportService(
             GetInt("Daily TRC Out (Qty)"),
             Get("TRC Overall Failure Inflow %"),
             Get("TRC Lying >3 Days (Cr)"),
-            ReadText(section.Worksheet, row, columns.IssueDescription));
+            ReadText(section.Worksheet, row, columns.IssueDescription),
+            GetPresentFields(columns, section.Metric)
+                .Where(field => !skippedFields.Contains(field))
+                .Where(field => field != "actualOTManhours"
+                    || values.ContainsKey("Planned OT")
+                    || values.ContainsKey("Unplanned OT"))
+                .ToArray());
     }
 
     private static bool TryReadNumber(IXLCell cell, out decimal? value)
@@ -1123,6 +1188,25 @@ public sealed class DailyReportExcelImportService(
         return 0;
     }
 
+    private static int FindCapacityTarget(
+        IXLWorksheet worksheet,
+        int subHeaderRow,
+        int groupColumn,
+        string metric)
+    {
+        var labels = metric == "UPPH"
+            ? new[] { "Installed", "Ins", "Target" }
+            : new[] { "Target", "Installed", "Ins" };
+        foreach (var label in labels)
+        {
+            var column = FindSubColumn(worksheet, subHeaderRow, groupColumn, label);
+            if (column > 0)
+                return column;
+        }
+
+        return 0;
+    }
+
     private static string Normalize(string value) =>
         new(value.Where(char.IsLetterOrDigit)
             .Select(char.ToUpperInvariant)
@@ -1131,6 +1215,76 @@ public sealed class DailyReportExcelImportService(
     private static string NormalizeMatchName(string value) =>
         string.Join(' ', value.Split((char[]?)null, StringSplitOptions.RemoveEmptyEntries))
             .ToUpperInvariant();
+
+    private static bool HasCapacityValue(DailySection section, int row)
+    {
+        var target = section.Columns.CapacityTarget;
+        var actual = section.Columns.CapacityActual;
+        return (target > 0 && !section.Worksheet.Cell(row, target).IsEmpty())
+            || (actual > 0 && !section.Worksheet.Cell(row, actual).IsEmpty());
+    }
+
+    private static bool HasNumericValue(
+        IXLWorksheet worksheet,
+        int row,
+        int column)
+    {
+        if (column <= 0)
+            return false;
+
+        return TryReadNumber(worksheet.Cell(row, column), out var value)
+            && value.HasValue;
+    }
+
+    private static bool HasOtherCapacityValue(DailySection section, int row)
+    {
+        return (section.OtherCapacityTarget > 0
+                && !section.Worksheet.Cell(row, section.OtherCapacityTarget).IsEmpty())
+            || (section.OtherCapacityActual > 0
+                && !section.Worksheet.Cell(row, section.OtherCapacityActual).IsEmpty());
+    }
+
+    private static IReadOnlyList<string> GetPresentFields(
+        DailyReportExcelColumns columns,
+        string metric)
+    {
+        var fields = new List<string>();
+        void Add(string field, int column)
+        {
+            if (column > 0)
+                fields.Add(field);
+        }
+
+        Add("monthPlan", columns.MonthPlan);
+        Add("monthActual", columns.MonthActual);
+        Add("productionPlan", columns.ProductionPlan);
+        Add("productionActual", columns.ProductionActual);
+        Add("uphTarget", columns.UphTarget);
+        Add("uphActual", columns.UphActual);
+        Add(metric == "UPPH" ? "upphInstalled" : "cphTarget", columns.CapacityTarget);
+        Add(metric == "UPPH" ? "upphActual" : "cphActual", columns.CapacityActual);
+        Add("fpyTarget", columns.FpyTarget);
+        Add("fpyActual", columns.FpyActual);
+        Add("ftyTarget", columns.FtyTarget);
+        Add("ftyActual", columns.FtyActual);
+        Add("rtyTarget", columns.RtyTarget);
+        Add("rtyActual", columns.RtyActual);
+        Add("osdReportingDateValue", columns.OsdReportingDateValue);
+        Add("osdReportingDatePercent", columns.OsdReportingDatePercent);
+        Add("osdMtdValue", columns.OsdMtdValue);
+        Add("osdMtdPercent", columns.OsdMtdPercent);
+        Add("plannedOTManhours", columns.PlannedOt);
+        Add("unplannedOTManhours", columns.UnplannedOt);
+        Add("actualOTManhours", columns.PlannedOt > 0 || columns.UnplannedOt > 0 ? 1 : 0);
+        Add("openWOQty", columns.OpenWoQty);
+        Add("over7DaysWOBalanceQty", columns.Over7DaysWoQty);
+        Add("dailyTRCInQty", columns.DailyTrcInQty);
+        Add("dailyTRCOutQty", columns.DailyTrcOutQty);
+        Add("trcOverallFailureInflowPercent", columns.TrcOverallFailureInflowPercent);
+        Add("trcLyingOver3DaysCr", columns.TrcLyingOver3DaysCr);
+        Add("issueDescription", columns.IssueDescription);
+        return fields;
+    }
 
     private static DailyReportExcelImportPreview Failure(
         DateTime reportDate,
@@ -1160,7 +1314,9 @@ public sealed class DailyReportExcelImportService(
         int HeaderRow,
         int LastDataRow,
         string Metric,
-        DailyReportExcelColumns Columns);
+        DailyReportExcelColumns Columns,
+        int OtherCapacityTarget,
+        int OtherCapacityActual);
 }
 
 public sealed record DailyReportExcelColumns(
@@ -1257,4 +1413,5 @@ public sealed record DailyReportExcelImportValues(
     int? DailyTRCOutQty,
     decimal? TRCOverallFailureInflowPercent,
     decimal? TRCLyingOver3DaysCr,
-    string? IssueDescription);
+    string? IssueDescription,
+    IReadOnlyList<string> PresentFields);

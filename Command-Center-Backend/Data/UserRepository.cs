@@ -418,7 +418,7 @@ public sealed class UserRepository(SqlConnectionFactory connectionFactory)
                 RoleName
             FROM Role
             WHERE RoleName <> 'SuperAdmin'
-              AND (@SuperAdmin = 1 OR RoleName <> 'Admin')
+              AND (@SuperAdmin = 1 OR RoleName NOT IN ('Admin', 'Viewer'))
             ORDER BY RoleName
             """,
             connection);
@@ -855,7 +855,7 @@ public sealed class UserRepository(SqlConnectionFactory connectionFactory)
                     FROM Role
                     WHERE RoleId = @RoleId
                       AND RoleName <> 'SuperAdmin'
-                      AND (@SuperAdmin = 1 OR RoleName NOT IN ('Admin', 'SuperAdmin'))
+                      AND (@SuperAdmin = 1 OR RoleName NOT IN ('Admin', 'SuperAdmin', 'Viewer'))
                 )
                 """,
                 connection,
@@ -1003,7 +1003,7 @@ public sealed class UserRepository(SqlConnectionFactory connectionFactory)
             FROM Role
             WHERE RoleId = @RoleId
               AND RoleName <> 'SuperAdmin'
-              AND (@SuperAdmin = 1 OR RoleName NOT IN ('Admin', 'SuperAdmin'))
+              AND (@SuperAdmin = 1 OR RoleName NOT IN ('Admin', 'SuperAdmin', 'Viewer'))
             """,
             connection,
             transaction);

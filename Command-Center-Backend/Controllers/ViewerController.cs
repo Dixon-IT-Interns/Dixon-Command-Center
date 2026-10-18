@@ -1,8 +1,8 @@
-using System.Security.Claims;
 using ClosedXML.Excel;
 using Dixon.CommandCenter.API.Data;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace Dixon.CommandCenter.API.Controllers;
 
@@ -14,6 +14,7 @@ public sealed class ViewerController(ViewerRepository viewer) : ControllerBase
     [HttpGet("progress")]
     public async Task<IActionResult> GetProgress(
         [FromQuery] DateTime? reportDate,
+        [FromQuery] int? plantId,
         [FromQuery] int? customerId,
         [FromQuery] string process = "ALL",
         CancellationToken cancellationToken = default)
@@ -23,9 +24,14 @@ public sealed class ViewerController(ViewerRepository viewer) : ControllerBase
             return BadRequest(new { message = "A reporting date is required." });
         }
 
-        if (!TryGetScope(out var userId, out var plantId))
+        if (!TryGetScope(plantId, out var selectedPlantId))
         {
             return Unauthorized();
+        }
+
+        if (!await viewer.IsActivePlantAsync(selectedPlantId, cancellationToken))
+        {
+            return Forbid();
         }
 
         if (!TryNormalizeProcess(process, out process))
@@ -34,19 +40,44 @@ public sealed class ViewerController(ViewerRepository viewer) : ControllerBase
         }
 
         if (customerId is not null
-            && !await viewer.HasCustomerAccessAsync(userId, plantId, customerId.Value, cancellationToken))
+            && !await viewer.HasCustomerAccessAsync(selectedPlantId, customerId.Value, cancellationToken))
         {
             return Forbid();
         }
 
         return Ok(await viewer.GetProgressAsync(
-            userId, plantId, customerId, process, reportDate.Value, cancellationToken));
+            selectedPlantId, customerId, process, reportDate.Value, cancellationToken));
+    }
+
+    [HttpGet("plants")]
+    public async Task<IActionResult> GetPlants(CancellationToken cancellationToken)
+    {
+        return Ok(await viewer.GetPlantsAsync(cancellationToken));
+    }
+
+    [HttpGet("customers")]
+    public async Task<IActionResult> GetCustomers(
+        [FromQuery] int? plantId,
+        CancellationToken cancellationToken)
+    {
+        if (!TryGetScope(plantId, out var selectedPlantId))
+        {
+            return Unauthorized();
+        }
+
+        if (!await viewer.IsActivePlantAsync(selectedPlantId, cancellationToken))
+        {
+            return Forbid();
+        }
+
+        return Ok(await viewer.GetCustomersAsync(selectedPlantId, cancellationToken));
     }
 
     [HttpGet("trend")]
     public async Task<IActionResult> GetTrend(
         [FromQuery] DateTime? startDate,
         [FromQuery] DateTime? endDate,
+        [FromQuery] int? plantId,
         [FromQuery] int? customerId,
         [FromQuery] string process = "ALL",
         CancellationToken cancellationToken = default)
@@ -61,9 +92,14 @@ public sealed class ViewerController(ViewerRepository viewer) : ControllerBase
             return BadRequest(new { message = "The trend range cannot exceed 366 days." });
         }
 
-        if (!TryGetScope(out var userId, out var plantId))
+        if (!TryGetScope(plantId, out var selectedPlantId))
         {
             return Unauthorized();
+        }
+
+        if (!await viewer.IsActivePlantAsync(selectedPlantId, cancellationToken))
+        {
+            return Forbid();
         }
 
         if (!TryNormalizeProcess(process, out process))
@@ -72,18 +108,19 @@ public sealed class ViewerController(ViewerRepository viewer) : ControllerBase
         }
 
         if (customerId is not null
-            && !await viewer.HasCustomerAccessAsync(userId, plantId, customerId.Value, cancellationToken))
+            && !await viewer.HasCustomerAccessAsync(selectedPlantId, customerId.Value, cancellationToken))
         {
             return Forbid();
         }
 
         return Ok(await viewer.GetTrendAsync(
-            userId, plantId, customerId, process, startDate.Value, endDate.Value, cancellationToken));
+            selectedPlantId, customerId, process, startDate.Value, endDate.Value, cancellationToken));
     }
 
     [HttpGet("export")]
     public async Task<IActionResult> Export(
         [FromQuery] DateTime? reportDate,
+        [FromQuery] int? plantId,
         [FromQuery] int? customerId,
         [FromQuery] string process = "ALL",
         CancellationToken cancellationToken = default)
@@ -93,9 +130,14 @@ public sealed class ViewerController(ViewerRepository viewer) : ControllerBase
             return BadRequest(new { message = "A reporting date is required." });
         }
 
-        if (!TryGetScope(out var userId, out var plantId))
+        if (!TryGetScope(plantId, out var selectedPlantId))
         {
             return Unauthorized();
+        }
+
+        if (!await viewer.IsActivePlantAsync(selectedPlantId, cancellationToken))
+        {
+            return Forbid();
         }
 
         if (!TryNormalizeProcess(process, out process))
@@ -104,13 +146,13 @@ public sealed class ViewerController(ViewerRepository viewer) : ControllerBase
         }
 
         if (customerId is not null
-            && !await viewer.HasCustomerAccessAsync(userId, plantId, customerId.Value, cancellationToken))
+            && !await viewer.HasCustomerAccessAsync(selectedPlantId, customerId.Value, cancellationToken))
         {
             return Forbid();
         }
 
         var progress = await viewer.GetProgressAsync(
-            userId, plantId, customerId, process, reportDate.Value, cancellationToken);
+            selectedPlantId, customerId, process, reportDate.Value, cancellationToken);
         using var workbook = new XLWorkbook();
         var sheet = workbook.Worksheets.Add("Line Work Progress");
         var headers = new[]
@@ -166,14 +208,18 @@ public sealed class ViewerController(ViewerRepository viewer) : ControllerBase
             $"Dixon_Viewer_{reportDate.Value:yyyyMMdd}.xlsx");
     }
 
-    private bool TryGetScope(out int userId, out int plantId)
+    private bool TryGetScope(int? requestedPlantId, out int plantId)
     {
-        userId = 0;
         plantId = 0;
-        return int.TryParse(User.FindFirstValue(ClaimTypes.NameIdentifier), out userId)
-            && userId > 0
-            && int.TryParse(User.FindFirstValue("plantId"), out plantId)
-            && plantId > 0;
+        if (!int.TryParse(User.FindFirstValue("plantId"), out var assignedPlantId)
+            || assignedPlantId <= 0
+            || requestedPlantId is <= 0)
+        {
+            return false;
+        }
+
+        plantId = requestedPlantId ?? assignedPlantId;
+        return plantId > 0;
     }
 
     private static bool TryNormalizeProcess(string? value, out string process)

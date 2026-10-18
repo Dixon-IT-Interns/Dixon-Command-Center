@@ -1,4 +1,5 @@
 using System.Data;
+using Dixon.CommandCenter.API.Models;
 using Microsoft.Data.SqlClient;
 
 namespace Dixon.CommandCenter.API.Data;
@@ -32,18 +33,68 @@ public sealed class ViewerRepository(SqlConnectionFactory connectionFactory)
               AND p.IsActive = 1
               AND (@CustomerId IS NULL OR c.CustomerId = @CustomerId)
               AND (@Process = 'ALL' OR cat.CategoryName = @Process)
-              AND EXISTS
-              (
-                  SELECT 1
-                  FROM UserCustomer uc
-                  WHERE uc.UserId = @UserId
-                    AND uc.CustomerId = c.CustomerId
-              )
         )
         """;
 
+    public async Task<IReadOnlyList<PlantResponse>> GetPlantsAsync(CancellationToken cancellationToken)
+    {
+        var plants = new List<PlantResponse>();
+        await using var connection = await connectionFactory.OpenAsync(cancellationToken);
+        await using var command = new SqlCommand("""
+            SELECT PlantId, PlantName, Location
+            FROM Plant
+            WHERE IsActive = 1
+            ORDER BY PlantName;
+            """, connection);
+        await using var reader = await command.ExecuteReaderAsync(cancellationToken);
+        while (await reader.ReadAsync(cancellationToken))
+        {
+            plants.Add(new PlantResponse(
+                reader.GetInt32(0),
+                reader.GetString(1),
+                GetString(reader, 2)));
+        }
+
+        return plants;
+    }
+
+    public async Task<IReadOnlyList<ViewerCustomerResponse>> GetCustomersAsync(
+        int plantId,
+        CancellationToken cancellationToken)
+    {
+        var customers = new List<ViewerCustomerResponse>();
+        await using var connection = await connectionFactory.OpenAsync(cancellationToken);
+        await using var command = new SqlCommand("""
+            SELECT c.CustomerId, c.CustomerName
+            FROM PlantCustomer pc
+            INNER JOIN Customer c ON c.CustomerId = pc.CustomerId
+            INNER JOIN Plant p ON p.PlantId = pc.PlantId
+            WHERE pc.PlantId = @PlantId
+              AND c.IsActive = 1
+              AND p.IsActive = 1
+            ORDER BY c.CustomerName;
+            """, connection);
+        Add(command, "@PlantId", SqlDbType.Int, plantId);
+        await using var reader = await command.ExecuteReaderAsync(cancellationToken);
+        while (await reader.ReadAsync(cancellationToken))
+        {
+            customers.Add(new ViewerCustomerResponse(reader.GetInt32(0), reader.GetString(1)));
+        }
+
+        return customers;
+    }
+
+    public async Task<bool> IsActivePlantAsync(int plantId, CancellationToken cancellationToken)
+    {
+        await using var connection = await connectionFactory.OpenAsync(cancellationToken);
+        await using var command = new SqlCommand(
+            "SELECT COUNT(1) FROM Plant WHERE PlantId = @PlantId AND IsActive = 1;",
+            connection);
+        Add(command, "@PlantId", SqlDbType.Int, plantId);
+        return Convert.ToInt32(await command.ExecuteScalarAsync(cancellationToken)) == 1;
+    }
+
     public async Task<bool> HasCustomerAccessAsync(
-        int userId,
         int plantId,
         int customerId,
         CancellationToken cancellationToken)
@@ -57,24 +108,15 @@ public sealed class ViewerRepository(SqlConnectionFactory connectionFactory)
             WHERE pc.PlantId = @PlantId
               AND pc.CustomerId = @CustomerId
               AND c.IsActive = 1
-              AND p.IsActive = 1
-              AND EXISTS
-              (
-                  SELECT 1
-                  FROM UserCustomer uc
-                  WHERE uc.UserId = @UserId
-                    AND uc.CustomerId = pc.CustomerId
-              );
+              AND p.IsActive = 1;
             """, connection);
 
-        Add(command, "@UserId", SqlDbType.Int, userId);
         Add(command, "@PlantId", SqlDbType.Int, plantId);
         Add(command, "@CustomerId", SqlDbType.Int, customerId);
         return Convert.ToInt32(await command.ExecuteScalarAsync(cancellationToken)) == 1;
     }
 
     public async Task<ViewerProgressResponse> GetProgressAsync(
-        int userId,
         int plantId,
         int? customerId,
         string process,
@@ -141,7 +183,7 @@ public sealed class ViewerRepository(SqlConnectionFactory connectionFactory)
                 m.ModelName;
             """, connection);
 
-        AddScopeParameters(command, userId, plantId, customerId, process);
+        AddScopeParameters(command, plantId, customerId, process);
         Add(command, "@ReportDate", SqlDbType.Date, reportDate.Date);
 
         await using var reader = await command.ExecuteReaderAsync(cancellationToken);
@@ -202,7 +244,6 @@ public sealed class ViewerRepository(SqlConnectionFactory connectionFactory)
     }
 
     public async Task<IReadOnlyList<ViewerTrendPoint>> GetTrendAsync(
-        int userId,
         int plantId,
         int? customerId,
         string process,
@@ -232,7 +273,7 @@ public sealed class ViewerRepository(SqlConnectionFactory connectionFactory)
             ORDER BY dr.ReportDate;
             """, connection);
 
-        AddScopeParameters(command, userId, plantId, customerId, process);
+        AddScopeParameters(command, plantId, customerId, process);
         Add(command, "@StartDate", SqlDbType.Date, startDate.Date);
         Add(command, "@EndDate", SqlDbType.Date, endDate.Date);
 
@@ -250,12 +291,10 @@ public sealed class ViewerRepository(SqlConnectionFactory connectionFactory)
 
     private static void AddScopeParameters(
         SqlCommand command,
-        int userId,
         int plantId,
         int? customerId,
         string process)
     {
-        Add(command, "@UserId", SqlDbType.Int, userId);
         Add(command, "@PlantId", SqlDbType.Int, plantId);
         Add(command, "@CustomerId", SqlDbType.Int, customerId);
         Add(command, "@Process", SqlDbType.VarChar, process, 10);
@@ -345,3 +384,5 @@ public sealed record ViewerTrendPoint(
     string Date,
     decimal ProductionPlan,
     decimal ProductionActual);
+
+public sealed record ViewerCustomerResponse(int CustomerId, string CustomerName);
