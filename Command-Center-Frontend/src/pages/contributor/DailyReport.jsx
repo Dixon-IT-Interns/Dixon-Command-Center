@@ -34,53 +34,52 @@ const GROUPS = [
   {
     title: "Production",
     rows: [
-      ["Month Plan", "monthPlan", "Plan"],
-      ["Month Plan", "monthActual", "Actual"],
-      ["Production", "productionPlan", "Plan"],
-      ["Production", "productionActual", "Actual"],
-      ["UPH", "uphTarget", "Target"],
-      ["UPH", "uphActual", "Actual"],
-      ["UPPH", "upphTarget", "Target"],
-      ["UPPH", "upphInstalled", "Installed"],
-      ["UPPH", "upphActual", "Actual"],
-      ["CPH", "cphTarget", "Target"],
-      ["CPH", "cphActual", "Actual"],
+      { label: "Month Plan", fields: [{ key: "monthPlan", label: "Plan" }, { key: "monthActual", label: "Actual" }] },
+      { label: "Production", fields: [{ key: "productionPlan", label: "Plan" }, { key: "productionActual", label: "Actual" }] },
+      { label: "UPH", fields: [{ key: "uphTarget", label: "Target" }, { key: "uphActual", label: "Actual" }] },
+      { label: "UPPH", fields: [{ key: "upphTarget", label: "Target" }, { key: "upphActual", label: "Actual" }] },
+      { label: "CPH", fields: [{ key: "cphTarget", label: "Target" }, { key: "cphActual", label: "Actual" }] },
     ],
   },
   {
     title: "Quality",
     rows: [
-      ["FPY", "fpyTarget", "Target"], ["FPY", "fpyActual", "Actual"],
-      ["FTY", "ftyTarget", "Target"], ["FTY", "ftyActual", "Actual"],
-      ["RTY", "rtyTarget", "Target"], ["RTY", "rtyActual", "Actual"],
+      { label: "FPY", fields: [{ key: "fpyTarget", label: "Target" }, { key: "fpyActual", label: "Actual" }] },
+      { label: "FTY", fields: [{ key: "ftyTarget", label: "Target" }, { key: "ftyActual", label: "Actual" }] },
+      { label: "RTY", fields: [{ key: "rtyTarget", label: "Target" }, { key: "rtyActual", label: "Actual" }] },
     ],
   },
   {
     title: "Operations",
     rows: [
-      ["OS&D — Reporting Date", "osdReportingDateValue", "Reporting Date"],
-      ["OS&D", "osdTarget", "Target"],
-      ["OS&D — Reporting Date %", "osdReportingDatePercent", "%"],
-      ["OS&D — MTD", "osdMtdValue", "MTD"],
-      ["OS&D — MTD %", "osdMtdPercent", "%"],
-      ["OT", "otTarget", "Target"],
-      ["Planned OT (Hrs)", "plannedOTManhours", "Planned"],
-      ["Unplanned OT (Hrs)", "unplannedOTManhours", "Unplanned"],
-      ["Actual OT (Hrs)", "actualOTManhours", "Actual"],
-      ["Open WO (Qty)", "openWOQty", "Value"],
-      [">7 Days WO (Qty)", "over7DaysWOBalanceQty", "Value"],
+      { label: "OS&D (Reporting Date)", fields: [
+        { key: "osdReportingDateValue", label: "Value (₹)" },
+        { key: "osdReportingDatePercent", label: "%" },
+      ] },
+      { label: "OS&D MTD", fields: [
+        { key: "osdMtdValue", label: "Value (₹)" },
+        { key: "osdMtdPercent", label: "%" },
+      ] },
+      { label: "OT (Hrs)", fields: [
+        { key: "otTarget", label: "Target" },
+        { key: "plannedOTManhours", label: "Planned" },
+        { key: "unplannedOTManhours", label: "Unplanned" },
+        { key: "actualOTManhours", label: "Actual" },
+      ] },
+      { label: "Open WO (Qty)", fields: [{ key: "openWOQty", label: "Value" }] },
+      { label: ">7 Days WO (Qty)", fields: [{ key: "over7DaysWOBalanceQty", label: "Value" }] },
     ],
   },
   {
     title: "TRC",
     rows: [
-      ["Daily TRC In (Qty)", "dailyTRCInQty", "Value"],
-      ["Daily TRC Out (Qty)", "dailyTRCOutQty", "Value"],
-      ["TRC Overall Failure Inflow %", "trcOverallFailureInflowPercent", "%"],
-      ["TRC Lying >3 Days (Cr)", "trcLyingOver3DaysCr", "Value"],
+      { label: "Daily TRC In (Qty)", fields: [{ key: "dailyTRCInQty", label: "Value" }] },
+      { label: "Daily TRC Out (Qty)", fields: [{ key: "dailyTRCOutQty", label: "Value" }] },
+      { label: "TRC Overall Failure Inflow %", fields: [{ key: "trcOverallFailureInflowPercent", label: "%" }] },
+      { label: "TRC Lying >3 Days (Cr)", fields: [{ key: "trcLyingOver3DaysCr", label: "Value" }] },
     ],
   },
-  { title: "Issue", rows: [["Issue Description", "issueDescription", ""]] },
+  { title: "Issue", rows: [{ label: "Issue Description", fields: [{ key: "issueDescription", label: "Description" }] }] },
 ];
 
 const KPI_PLAN_FIELDS = [
@@ -143,6 +142,8 @@ export default function DailyReport({ session, onSignOut }) {
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
   const excelFileInput = useRef(null);
+  const matrixScrollRef = useRef(null);
+  const pendingModelEntryId = useRef("");
   const loadSequence = useRef(0);
   const entryIdSequence = useRef(0);
   const [loadedReportKey, setLoadedReportKey] = useState("");
@@ -150,15 +151,23 @@ export default function DailyReport({ session, onSignOut }) {
   const reportLoaded = loadedReportKey === currentReportKey;
   const isSmtCategory = category?.categoryName?.trim().toUpperCase() === "SMT";
   const isFATPImport = category?.categoryName?.trim().toUpperCase() === "FATP";
+  const reportCategories = customer?.categories || [];
+  const fatpCategory = reportCategories.find((item) => item.categoryName?.trim().toUpperCase() === "FATP");
+  const smtCategory = reportCategories.find((item) => item.categoryName?.trim().toUpperCase() === "SMT");
   const reportGroups = useMemo(() => GROUPS.map((group) => (
     group.title === "Production"
       ? {
           ...group,
-          rows: group.rows.filter(([, key]) => (
-            isSmtCategory
-              ? key !== "upphTarget" && key !== "upphInstalled" && key !== "upphActual"
-              : key !== "cphTarget" && key !== "cphActual"
-          )),
+          rows: group.rows
+            .map((row) => ({
+              ...row,
+              fields: row.fields.filter(({ key }) => (
+                isSmtCategory
+                  ? key !== "upphTarget" && key !== "upphInstalled" && key !== "upphActual"
+                  : key !== "cphTarget" && key !== "cphActual"
+              )),
+            }))
+            .filter((row) => row.fields.length > 0),
         }
       : group
   )), [isSmtCategory]);
@@ -260,6 +269,22 @@ export default function DailyReport({ session, onSignOut }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [customerId, categoryId, reportDate]);
 
+  useEffect(() => {
+    if (!pendingModelEntryId.current) return;
+    const modelHeader = matrixScrollRef.current?.querySelector(
+      `[data-entry-id="${pendingModelEntryId.current}"]`
+    );
+    if (!modelHeader) return;
+    const scrollContainer = matrixScrollRef.current;
+    const containerBounds = scrollContainer.getBoundingClientRect();
+    const headerBounds = modelHeader.getBoundingClientRect();
+    scrollContainer.scrollTo({
+      left: scrollContainer.scrollLeft + headerBounds.left - containerBounds.left - 210,
+      behavior: "smooth",
+    });
+    pendingModelEntryId.current = "";
+  }, [lineData]);
+
   const updateEntry = (lineId, entryId, field, value) => {
     setLineData((current) => ({
       ...current,
@@ -311,13 +336,21 @@ export default function DailyReport({ session, onSignOut }) {
   const addModel = (lineId, modelId) => {
     if (!modelId) return;
     const line = lineData[lineId];
+    if (!line) {
+      setError("Unable to find the selected production line. Please refresh the report and try again.");
+      return;
+    }
     if (line?.entries.some((entry) => String(entry.modelId) === String(modelId))) {
       setError(`${line.lineName}: this model is already on the line.`);
       return;
     }
     const model = line?.models.find((item) => String(item.modelId) === String(modelId));
-    if (!model) return;
+    if (!model) {
+      setError("The selected model is not available for this production line. Please refresh the report and try again.");
+      return;
+    }
     const entryId = `new-${lineId}-${modelId}-${++entryIdSequence.current}`;
+    pendingModelEntryId.current = entryId;
     const sequence = loadSequence.current;
     setLineData((current) => {
       const currentLine = current[lineId];
@@ -391,6 +424,17 @@ export default function DailyReport({ session, onSignOut }) {
 
   const getLineName = (lineId) => lines.find((x) => Number(x.lineId) === Number(lineId))?.lineName || "Selected line";
 
+  const switchReportCategory = (nextCategory) => {
+    if (!nextCategory || Number(nextCategory.categoryId) === Number(categoryId)) return;
+    const hasUnsavedChanges = Object.values(lineData).some((line) => (
+      (line.entries || []).some((entry) => (
+        entry.isNew || JSON.stringify(entry.form) !== JSON.stringify(entry.initialForm)
+      ))
+    ));
+    if (hasUnsavedChanges && !window.confirm("You have unsaved changes. Switch report and discard these changes?")) return;
+    navigate(`/contributor/brands/${customerId}/categories/${nextCategory.categoryId}/report`);
+  };
+
   const buildPayload = (lineId, entry) => ({
     reportDate,
     customerId: Number(customerId), categoryId: Number(categoryId), lineId: Number(lineId), modelId: Number(entry.modelId),
@@ -435,9 +479,47 @@ export default function DailyReport({ session, onSignOut }) {
     try {
       for (const entry of line.entries) {
         if (!entry.modelId) throw new Error(`Select a model for every column in ${getLineName(lineId)}.`);
-        await api.post(`/daily-reports/${submit ? "submit" : "draft"}`, buildPayload(lineId, entry));
+        const saved = await api.post(`/daily-reports/${submit ? "submit" : "draft"}`, buildPayload(lineId, entry));
+        const savedStatus = saved?.status || (submit ? "SUBMITTED" : "DRAFT");
+        setLineData((current) => {
+          const currentLine = current[lineId];
+          if (!currentLine) return current;
+          const entries = currentLine.entries.map((currentEntry) => currentEntry.entryId !== entry.entryId
+            ? currentEntry
+            : {
+                ...currentEntry,
+                dailyReportId: saved?.dailyReportId ?? currentEntry.dailyReportId,
+                status: savedStatus,
+                isNew: false,
+                initialForm: { ...entry.form },
+                planEditedFields: KPI_PLAN_FIELDS.filter((field) => (
+                  asNumber(currentEntry.form[field]) !== asNumber(entry.form[field])
+                )),
+              });
+          const statuses = entries.map((item) => item.status);
+          const lineStatus = statuses.every((status) => status === "APPROVED")
+            ? "APPROVED"
+            : statuses.every((status) => status === "SUBMITTED" || status === "APPROVED")
+              ? "SUBMITTED"
+              : "IN_PROGRESS";
+          return { ...current, [lineId]: { ...currentLine, status: lineStatus, entries } };
+        });
+
+        const sequence = loadSequence.current;
+        fetchKpiPlan(lineId, entry.modelId).then(({ plan }) => {
+          if (sequence === loadSequence.current)
+            setEntryPlan(lineId, entry.entryId, plan || null, plan ? "ready" : "missing");
+        }).catch((e) => {
+          if (sequence === loadSequence.current)
+            setEntryPlan(
+              lineId,
+              entry.entryId,
+              null,
+              /more than one|ambiguous/i.test(e.message || "") ? "ambiguous" : "error",
+              e.message || "Unable to load this monthly KPI plan."
+            );
+        });
       }
-      await loadReport(false);
       setNotice(`${getLineName(lineId)} ${submit ? "submitted for approval" : "draft saved"}.`);
     } catch (e) {
       setError(e.message || "Unable to save the report.");
@@ -787,12 +869,6 @@ export default function DailyReport({ session, onSignOut }) {
     setNotice(`Applied ${importedRows.length} reviewed FATP row(s) to the form. Review and save or submit manually.`);
   };
 
-  const columns = useMemo(() => {
-    const result = [];
-    lines.forEach((line) => (lineData[line.lineId]?.entries || []).forEach((entry) => result.push({ lineId: line.lineId, entry })));
-    return result;
-  }, [lines, lineData]);
-
   const completed = lines.filter((line) => ["SUBMITTED", "APPROVED", "INACTIVE"].includes(lineData[line.lineId]?.status)).length;
 
   return (
@@ -801,15 +877,24 @@ export default function DailyReport({ session, onSignOut }) {
         <div className="daily-report-content">
           <ProcessTracker activeStep="report" customerId={customerId} categoryId={categoryId} />
 
-          <button className="report-back" onClick={() => navigate(`/contributor/brands/${customerId}/categories`)}>
-            <ArrowLeft size={16} /> Back to categories
+          <button className="report-back" onClick={() => navigate("/contributor/brands")}>
+            <ArrowLeft size={16} /> Back to customers
           </button>
 
           <div className="report-breadcrumb">{customer?.customerName || "Brand"}<span>›</span>{category?.categoryName || "FATP"}<span>›</span><strong>Daily Report</strong></div>
 
           <header className="report-title-row">
             <div className="report-title-icon"><ClipboardList size={25} /></div>
-            <div><h1>{category?.categoryName || "Daily"} Daily Report</h1><p>Plan targets load from the monthly KPI plan; daily actuals remain date-specific.</p></div>
+            <div><h1>{category?.categoryName || "Daily"} Daily Report</h1></div>
+            {fatpCategory && smtCategory && (
+              <div className="report-category-switch" role="group" aria-label="Select reporting category">
+                <span>REPORT TYPE</span>
+                <div>
+                  <button type="button" aria-pressed={!isSmtCategory} className={!isSmtCategory ? "active" : ""} onClick={() => switchReportCategory(fatpCategory)}>FATP</button>
+                  <button type="button" aria-pressed={isSmtCategory} className={isSmtCategory ? "active" : ""} onClick={() => switchReportCategory(smtCategory)}>SMT</button>
+                </div>
+              </div>
+            )}
             <button
               className="secondary-action report-excel-upload"
               type="button"
@@ -966,50 +1051,17 @@ export default function DailyReport({ session, onSignOut }) {
             <div className="report-message info"><Loader2 size={18} className="spin" /><div><strong>Loading {category?.categoryName || "daily"} report</strong><p>Loading lines, models, saved values and monthly KPI plans…</p></div></div>
           ) : (
             <section className="matrix-shell">
-              <div className="matrix-scroll">
-                <table className="daily-matrix">
-                  <thead>
-                    <tr className="line-header-row">
-                      <th className="parameter-head sticky-col" rowSpan="2">PARAMETERS</th>
-                      {lines.map((line) => {
-                        const count = Math.max(lineData[line.lineId]?.entries?.length || 0, 1);
-                        return (
-                          <th key={line.lineId} className="line-group-head" colSpan={count}>
-                            <div className="line-head-inner">
-                              <div><strong>{line.lineName}</strong><span>{line.sapLocation || "SAP location not set"}</span></div>
-                              <button className={`matrix-line-toggle ${lineData[line.lineId]?.isActive === false ? "off" : ""}`} onClick={() => toggleLine(line.lineId)} disabled={busy === `toggle-${line.lineId}`}>
-                                {lineData[line.lineId]?.isActive === false ? <ToggleLeft size={18} /> : <ToggleRight size={18} />}
-                              </button>
-                            </div>
-                          </th>
-                        );
-                      })}
-                    </tr>
-                    <tr className="model-header-row">
-                      {lines.map((line) => {
-                        const data = lineData[line.lineId] || { entries: [], models: [] };
-                        if (!data.entries.length) {
-                          return <th key={line.lineId} className="model-head empty-model-head"><AddModelSelect models={data.models} onSelect={(id) => addModel(line.lineId, id)} disabled={!data.isActive} /></th>;
-                        }
-                        return data.entries.map((entry) => (
-                          <th key={entry.entryId} className="model-head">
-                            <div className="model-head-content">
-                              <div><span>MODEL</span><strong>{entry.modelName}</strong></div>
-                              {entry.planStatus === "loading" && <small className="plan-status loading"><Loader2 size={11} className="spin" /> Loading KPI plan…</small>}
-                              {entry.planStatus === "missing" && <small className="plan-status missing" title="No monthly plan exists for this plant, customer, category, line, model and month.">{entry.isNew ? "No monthly plan; targets left blank." : "No active monthly plan; saved targets are preserved."}</small>}
-                              {entry.planStatus === "error" && <small className="plan-status error" title={entry.planError}>KPI plan unavailable; daily report remains editable.</small>}
-                              {entry.planStatus === "ambiguous" && <small className="plan-status ambiguous" title={entry.planError}>Multiple monthly plans match; targets not prefilled.</small>}
-                              {entry.isNew && <button onClick={() => removeModel(line.lineId, entry.entryId)} title="Remove model"><Trash2 size={13} /></button>}
-                            </div>
-                          </th>
-                        ));
-                      })}
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {reportGroups.map((group) => <MatrixGroup key={group.title} group={group} columns={columns} lineData={lineData} onChange={updateEntry} />)}
-                  </tbody>
-                </table>
+              <div className="matrix-scroll" ref={matrixScrollRef}>
+                <MatrixTable
+                  groups={reportGroups}
+                  lines={lines}
+                  lineData={lineData}
+                  onChange={updateEntry}
+                  onToggleLine={toggleLine}
+                  onAddModel={addModel}
+                  onRemoveModel={removeModel}
+                  busy={busy}
+                />
               </div>
 
               <div className="matrix-add-model-bar">
@@ -1022,7 +1074,6 @@ export default function DailyReport({ session, onSignOut }) {
               </div>
 
               <div className="matrix-actions">
-                <span>Plan targets prefill from the monthly KPI plan. Explicit target edits persist only when this report is saved.</span>
                 <div className="action-groups">
                   {lines.map((line) => {
                     const data = lineData[line.lineId] || { entries: [] };
@@ -1046,16 +1097,92 @@ function AddModelSelect({ models, onSelect, disabled }) {
   return <label className="add-model-control"><Plus size={13} /><select value="" onChange={(e) => onSelect(e.target.value)} disabled={disabled}><option value="">Add model</option>{models.map((model) => <option key={model.modelId} value={model.modelId}>{model.modelName}</option>)}</select></label>;
 }
 
+function MatrixTable({ groups, lines, lineData, onChange, onToggleLine, onAddModel, onRemoveModel, busy }) {
+  const columns = lines.flatMap((line) => {
+    const entries = lineData[line.lineId]?.entries || [];
+    return entries.length
+      ? entries.map((entry) => ({ lineId: line.lineId, entry }))
+      : [{ lineId: line.lineId, entry: null }];
+  });
+  const tableWidth = 210 + columns.length * 300;
+  return <table className="daily-matrix" style={{ "--matrix-width": `${tableWidth}px` }}>
+    <colgroup>
+      <col className="matrix-category-column" />
+      {columns.map(({ entry }, index) => (
+        <col
+          className="matrix-model-column"
+          key={`${entry?.entryId || "empty"}-${index}`}
+        />
+      ))}
+    </colgroup>
+    <thead>
+      <tr className="line-header-row">
+        <th className="parameter-head sticky-col" rowSpan="2">CATEGORY / KPI</th>
+        {lines.map((line) => {
+            const data = lineData[line.lineId] || { entries: [], isActive: true };
+            const entryCount = Math.max(data.entries.length, 1);
+            return <th key={line.lineId} className="line-group-head" colSpan={entryCount}>
+              <div className="line-head-inner">
+                <div><strong>{line.lineName}</strong><span>{line.sapLocation || "SAP location not set"}</span></div>
+                <button className={`matrix-line-toggle ${data.isActive === false ? "off" : ""}`} onClick={() => onToggleLine(line.lineId)} disabled={busy === `toggle-${line.lineId}`}>
+                  {data.isActive === false ? <ToggleLeft size={18} /> : <ToggleRight size={18} />}
+                </button>
+              </div>
+            </th>;
+        })}
+      </tr>
+      <tr className="model-header-row">
+        {lines.map((line) => {
+            const data = lineData[line.lineId] || { entries: [], models: [], isActive: true };
+            if (!data.entries.length)
+              return <th key={line.lineId} className="model-head empty-model-head">
+                <AddModelSelect models={data.models || []} onSelect={(id) => onAddModel(line.lineId, id)} disabled={data.isActive === false} />
+              </th>;
+            return data.entries.map((entry) => (
+              <th key={entry.entryId} className="model-head" data-entry-id={entry.entryId}>
+                <div className="model-head-content">
+                  <div><span>MODEL</span><strong>{entry.modelName}</strong></div>
+                  {entry.planStatus === "loading" && <small className="plan-status loading"><Loader2 size={11} className="spin" /> Loading KPI plan…</small>}
+                  {entry.planStatus === "missing" && <small className="plan-status missing" title="No monthly plan exists for this plant, customer, category, line, model and month.">{entry.isNew ? "No monthly plan; targets left blank." : "No active monthly plan; saved targets are preserved."}</small>}
+                  {entry.planStatus === "error" && <small className="plan-status error" title={entry.planError}>KPI plan unavailable; daily report remains editable.</small>}
+                  {entry.planStatus === "ambiguous" && <small className="plan-status ambiguous" title={entry.planError}>Multiple monthly plans match; targets not prefilled.</small>}
+                  {entry.isNew && <button onClick={() => onRemoveModel(line.lineId, entry.entryId)} title="Remove model"><Trash2 size={13} /></button>}
+                </div>
+              </th>
+            ));
+        })}
+      </tr>
+    </thead>
+    <tbody>
+      {groups.map((group) => (
+        <MatrixGroup key={group.title} group={group} columns={columns} lineData={lineData} onChange={onChange} />
+      ))}
+    </tbody>
+  </table>;
+}
+
 function MatrixGroup({ group, columns, lineData, onChange }) {
   return <>
-    <tr className="group-row"><th className="sticky-col group-label">{group.title}</th>{columns.map(({ entry }) => <td className="group-spacer" key={`${group.title}-${entry.entryId}`} />)}</tr>
-    {group.rows.map(([label, key, sub]) => <tr key={key} className={key === "issueDescription" ? "issue-row" : ""}>
-      <th className="sticky-col parameter-label"><span>{label}</span>{sub && <small>{sub}</small>}</th>
+    <tr className="group-row">
+      <th className="sticky-col group-label">{group.title}</th>
+      <td className="group-spacer" colSpan={Math.max(columns.length, 1)} />
+    </tr>
+    {group.rows.map((row) => <tr key={row.label} className={row.fields.some(({ key }) => key === "issueDescription") ? "issue-row" : ""}>
+      <th className="sticky-col parameter-label"><span>{row.label}</span></th>
       {columns.map(({ lineId, entry }) => {
+        if (!entry) return <td className="matrix-cell empty-matrix-cell" key={`${lineId}-${row.label}`} />;
         const disabled = entry.status === "APPROVED" || lineData[lineId]?.isActive === false;
-        return <td className="matrix-cell" key={`${key}-${entry.entryId}`}>
-          {key === "issueDescription" ? <textarea value={entry.form?.[key] ?? ""} disabled={disabled} placeholder="Issue / observation" onChange={(e) => onChange(lineId, entry.entryId, key, e.target.value)} />
-            : <input type="number" min="0" step="0.01" value={entry.form?.[key] ?? ""} disabled={disabled} placeholder="—" onChange={(e) => onChange(lineId, entry.entryId, key, e.target.value)} />}
+        return <td className="matrix-cell" key={`${row.label}-${entry.entryId}`}>
+          <div className="matrix-values-grid">
+            {row.fields.map(({ key, label }) => (
+              <label className={`matrix-value-field ${key === "issueDescription" ? "matrix-value-wide" : ""}`} key={key}>
+                <span>{label}</span>
+                {key === "issueDescription"
+                  ? <textarea aria-label={`${row.label} ${label}`} value={entry.form?.[key] ?? ""} disabled={disabled} placeholder="Issue / observation" onChange={(event) => onChange(lineId, entry.entryId, key, event.target.value)} />
+                  : <input aria-label={`${row.label} ${label}`} type="number" min="0" step="0.01" value={entry.form?.[key] ?? ""} disabled={disabled} placeholder="—" onChange={(event) => onChange(lineId, entry.entryId, key, event.target.value)} />}
+              </label>
+            ))}
+          </div>
         </td>;
       })}
     </tr>)}

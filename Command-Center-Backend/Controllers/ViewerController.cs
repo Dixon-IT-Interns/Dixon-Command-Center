@@ -115,8 +115,15 @@ public sealed class ViewerController(ViewerRepository viewer) : ControllerBase
         var sheet = workbook.Worksheets.Add("Line Work Progress");
         var headers = new[]
         {
-            "Customer", "Process", "Line", "Status", "Plan", "Actual",
-            "Achievement (%)", "Open WO", "7+ Days WO"
+            "Customer", "Process", "Line No.", "SAP Location", "Model", "Status",
+            "Month Plan", "Month Actual", "Production Plan", "Production Actual",
+            "UPH Target", "UPH Actual", "UPPH Installed", "UPPH Actual",
+            "FPY Target", "FPY Actual", "FTY Target", "FTY Actual", "RTY Target", "RTY Actual",
+            "OS&D Reporting Date Value", "OS&D Reporting Date %",
+            "OS&D MTD Value", "OS&D MTD %",
+            "Actual OT", "Planned OT", "Unplanned OT", "Open WO Qty", ">7 Days WO",
+            "Daily TRC In", "Daily TRC Out", "TRC Overall Failure %",
+            "TRC Lying >3 Days", "Issue Description"
         };
 
         for (var column = 0; column < headers.Length; column++)
@@ -128,15 +135,24 @@ public sealed class ViewerController(ViewerRepository viewer) : ControllerBase
         {
             var line = progress.Lines[row];
             var excelRow = row + 2;
-            sheet.Cell(excelRow, 1).Value = line.CustomerName;
-            sheet.Cell(excelRow, 2).Value = line.Process;
-            sheet.Cell(excelRow, 3).Value = line.LineName;
-            sheet.Cell(excelRow, 4).Value = line.Status;
-            sheet.Cell(excelRow, 5).Value = line.ProductionPlan;
-            sheet.Cell(excelRow, 6).Value = line.ProductionActual;
-            sheet.Cell(excelRow, 7).Value = line.Achievement;
-            sheet.Cell(excelRow, 8).Value = line.OpenWOQty;
-            sheet.Cell(excelRow, 9).Value = line.Over7DaysWOBalanceQty;
+            var values = new object?[]
+            {
+                line.CustomerName, line.Process, line.LineName, line.SAPLocation, line.ModelName, line.Status,
+                line.MonthPlan, line.MonthActual, line.ProductionPlan, line.ProductionActual,
+                line.UPHTarget, line.UPHActual, line.UPPHInstalled, line.UPPHActual,
+                line.FPYTarget, line.FPYActual, line.FTYTarget, line.FTYActual, line.RTYTarget, line.RTYActual,
+                line.OSDReportingDateValue, line.OSDReportingDatePercent,
+                line.OSDMTDValue, line.OSDMTDPercent,
+                line.ActualOTManhours, line.PlannedOTManhours, line.UnplannedOTManhours,
+                line.OpenWOQty, line.Over7DaysWOBalanceQty,
+                line.DailyTRCInQty, line.DailyTRCOutQty, line.TRCOverallFailureInflowPercent,
+                line.TRCLyingOver3DaysCr, line.IssueDescription
+            };
+
+            for (var column = 0; column < values.Length; column++)
+            {
+                SetCellValue(sheet.Cell(excelRow, column + 1), values[column]);
+            }
         }
 
         sheet.Row(1).Style.Font.Bold = true;
@@ -164,5 +180,26 @@ public sealed class ViewerController(ViewerRepository viewer) : ControllerBase
     {
         process = value?.Trim().ToUpperInvariant() ?? string.Empty;
         return process is "ALL" or "FATP" or "SMT";
+    }
+
+    private static void SetCellValue(IXLCell cell, object? value)
+    {
+        switch (value)
+        {
+            case null:
+                cell.Clear(XLClearOptions.Contents);
+                break;
+            case string text:
+                cell.Value = text;
+                break;
+            case int number:
+                cell.Value = number;
+                break;
+            case decimal number:
+                cell.Value = number;
+                break;
+            default:
+                throw new InvalidOperationException($"Unsupported Excel cell value type: {value.GetType().Name}.");
+        }
     }
 }

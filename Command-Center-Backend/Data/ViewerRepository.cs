@@ -14,7 +14,8 @@ public sealed class ViewerRepository(SqlConnectionFactory connectionFactory)
                 cat.CategoryId,
                 cat.CategoryName AS Process,
                 pl.LineId,
-                pl.LineName
+                pl.LineName,
+                pl.SAPLocation
             FROM PlantCustomer pc
             INNER JOIN Customer c ON c.CustomerId = pc.CustomerId
             INNER JOIN Category cat
@@ -89,13 +90,39 @@ public sealed class ViewerRepository(SqlConnectionFactory connectionFactory)
                 al.Process,
                 al.LineId,
                 al.LineName,
-                COALESCE(SUM(dr.ProductionPlan), 0) AS ProductionPlan,
-                COALESCE(SUM(dr.ProductionActual), 0) AS ProductionActual,
-                COALESCE(SUM(dr.OpenWOQty), 0) AS OpenWOQty,
-                COALESCE(SUM(dr.Over7DaysWOBalanceQty), 0) AS Over7DaysWOBalanceQty,
-                COUNT(dr.DailyReportId) AS ReportCount,
-                SUM(CASE WHEN dr.Status = 'APPROVED' THEN 1 ELSE 0 END) AS ApprovedCount,
-                SUM(CASE WHEN dr.Status = 'SUBMITTED' THEN 1 ELSE 0 END) AS SubmittedCount
+                al.SAPLocation,
+                dr.ModelId,
+                m.ModelName,
+                dr.DailyReportId,
+                dr.Status,
+                dr.MonthPlan,
+                dr.MonthActual,
+                dr.ProductionPlan,
+                dr.ProductionActual,
+                dr.UPHTarget,
+                dr.UPHActual,
+                dr.UPPHInstalled,
+                dr.UPPHActual,
+                dr.FPYTarget,
+                dr.FPYActual,
+                dr.FTYTarget,
+                dr.FTYActual,
+                dr.RTYTarget,
+                dr.RTYActual,
+                dr.OSDReportingDateValue,
+                dr.OSDReportingDatePercent,
+                dr.OSDMTDValue,
+                dr.OSDMTDPercent,
+                dr.ActualOTManhours,
+                dr.PlannedOTManhours,
+                dr.UnplannedOTManhours,
+                dr.OpenWOQty,
+                dr.Over7DaysWOBalanceQty,
+                dr.DailyTRCInQty,
+                dr.DailyTRCOutQty,
+                dr.TRCOverallFailureInflowPercent,
+                dr.TRCLyingOver3DaysCr,
+                dr.IssueDescription
             FROM AccessibleLines al
             LEFT JOIN DailyReport dr
                 ON dr.CustomerId = al.CustomerId
@@ -106,13 +133,12 @@ public sealed class ViewerRepository(SqlConnectionFactory connectionFactory)
                AND dr.IsActive = 1
                AND dr.ModelId IS NOT NULL
                AND dr.Status <> 'INACTIVE'
-            GROUP BY
-                al.CustomerId,
+            LEFT JOIN Model m ON m.ModelId = dr.ModelId
+            ORDER BY
+                CASE al.Process WHEN 'FATP' THEN 0 WHEN 'SMT' THEN 1 ELSE 2 END,
                 al.CustomerName,
-                al.Process,
-                al.LineId,
-                al.LineName
-            ORDER BY al.CustomerName, al.Process, al.LineName;
+                al.LineName,
+                m.ModelName;
             """, connection);
 
         AddScopeParameters(command, userId, plantId, customerId, process);
@@ -121,41 +147,56 @@ public sealed class ViewerRepository(SqlConnectionFactory connectionFactory)
         await using var reader = await command.ExecuteReaderAsync(cancellationToken);
         while (await reader.ReadAsync(cancellationToken))
         {
-            var plan = reader.GetDecimal(5);
-            var actual = reader.GetDecimal(6);
-            var reportCount = reader.GetInt32(9);
-            var approvedCount = reader.IsDBNull(10) ? 0 : reader.GetInt32(10);
-            var submittedCount = reader.IsDBNull(11) ? 0 : reader.GetInt32(11);
-            var status = reportCount == 0
-                ? "NOT_REPORTED"
-                : approvedCount == reportCount
-                    ? "APPROVED"
-                    : submittedCount + approvedCount == reportCount
-                        ? "SUBMITTED"
-                        : "IN_PROGRESS";
-
             lines.Add(new ViewerLineProgress(
-                reader.GetInt32(0),
-                reader.GetString(1),
-                reader.GetString(2),
-                reader.GetInt32(3),
-                reader.GetString(4),
-                plan,
-                actual,
-                plan > 0 ? decimal.Round(actual / plan * 100, 1) : 0,
-                status,
-                reader.GetInt32(7),
-                reader.GetInt32(8)));
+                CustomerId: reader.GetInt32(0),
+                CustomerName: reader.GetString(1),
+                Process: reader.GetString(2),
+                LineId: reader.GetInt32(3),
+                LineName: reader.GetString(4),
+                SAPLocation: GetString(reader, 5),
+                ModelId: GetInt(reader, 6),
+                ModelName: GetString(reader, 7),
+                DailyReportId: GetInt(reader, 8),
+                Status: GetInt(reader, 8) is null ? "NOT_REPORTED" : reader.GetString(9),
+                MonthPlan: GetDecimal(reader, 10),
+                MonthActual: GetDecimal(reader, 11),
+                ProductionPlan: GetDecimal(reader, 12),
+                ProductionActual: GetDecimal(reader, 13),
+                UPHTarget: GetDecimal(reader, 14),
+                UPHActual: GetDecimal(reader, 15),
+                UPPHInstalled: GetDecimal(reader, 16),
+                UPPHActual: GetDecimal(reader, 17),
+                FPYTarget: GetDecimal(reader, 18),
+                FPYActual: GetDecimal(reader, 19),
+                FTYTarget: GetDecimal(reader, 20),
+                FTYActual: GetDecimal(reader, 21),
+                RTYTarget: GetDecimal(reader, 22),
+                RTYActual: GetDecimal(reader, 23),
+                OSDReportingDateValue: GetDecimal(reader, 24),
+                OSDReportingDatePercent: GetDecimal(reader, 25),
+                OSDMTDValue: GetDecimal(reader, 26),
+                OSDMTDPercent: GetDecimal(reader, 27),
+                ActualOTManhours: GetDecimal(reader, 28),
+                PlannedOTManhours: GetDecimal(reader, 29),
+                UnplannedOTManhours: GetDecimal(reader, 30),
+                OpenWOQty: GetInt(reader, 31),
+                Over7DaysWOBalanceQty: GetInt(reader, 32),
+                DailyTRCInQty: GetInt(reader, 33),
+                DailyTRCOutQty: GetInt(reader, 34),
+                TRCOverallFailureInflowPercent: GetDecimal(reader, 35),
+                TRCLyingOver3DaysCr: GetDecimal(reader, 36),
+                IssueDescription: GetString(reader, 37)));
         }
 
-        var totalPlan = lines.Sum(line => line.ProductionPlan);
-        var totalActual = lines.Sum(line => line.ProductionActual);
+        var totalPlan = lines.Sum(line => line.ProductionPlan ?? 0);
+        var totalActual = lines.Sum(line => line.ProductionActual ?? 0);
         var summary = new ViewerSummary(
             totalPlan,
             totalActual,
             totalPlan > 0 ? decimal.Round(totalActual / totalPlan * 100, 1) : 0,
-            lines.Count(line => line.Status == "APPROVED"),
-            lines.Count);
+            lines.GroupBy(line => line.LineId)
+                .Count(group => group.All(line => line.Status == "APPROVED")),
+            lines.Select(line => line.LineId).Distinct().Count());
 
         return new ViewerProgressResponse(summary, lines);
     }
@@ -232,6 +273,15 @@ public sealed class ViewerRepository(SqlConnectionFactory connectionFactory)
             : command.Parameters.Add(name, type, size.Value);
         parameter.Value = value ?? DBNull.Value;
     }
+
+    private static decimal? GetDecimal(SqlDataReader reader, int ordinal) =>
+        reader.IsDBNull(ordinal) ? null : reader.GetDecimal(ordinal);
+
+    private static int? GetInt(SqlDataReader reader, int ordinal) =>
+        reader.IsDBNull(ordinal) ? null : reader.GetInt32(ordinal);
+
+    private static string? GetString(SqlDataReader reader, int ordinal) =>
+        reader.IsDBNull(ordinal) ? null : reader.GetString(ordinal);
 }
 
 public sealed record ViewerSummary(
@@ -247,12 +297,45 @@ public sealed record ViewerLineProgress(
     string Process,
     int LineId,
     string LineName,
-    decimal ProductionPlan,
-    decimal ProductionActual,
-    decimal Achievement,
+    string? SAPLocation,
+    int? ModelId,
+    string? ModelName,
+    int? DailyReportId,
     string Status,
-    int OpenWOQty,
-    int Over7DaysWOBalanceQty);
+    decimal? MonthPlan,
+    decimal? MonthActual,
+    decimal? ProductionPlan,
+    decimal? ProductionActual,
+    decimal? UPHTarget,
+    decimal? UPHActual,
+    decimal? UPPHInstalled,
+    decimal? UPPHActual,
+    decimal? FPYTarget,
+    decimal? FPYActual,
+    decimal? FTYTarget,
+    decimal? FTYActual,
+    decimal? RTYTarget,
+    decimal? RTYActual,
+    decimal? OSDReportingDateValue,
+    decimal? OSDReportingDatePercent,
+    decimal? OSDMTDValue,
+    decimal? OSDMTDPercent,
+    decimal? ActualOTManhours,
+    decimal? PlannedOTManhours,
+    decimal? UnplannedOTManhours,
+    int? OpenWOQty,
+    int? Over7DaysWOBalanceQty,
+    int? DailyTRCInQty,
+    int? DailyTRCOutQty,
+    decimal? TRCOverallFailureInflowPercent,
+    decimal? TRCLyingOver3DaysCr,
+    string? IssueDescription)
+{
+    public decimal Achievement =>
+        ProductionPlan is decimal plan && plan > 0
+            ? decimal.Round(ProductionActual.GetValueOrDefault() / plan * 100, 1)
+            : 0;
+}
 
 public sealed record ViewerProgressResponse(
     ViewerSummary Summary,

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { CheckCircle2, Clock3, ArrowRight } from "lucide-react";
+import { CheckCircle2, ArrowRight } from "lucide-react";
 import { api } from "../../api";
 import ContributorLayout from "../../components/contributor/ContributorLayout";
 import ProcessTracker from "../../components/contributor/ProcessTracker";
@@ -65,7 +65,6 @@ export default function CategorySelection({ session, onSignOut }) {
           <section className="category-hero">
             <span className="page-kicker">STEP 02 · CHOOSE YOUR WORK</span>
             <h1>What do you want to report?</h1>
-            <p>Choose a production category. You&apos;ll go directly to today&apos;s report for all its lines.</p>
           </section>
 
           {error && <p className="notice error" role="alert">{error}</p>}
@@ -103,7 +102,6 @@ export default function CategorySelection({ session, onSignOut }) {
             {customer && !customer.categories.length && <div className="loading-card">No production categories are configured for this brand.</div>}
           </section>
 
-          <div className="brand-tip"><Clock3 size={15} /><p><strong>Today&apos;s progress stays saved.</strong> Complete SMT and come back here — it will show as completed. You can then report FATP.</p></div>
         </main>
       </div>
     </ContributorLayout>
