@@ -1,23 +1,23 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\Saksham Jain\\OneDrive\\Desktop\\Backup\\Dixon-Command-Center\\Command-Center-Backend\\Dixon.CommandCenter.API.csproj": {}
+    "D:\\Dixon-Command-Center\\Command-Center-Backend\\Dixon.CommandCenter.API.csproj": {}
   },
   "projects": {
-    "C:\\Users\\Saksham Jain\\OneDrive\\Desktop\\Backup\\Dixon-Command-Center\\Command-Center-Backend\\Dixon.CommandCenter.API.csproj": {
+    "D:\\Dixon-Command-Center\\Command-Center-Backend\\Dixon.CommandCenter.API.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\Saksham Jain\\OneDrive\\Desktop\\Backup\\Dixon-Command-Center\\Command-Center-Backend\\Dixon.CommandCenter.API.csproj",
+        "projectUniqueName": "D:\\Dixon-Command-Center\\Command-Center-Backend\\Dixon.CommandCenter.API.csproj",
         "projectName": "Dixon.CommandCenter.API",
-        "projectPath": "C:\\Users\\Saksham Jain\\OneDrive\\Desktop\\Backup\\Dixon-Command-Center\\Command-Center-Backend\\Dixon.CommandCenter.API.csproj",
-        "packagesPath": "C:\\Users\\Saksham Jain\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\Saksham Jain\\OneDrive\\Desktop\\Backup\\Dixon-Command-Center\\Command-Center-Backend\\obj\\",
+        "projectPath": "D:\\Dixon-Command-Center\\Command-Center-Backend\\Dixon.CommandCenter.API.csproj",
+        "packagesPath": "C:\\Users\\HP\\.nuget\\packages\\",
+        "outputPath": "D:\\Dixon-Command-Center\\Command-Center-Backend\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
         ],
         "configFilePaths": [
-          "C:\\Users\\Saksham Jain\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\HP\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
@@ -45,7 +45,7 @@
           "auditLevel": "low",
           "auditMode": "direct"
         },
-        "SdkAnalysisLevel": "11.0.100"
+        "SdkAnalysisLevel": "10.0.400"
       },
       "frameworks": {
         "net8.0": {
@@ -84,6 +84,24 @@
           ],
           "assetTargetFallback": true,
           "warn": true,
+          "downloadDependencies": [
+            {
+              "name": "Microsoft.AspNetCore.App.Ref",
+              "version": "[8.0.31, 8.0.31]"
+            },
+            {
+              "name": "Microsoft.NETCore.App.Host.win-x64",
+              "version": "[8.0.31, 8.0.31]"
+            },
+            {
+              "name": "Microsoft.NETCore.App.Ref",
+              "version": "[8.0.31, 8.0.31]"
+            },
+            {
+              "name": "Microsoft.WindowsDesktop.App.Ref",
+              "version": "[8.0.31, 8.0.31]"
+            }
+          ],
           "frameworkReferences": {
             "Microsoft.AspNetCore.App": {
               "privateAssets": "none"
@@ -92,7 +110,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\11.0.100-rc.1.26425.128/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.401/PortableRuntimeIdentifierGraph.json"
         }
       }
     }

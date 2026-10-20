@@ -4,7 +4,8 @@ using Dixon.CommandCenter.API.Data;
 using Dixon.CommandCenter.API.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
-using Dixon.CommandCenter.API.Data;
+
+
 var builder = WebApplication.CreateBuilder(args);
 
 var jwtSecret = builder.Configuration["Jwt:Secret"];

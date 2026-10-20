@@ -45,3 +45,9 @@ API:
 - `GET /api/contributor/dashboard?days=7` — contributor activity/history.
 
 Plant customer access is controlled by `PlantCustomer`; individual user assignments remain controlled by `UserCustomer`. Both are enforced by the backend catalog/reporting APIs.
+
+## Daily Performance Excel import
+
+On the Daily Report page, choose FATP or SMT in the process dropdown before uploading the workbook. The importer selects the matching UPPH (FATP) or CPH (SMT) section; if both metrics are present in one table, it uses the populated metric for each row. It matches rows using the selected customer, line, SAP location, and model, and skips rows that belong to the other process. CPH target subheadings may be `Target`, `Installed`, or `Ins`.
+
+Quality, overtime, and TRC columns are optional in the Daily Performance workbook. Fields that are not present are left unchanged in the form. Standalone WO Closure, Quality, and IE workbooks are not imported through this Daily Report upload because WO Closure is an aggregate report without line/model keys and needs a separate destination.

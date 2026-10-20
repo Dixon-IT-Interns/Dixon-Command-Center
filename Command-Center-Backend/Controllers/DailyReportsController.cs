@@ -910,7 +910,30 @@ public sealed class DailyReportsController(
 
                 dr.UPPHTarget,
                 dr.OSDTarget,
-                dr.OTTarget
+                dr.OTTarget,
+                dr.wip_lying_greater_3_days,
+                dr.wip_lying_greater_7_days,
+                dr.FPYIntViTarget,
+                dr.FPYIntViActual,
+                dr.FPYPTTarget,
+                dr.FPYPTActual,
+                dr.FPYRiTarget,
+                dr.FPYRiActual,
+                dr.FPYRiImageTarget,
+                dr.FPYRiImageActual,
+                dr.FPYPackingViTarget,
+                dr.FPYPackingViActual,
+                dr.WOCount0To3Days,
+                dr.WOCount4To7Days,
+                dr.WOCountGreater7Days,
+                dr.WOCountTotal,
+                dr.WOQty0To3Days,
+                dr.WOQty4To7Days,
+                dr.WOQtyGreater7Days,
+                dr.WOQtyTotal,
+                dr.WOClearancePlanGreater7Days,
+                dr.WOResponsible,
+                dr.WOTimeline
 
             FROM DailyReport dr
 
@@ -1052,7 +1075,30 @@ public sealed class DailyReportsController(
 
                 upphTarget = GetDecimal(reader, 36),
                 osdTarget = GetDecimal(reader, 37),
-                otTarget = GetDecimal(reader, 38)
+                otTarget = GetDecimal(reader, 38),
+                wipLyingGreater3Days = GetInt(reader, 39),
+                wipLyingGreater7Days = GetInt(reader, 40),
+                fpyIntViTarget = GetDecimal(reader, 41),
+                fpyIntViActual = GetDecimal(reader, 42),
+                fpyPtTarget = GetDecimal(reader, 43),
+                fpyPtActual = GetDecimal(reader, 44),
+                fpyRiTarget = GetDecimal(reader, 45),
+                fpyRiActual = GetDecimal(reader, 46),
+                fpyRiImageTarget = GetDecimal(reader, 47),
+                fpyRiImageActual = GetDecimal(reader, 48),
+                fpyPackingViTarget = GetDecimal(reader, 49),
+                fpyPackingViActual = GetDecimal(reader, 50),
+                woCount0To3Days = GetInt(reader, 51),
+                woCount4To7Days = GetInt(reader, 52),
+                woCountGreater7Days = GetInt(reader, 53),
+                woCountTotal = GetInt(reader, 54),
+                woQty0To3Days = GetInt(reader, 55),
+                woQty4To7Days = GetInt(reader, 56),
+                woQtyGreater7Days = GetInt(reader, 57),
+                woQtyTotal = GetInt(reader, 58),
+                woClearancePlanGreater7Days = GetInt(reader, 59),
+                woResponsible = GetString(reader, 60),
+                woTimeline = GetString(reader, 61)
             });
         }
 
@@ -1137,7 +1183,30 @@ public sealed class DailyReportsController(
 
                 dr.UPPHTarget,
                 dr.OSDTarget,
-                dr.OTTarget
+                dr.OTTarget,
+                dr.wip_lying_greater_3_days,
+                dr.wip_lying_greater_7_days,
+                dr.FPYIntViTarget,
+                dr.FPYIntViActual,
+                dr.FPYPTTarget,
+                dr.FPYPTActual,
+                dr.FPYRiTarget,
+                dr.FPYRiActual,
+                dr.FPYRiImageTarget,
+                dr.FPYRiImageActual,
+                dr.FPYPackingViTarget,
+                dr.FPYPackingViActual,
+                dr.WOCount0To3Days,
+                dr.WOCount4To7Days,
+                dr.WOCountGreater7Days,
+                dr.WOCountTotal,
+                dr.WOQty0To3Days,
+                dr.WOQty4To7Days,
+                dr.WOQtyGreater7Days,
+                dr.WOQtyTotal,
+                dr.WOClearancePlanGreater7Days,
+                dr.WOResponsible,
+                dr.WOTimeline
 
             FROM DailyReport dr
 
@@ -1267,7 +1336,30 @@ public sealed class DailyReportsController(
 
             upphTarget = GetDecimal(reader, 34),
             osdTarget = GetDecimal(reader, 35),
-            otTarget = GetDecimal(reader, 36)
+            otTarget = GetDecimal(reader, 36),
+            wipLyingGreater3Days = GetInt(reader, 37),
+            wipLyingGreater7Days = GetInt(reader, 38),
+            fpyIntViTarget = GetDecimal(reader, 39),
+            fpyIntViActual = GetDecimal(reader, 40),
+            fpyPtTarget = GetDecimal(reader, 41),
+            fpyPtActual = GetDecimal(reader, 42),
+            fpyRiTarget = GetDecimal(reader, 43),
+            fpyRiActual = GetDecimal(reader, 44),
+            fpyRiImageTarget = GetDecimal(reader, 45),
+            fpyRiImageActual = GetDecimal(reader, 46),
+            fpyPackingViTarget = GetDecimal(reader, 47),
+            fpyPackingViActual = GetDecimal(reader, 48),
+            woCount0To3Days = GetInt(reader, 49),
+            woCount4To7Days = GetInt(reader, 50),
+            woCountGreater7Days = GetInt(reader, 51),
+            woCountTotal = GetInt(reader, 52),
+            woQty0To3Days = GetInt(reader, 53),
+            woQty4To7Days = GetInt(reader, 54),
+            woQtyGreater7Days = GetInt(reader, 55),
+            woQtyTotal = GetInt(reader, 56),
+            woClearancePlanGreater7Days = GetInt(reader, 57),
+            woResponsible = GetString(reader, 58),
+            woTimeline = GetString(reader, 59)
         });
     }
 
@@ -1976,6 +2068,34 @@ public sealed class DailyReportsController(
                 Over7DaysWOBalanceQty =
                     @Over7DaysWOBalanceQty,
 
+                wip_lying_greater_3_days =
+                    @WipLyingGreater3Days,
+
+                wip_lying_greater_7_days =
+                    @WipLyingGreater7Days,
+
+                FPYIntViTarget = @FPYIntViTarget,
+                FPYIntViActual = @FPYIntViActual,
+                FPYPTTarget = @FPYPTTarget,
+                FPYPTActual = @FPYPTActual,
+                FPYRiTarget = @FPYRiTarget,
+                FPYRiActual = @FPYRiActual,
+                FPYRiImageTarget = @FPYRiImageTarget,
+                FPYRiImageActual = @FPYRiImageActual,
+                FPYPackingViTarget = @FPYPackingViTarget,
+                FPYPackingViActual = @FPYPackingViActual,
+                WOCount0To3Days = @WOCount0To3Days,
+                WOCount4To7Days = @WOCount4To7Days,
+                WOCountGreater7Days = @WOCountGreater7Days,
+                WOCountTotal = @WOCountTotal,
+                WOQty0To3Days = @WOQty0To3Days,
+                WOQty4To7Days = @WOQty4To7Days,
+                WOQtyGreater7Days = @WOQtyGreater7Days,
+                WOQtyTotal = @WOQtyTotal,
+                WOClearancePlanGreater7Days = @WOClearancePlanGreater7Days,
+                WOResponsible = @WOResponsible,
+                WOTimeline = @WOTimeline,
+
                 DailyTRCInQty =
                     @DailyTRCInQty,
 
@@ -2189,6 +2309,40 @@ public sealed class DailyReportsController(
             "@Over7DaysWOBalanceQty",
             SqlDbType.Int,
             request.Over7DaysWOBalanceQty);
+
+        Add(
+            command,
+            "@WipLyingGreater3Days",
+            SqlDbType.Int,
+            request.WipLyingGreater3Days);
+
+        Add(
+            command,
+            "@WipLyingGreater7Days",
+            SqlDbType.Int,
+            request.WipLyingGreater7Days);
+
+        Add(command, "@FPYIntViTarget", SqlDbType.Decimal, request.FPYIntViTarget);
+        Add(command, "@FPYIntViActual", SqlDbType.Decimal, request.FPYIntViActual);
+        Add(command, "@FPYPTTarget", SqlDbType.Decimal, request.FPYPTTarget);
+        Add(command, "@FPYPTActual", SqlDbType.Decimal, request.FPYPTActual);
+        Add(command, "@FPYRiTarget", SqlDbType.Decimal, request.FPYRiTarget);
+        Add(command, "@FPYRiActual", SqlDbType.Decimal, request.FPYRiActual);
+        Add(command, "@FPYRiImageTarget", SqlDbType.Decimal, request.FPYRiImageTarget);
+        Add(command, "@FPYRiImageActual", SqlDbType.Decimal, request.FPYRiImageActual);
+        Add(command, "@FPYPackingViTarget", SqlDbType.Decimal, request.FPYPackingViTarget);
+        Add(command, "@FPYPackingViActual", SqlDbType.Decimal, request.FPYPackingViActual);
+        Add(command, "@WOCount0To3Days", SqlDbType.Int, request.WOCount0To3Days);
+        Add(command, "@WOCount4To7Days", SqlDbType.Int, request.WOCount4To7Days);
+        Add(command, "@WOCountGreater7Days", SqlDbType.Int, request.WOCountGreater7Days);
+        Add(command, "@WOCountTotal", SqlDbType.Int, request.WOCountTotal);
+        Add(command, "@WOQty0To3Days", SqlDbType.Int, request.WOQty0To3Days);
+        Add(command, "@WOQty4To7Days", SqlDbType.Int, request.WOQty4To7Days);
+        Add(command, "@WOQtyGreater7Days", SqlDbType.Int, request.WOQtyGreater7Days);
+        Add(command, "@WOQtyTotal", SqlDbType.Int, request.WOQtyTotal);
+        Add(command, "@WOClearancePlanGreater7Days", SqlDbType.Int, request.WOClearancePlanGreater7Days);
+        Add(command, "@WOResponsible", SqlDbType.NVarChar, request.WOResponsible?.Trim());
+        Add(command, "@WOTimeline", SqlDbType.NVarChar, request.WOTimeline?.Trim());
 
         // ========================================================
         // TRC
@@ -2628,6 +2782,32 @@ public sealed class DailyReportRequest
     public int? OpenWOQty { get; set; }
 
     public int? Over7DaysWOBalanceQty { get; set; }
+
+    public int WipLyingGreater3Days { get; set; }
+
+    public int WipLyingGreater7Days { get; set; }
+
+    public decimal? FPYIntViTarget { get; set; }
+    public decimal? FPYIntViActual { get; set; }
+    public decimal? FPYPTTarget { get; set; }
+    public decimal? FPYPTActual { get; set; }
+    public decimal? FPYRiTarget { get; set; }
+    public decimal? FPYRiActual { get; set; }
+    public decimal? FPYRiImageTarget { get; set; }
+    public decimal? FPYRiImageActual { get; set; }
+    public decimal? FPYPackingViTarget { get; set; }
+    public decimal? FPYPackingViActual { get; set; }
+    public int? WOCount0To3Days { get; set; }
+    public int? WOCount4To7Days { get; set; }
+    public int? WOCountGreater7Days { get; set; }
+    public int? WOCountTotal { get; set; }
+    public int? WOQty0To3Days { get; set; }
+    public int? WOQty4To7Days { get; set; }
+    public int? WOQtyGreater7Days { get; set; }
+    public int? WOQtyTotal { get; set; }
+    public int? WOClearancePlanGreater7Days { get; set; }
+    public string? WOResponsible { get; set; }
+    public string? WOTimeline { get; set; }
 
 
     // ==============================================================
