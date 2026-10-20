@@ -47,7 +47,6 @@ export default function BrandSelection({ session, onSignOut }) {
             <div>
               <span className="page-kicker">TODAY · {new Date().toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" })}</span>
               <h1>What are you working on first?</h1>
-              <p>Pick a brand to start today&apos;s factory report. You can come back and complete another brand anytime.</p>
             </div>
             <div className="today-chip"><span /> Reporting workspace</div>
           </section>
@@ -64,7 +63,12 @@ export default function BrandSelection({ session, onSignOut }) {
                 const meta = brandMeta[customer.customerName] || { tone: "violet", tag: "Manufacturing", mark: customer.customerName };
                 return (
                   <button className={`brand-card brand-card-${meta.tone}`} key={customer.customerId}
-                    onClick={() => navigate(`/contributor/brands/${customer.customerId}/categories`)}>
+                    onClick={() => {
+                      const fatp = customer.categories?.find((category) => category.categoryName?.trim().toUpperCase() === "FATP");
+                      navigate(fatp
+                        ? `/contributor/brands/${customer.customerId}/categories/${fatp.categoryId}/report`
+                        : `/contributor/brands/${customer.customerId}/categories`);
+                    }}>
                     <div className="brand-card-top"><BrandMark name={customer.customerName} /><span className="brand-open">↗</span></div>
                     <div className="brand-card-copy"><h3>{customer.customerName}</h3><p>{meta.tag}</p></div>
                     <div className="brand-card-bottom"><span>{customer.categories.length} reporting categories</span><strong>{customer.categories.reduce((total, category) => total + category.productionLines.length, 0)} lines</strong></div>
@@ -76,7 +80,6 @@ export default function BrandSelection({ session, onSignOut }) {
             </div>
           </section>
 
-          <section className="workspace-tip"><div className="tip-icon">✦</div><div><strong>You choose the order. We remember the work.</strong><p>Finish one line, save it, then pick the next pending line. Your progress stays with you.</p></div></section>
         </main>
       </div>
     </ContributorLayout>

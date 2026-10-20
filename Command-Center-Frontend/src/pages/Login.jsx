@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { api } from "../api";
 import dixonLogo from "../assets/dixon-logo.jpeg";
-import AppFooter from "../components/AppFooter";
 import "./Login.css";
 
 function Login({ onSignIn }) {
@@ -38,73 +37,18 @@ function Login({ onSignIn }) {
 
   return (
     <div className="login-page-shell">
-    <main className="login-shell">
-      <div className="login-orb login-orb-one" />
-      <div className="login-orb login-orb-two" />
-
-      <section className="login-visual" aria-label="Dixon Digital Command Center">
-        <div className="visual-topline">
-          <div className="dcc-mark">D</div>
-          <span>Dixon Digital Command Center</span>
-        </div>
-
-        <div className="visual-copy">
-          <span className="visual-kicker">FACTORY OPERATIONS · 01</span>
-          <h1>Work flows.<br /><span>Data follows.</span></h1>
-          <p>
-            A simpler workspace for daily factory reporting, KPI visibility,
-            and continuous improvement.
-          </p>
-        </div>
-
-        <div className="visual-workspace">
-          <div className="workspace-glow" />
-          <div className="workspace-window">
-            <div className="workspace-head">
-              <div>
-                <small>Today&apos;s reporting</small>
-                <strong>Contributor workspace</strong>
-              </div>
-              <span className="workspace-dot" />
+      <main className="login-shell">
+        <section className="login-panel">
+          <div className="login-card">
+            <div className="login-brand-row">
+              <img src={dixonLogo} alt="Dixon" />
+              <span>Digital Command Center</span>
             </div>
-            <div className="mini-progress">
-              <span style={{ width: "68%" }} />
-            </div>
-            <div className="mini-stats">
-              <div><b>14</b><span>completed</span></div>
-              <div><b>4</b><span>remaining</span></div>
-              <div><b>68%</b><span>progress</span></div>
-            </div>
-            <div className="mini-next">
-              <div className="mini-icon">→</div>
-              <div><small>Next up</small><b>HP · SMT · Line 04</b></div>
-              <span>Continue</span>
-            </div>
-          </div>
-        </div>
 
-        <div className="visual-footer">
-          <span>Daily reporting</span>
-          <span>Guided workflow</span>
-          <span>Live visibility</span>
-        </div>
-      </section>
-
-      <section className="login-panel">
-        <div className="login-card">
-          <div className="login-brand-row">
-            <img src={dixonLogo} alt="Dixon" />
-            <span>Digital Command Center</span>
-          </div>
-
-          <div className="login-heading">
-            <span className="login-eyebrow">SECURE WORKSPACE</span>
-            <h2>{setupRequired ? "Set up your workspace" : "Welcome back"}</h2>
-            <p>{setupRequired
-              ? "Create the first administrator account to get started."
-              : "Sign in and pick up today’s reporting where you left off."}
-            </p>
-          </div>
+            <div className="login-heading">
+              <span className="login-eyebrow">SECURE WORKSPACE</span>
+              <h2>{setupRequired ? "Set up your workspace" : "Welcome back"}</h2>
+            </div>
 
           <form onSubmit={handleSubmit} className="login-form">
             {setupRequired && (
@@ -142,18 +86,12 @@ function Login({ onSignIn }) {
               <span>{busy ? "Connecting…" : setupRequired === null ? "Checking connection…" : setupRequired ? "Create administrator" : "Sign in"}</span>
               <span className="button-arrow">↗</span>
             </button>
-          </form>
-
-          <div className="login-trust">
-            <span><i /> Protected workspace</span>
-            <span>Plant access controlled</span>
+            </form>
           </div>
-        </div>
 
-        <p className="login-bottom">Dixon Digital Command Center · Factory reporting platform</p>
-      </section>
-    </main>
-    <AppFooter />
+          <p className="login-bottom">Dixon Digital Command Center · Factory reporting platform</p>
+        </section>
+      </main>
     </div>
   );
 }

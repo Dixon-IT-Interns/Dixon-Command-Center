@@ -27,7 +27,7 @@
 
 .ao-head h1 {
   margin: 7px 0 0;
-  font: 800 32px Manrope, sans-serif;
+  font: 800 32px var(--font-family-base);
   letter-spacing: -0.04em;
   color: var(--text);
 }
@@ -52,7 +52,7 @@
   border: 1px solid var(--border);
   border-radius: 8px;
 
-  background: #fff;
+  background: var(--color-surface);
   color: var(--secondary);
 
   font-size: 11px;
@@ -68,7 +68,7 @@
 
 .ao-head button:hover:not(:disabled) {
   background: var(--primary-soft);
-  border-color: #d8d4ff;
+  border-color: var(--color-border);
   color: var(--primary);
 }
 
@@ -103,9 +103,9 @@
   margin-top: 14px;
   padding: 12px;
 
-  border: 1px solid #ffd8df;
+  border: 1px solid var(--color-danger-soft);
   background: var(--danger-soft);
-  color: #a83a50;
+  color: var(--color-danger);
 
   border-radius: 9px;
 
@@ -124,7 +124,7 @@
   border: 1px solid var(--border);
   border-radius: 11px;
 
-  background: #fff;
+  background: var(--color-surface);
 
   overflow: hidden;
 
@@ -170,7 +170,7 @@
 }
 
 .ao-stat strong {
-  font: 800 28px Manrope, sans-serif;
+  font: 800 28px var(--font-family-base);
   color: var(--text);
 }
 
@@ -215,7 +215,7 @@
   border: 1px solid var(--border);
   border-radius: 11px;
 
-  background: #fff;
+  background: var(--color-surface);
 
   box-shadow: var(--shadow-sm);
 
@@ -226,7 +226,7 @@
 }
 
 .ao-actions article:hover {
-  border-color: #d9d5ff;
+  border-color: var(--color-border);
   box-shadow: var(--shadow-md);
   transform: translateY(-2px);
 }
@@ -234,7 +234,7 @@
 .ao-actions h2 {
   margin: 0;
 
-  font: 800 16px Manrope, sans-serif;
+  font: 800 16px var(--font-family-base);
 
   color: var(--text);
 }

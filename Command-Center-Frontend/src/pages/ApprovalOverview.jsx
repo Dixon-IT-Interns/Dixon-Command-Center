@@ -54,11 +54,6 @@ export default function ApprovalOverview({ session, onSignOut }) {
             <span>APPROVER WORKSPACE</span>
 
             <h1>Approval overview</h1>
-
-            <p>
-              Monitor the review queue, approved submissions and
-              rejected reports across your assigned brands.
-            </p>
           </div>
 
           <button
@@ -114,21 +109,18 @@ export default function ApprovalOverview({ session, onSignOut }) {
         <section className="ao-actions">
           <Action
             title="Open approval queue"
-            text="Inspect submitted daily KPI reports and approve or return them with a comment."
             to="/approvals"
             label="Review queue"
           />
 
           <Action
             title="Review history"
-            text="Browse the reports already handled by your approval account."
             to="/approvals/history"
             label="View history"
           />
 
           <Action
             title="Monthly plan reference"
-            text="Approved reports can be checked against the KPI plan maintained by the administrator."
             to="/approvals"
             label="Open a report"
           />
@@ -161,15 +153,12 @@ function Stat({
 
 function Action({
   title,
-  text,
   to,
   label,
 }) {
   return (
     <article>
       <h2>{title}</h2>
-
-      <p>{text}</p>
 
       <Link to={to}>
         {label}
