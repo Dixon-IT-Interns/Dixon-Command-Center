@@ -1002,8 +1002,11 @@ public sealed class ApprovalController(
 
                     OpenWOQty = dr.OpenWOQty,
                     Over7DaysWOBalanceQty = dr.Over7DaysWOBalanceQty,
+<<<<<<< HEAD
+=======
                     wip_lying_greater_3_days = dr.wip_lying_greater_3_days,
                     wip_lying_greater_7_days = dr.wip_lying_greater_7_days,
+>>>>>>> origin/main
 
                     DailyTRCInQty = dr.DailyTRCInQty,
                     DailyTRCOutQty = dr.DailyTRCOutQty,
@@ -1066,8 +1069,11 @@ public sealed class ApprovalController(
 
                     OpenWOQty,
                     Over7DaysWOBalanceQty,
+<<<<<<< HEAD
+=======
                     wip_lying_greater_3_days,
                     wip_lying_greater_7_days,
+>>>>>>> origin/main
 
                     DailyTRCInQty,
                     DailyTRCOutQty,
@@ -1123,8 +1129,11 @@ public sealed class ApprovalController(
 
                     dr.OpenWOQty,
                     dr.Over7DaysWOBalanceQty,
+<<<<<<< HEAD
+=======
                     dr.wip_lying_greater_3_days,
                     dr.wip_lying_greater_7_days,
+>>>>>>> origin/main
 
                     dr.DailyTRCInQty,
                     dr.DailyTRCOutQty,

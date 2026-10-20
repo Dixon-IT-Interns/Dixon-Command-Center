@@ -910,6 +910,9 @@ public sealed class DailyReportsController(
 
                 dr.UPPHTarget,
                 dr.OSDTarget,
+<<<<<<< HEAD
+                dr.OTTarget
+=======
                 dr.OTTarget,
                 dr.wip_lying_greater_3_days,
                 dr.wip_lying_greater_7_days,
@@ -934,6 +937,7 @@ public sealed class DailyReportsController(
                 dr.WOClearancePlanGreater7Days,
                 dr.WOResponsible,
                 dr.WOTimeline
+>>>>>>> origin/main
 
             FROM DailyReport dr
 
@@ -1075,6 +1079,9 @@ public sealed class DailyReportsController(
 
                 upphTarget = GetDecimal(reader, 36),
                 osdTarget = GetDecimal(reader, 37),
+<<<<<<< HEAD
+                otTarget = GetDecimal(reader, 38)
+=======
                 otTarget = GetDecimal(reader, 38),
                 wipLyingGreater3Days = GetInt(reader, 39),
                 wipLyingGreater7Days = GetInt(reader, 40),
@@ -1099,6 +1106,7 @@ public sealed class DailyReportsController(
                 woClearancePlanGreater7Days = GetInt(reader, 59),
                 woResponsible = GetString(reader, 60),
                 woTimeline = GetString(reader, 61)
+>>>>>>> origin/main
             });
         }
 
@@ -1183,6 +1191,9 @@ public sealed class DailyReportsController(
 
                 dr.UPPHTarget,
                 dr.OSDTarget,
+<<<<<<< HEAD
+                dr.OTTarget
+=======
                 dr.OTTarget,
                 dr.wip_lying_greater_3_days,
                 dr.wip_lying_greater_7_days,
@@ -1207,6 +1218,7 @@ public sealed class DailyReportsController(
                 dr.WOClearancePlanGreater7Days,
                 dr.WOResponsible,
                 dr.WOTimeline
+>>>>>>> origin/main
 
             FROM DailyReport dr
 
@@ -1336,6 +1348,9 @@ public sealed class DailyReportsController(
 
             upphTarget = GetDecimal(reader, 34),
             osdTarget = GetDecimal(reader, 35),
+<<<<<<< HEAD
+            otTarget = GetDecimal(reader, 36)
+=======
             otTarget = GetDecimal(reader, 36),
             wipLyingGreater3Days = GetInt(reader, 37),
             wipLyingGreater7Days = GetInt(reader, 38),
@@ -1360,6 +1375,7 @@ public sealed class DailyReportsController(
             woClearancePlanGreater7Days = GetInt(reader, 57),
             woResponsible = GetString(reader, 58),
             woTimeline = GetString(reader, 59)
+>>>>>>> origin/main
         });
     }
 
@@ -2068,6 +2084,8 @@ public sealed class DailyReportsController(
                 Over7DaysWOBalanceQty =
                     @Over7DaysWOBalanceQty,
 
+<<<<<<< HEAD
+=======
                 wip_lying_greater_3_days =
                     @WipLyingGreater3Days,
 
@@ -2096,6 +2114,7 @@ public sealed class DailyReportsController(
                 WOResponsible = @WOResponsible,
                 WOTimeline = @WOTimeline,
 
+>>>>>>> origin/main
                 DailyTRCInQty =
                     @DailyTRCInQty,
 
@@ -2310,6 +2329,8 @@ public sealed class DailyReportsController(
             SqlDbType.Int,
             request.Over7DaysWOBalanceQty);
 
+<<<<<<< HEAD
+=======
         Add(
             command,
             "@WipLyingGreater3Days",
@@ -2344,6 +2365,7 @@ public sealed class DailyReportsController(
         Add(command, "@WOResponsible", SqlDbType.NVarChar, request.WOResponsible?.Trim());
         Add(command, "@WOTimeline", SqlDbType.NVarChar, request.WOTimeline?.Trim());
 
+>>>>>>> origin/main
         // ========================================================
         // TRC
         // ========================================================
@@ -2783,6 +2805,8 @@ public sealed class DailyReportRequest
 
     public int? Over7DaysWOBalanceQty { get; set; }
 
+<<<<<<< HEAD
+=======
     public int WipLyingGreater3Days { get; set; }
 
     public int WipLyingGreater7Days { get; set; }
@@ -2809,6 +2833,7 @@ public sealed class DailyReportRequest
     public string? WOResponsible { get; set; }
     public string? WOTimeline { get; set; }
 
+>>>>>>> origin/main
 
     // ==============================================================
     // TRC

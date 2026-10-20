@@ -1,5 +1,10 @@
+<<<<<<< HEAD
+using System.Data;
+using Dixon.CommandCenter.API.Models;
+=======
 using Dixon.CommandCenter.API.Models;
 using System.Data;
+>>>>>>> origin/main
 using Microsoft.Data.SqlClient;
 
 namespace Dixon.CommandCenter.API.Data;

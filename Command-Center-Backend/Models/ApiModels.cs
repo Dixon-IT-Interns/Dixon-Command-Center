@@ -42,8 +42,12 @@ public sealed record CreateUserRequest
     [Required, EmailAddress, MaxLength(150)]
     public required string Email { get; init; }
 
+<<<<<<< HEAD
+   
+=======
     [Required, MinLength(8), MaxLength(128)]
     public required string Password { get; init; }
+>>>>>>> origin/main
 
     [Range(1, int.MaxValue)]
     public int RoleId { get; init; }
@@ -67,6 +71,24 @@ public sealed record BootstrapAdminRequest
     public required string Password { get; init; }
 }
 
+<<<<<<< HEAD
+
+public sealed record SetPasswordRequest
+{
+    [System.ComponentModel.DataAnnotations.Required]
+    [System.ComponentModel.DataAnnotations.MinLength(8)]
+    [System.ComponentModel.DataAnnotations.MaxLength(128)]
+    public required string Token { get; init; }
+
+    [System.ComponentModel.DataAnnotations.Required]
+    [System.ComponentModel.DataAnnotations.MinLength(8)]
+    [System.ComponentModel.DataAnnotations.MaxLength(128)]
+    public required string Password { get; init; }
+}
+
+
+=======
+>>>>>>> origin/main
 /// <summary>Role available for user assignment.</summary>
 public sealed record RoleResponse(int RoleId, string RoleName);
 
@@ -88,6 +110,15 @@ public sealed record ProductionLineResponse(int LineId, string LineName, string?
 public sealed record UpdateUserCustomersRequest(IReadOnlyList<int> CustomerIds);
 public sealed record UpdateUserActiveRequest(bool IsActive);
 
+<<<<<<< HEAD
+public sealed record ForgotPasswordRequest(string Email);
+
+public sealed record ResetPasswordRequest(
+    string Token,
+    string Password);
+
+=======
+>>>>>>> origin/main
 public sealed record UpdateUserRequest
 {
     [Required, MaxLength(100)] public required string FullName { get; init; }

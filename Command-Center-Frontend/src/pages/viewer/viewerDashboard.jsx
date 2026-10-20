@@ -1,9 +1,17 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
+<<<<<<< HEAD
+import { Download, RefreshCw, X, Search, RotateCcw, ChevronLeft, ChevronRight } from "lucide-react";
+import { api } from "../../api";
+import Header from "../../components/Header";
+import AppFooter from "../../components/AppFooter";
+import "./viewerDashboard.css";
+=======
 import { Download, RefreshCw, X } from "lucide-react";
 import { api } from "../../api";
 import Header from "../../components/Header";
 import AppFooter from "../../components/AppFooter";
 import "./ViewerDashboard.css";
+>>>>>>> origin/main
 import "./ViewerProgress.css";
 
 const today = new Date(Date.now() - new Date().getTimezoneOffset() * 60_000).toISOString().slice(0, 10);
@@ -24,6 +32,13 @@ export default function ViewerDashboard({ session, onSignOut }) {
   const [exportPlantId, setExportPlantId] = useState("");
   const [exporting, setExporting] = useState(false);
   const [error, setError] = useState("");
+<<<<<<< HEAD
+  const [searchTerm, setSearchTerm] = useState("");
+  const [statusFilter, setStatusFilter] = useState("ALL");
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
+=======
+>>>>>>> origin/main
 
   const query = useMemo(() => {
     const q = new URLSearchParams({ reportDate: date, process });
@@ -149,9 +164,34 @@ export default function ViewerDashboard({ session, onSignOut }) {
     }));
   }, [data.lines]);
   const s = data.summary || {};
+<<<<<<< HEAD
+  const filteredLines = useMemo(() => {
+    const needle = searchTerm.trim().toLowerCase();
+    return data.lines.filter(line => {
+      const status = String(line.status || "").toUpperCase();
+      const matchesStatus = statusFilter === "ALL" || status === statusFilter;
+      const haystack = [line.lineName, line.sapLocation, line.customerName, line.process, line.modelName, line.status, line.issueDescription]
+        .map(value => String(value ?? "").toLowerCase()).join(" ");
+      return matchesStatus && (!needle || haystack.includes(needle));
+    });
+  }, [data.lines, searchTerm, statusFilter]);
+  const pageCount = Math.max(1, Math.ceil(filteredLines.length / pageSize));
+  const safePage = Math.min(page, pageCount);
+  const visibleLines = filteredLines.slice((safePage - 1) * pageSize, safePage * pageSize);
+  const statusCounts = useMemo(() => data.lines.reduce((counts, line) => {
+    const key = String(line.status || "UNKNOWN").toUpperCase();
+    counts[key] = (counts[key] || 0) + 1;
+    return counts;
+  }, {}), [data.lines]);
 
   return <div className="viewer-page">
     <Header user={session?.user} onSignOut={onSignOut} />
+    <div className="viewer-module-nav-wrap"><nav className="viewer-module-nav" aria-label="Viewer pages"><a href="/viewer">Dashboard</a><a href="/viewer/exceptions">Operations Exceptions</a><a href="/viewer/comparison">Period Comparison</a><a href="/viewer/tracker">Report Tracker</a><a href="/viewer/reports">Report Center</a></nav></div>
+=======
+
+  return <div className="viewer-page">
+    <Header user={session?.user} onSignOut={onSignOut} />
+>>>>>>> origin/main
     <main className="viewer-main">
       <div className="viewer-title-row">
         <div><span className="eyebrow">READ ONLY</span><h1>FATP & SMT Work Progress</h1><p>Date-wise production and KPI visibility for the selected plant.</p></div>
@@ -183,7 +223,17 @@ export default function ViewerDashboard({ session, onSignOut }) {
       </section>
 
       <section className="panel table-panel">
+<<<<<<< HEAD
+        <div className="panel-head"><div><h2>Line Work Progress</h2><small className="panel-subtitle">{date} · {process === "ALL" ? "FATP first, then SMT" : `${process} only`} · Brand/model-wise daily records{loading ? " · Loading..." : ""}</small></div><span>{filteredLines.length} of {data.lines.length} records</span></div>
+        <div className="viewer-table-tools">
+          <label className="viewer-search"><Search size={16}/><input aria-label="Search line records" placeholder="Search line, customer, model, SAP location…" value={searchTerm} onChange={event => { setSearchTerm(event.target.value); setPage(1); }}/></label>
+          <label className="viewer-status-filter">Status<select value={statusFilter} onChange={event => { setStatusFilter(event.target.value); setPage(1); }}><option value="ALL">All statuses ({data.lines.length})</option>{Object.keys(statusCounts).sort().map(status => <option key={status} value={status}>{status.replaceAll("_", " ")} ({statusCounts[status]})</option>)}</select></label>
+          <label className="viewer-page-size">Rows<select value={pageSize} onChange={event => { setPageSize(Number(event.target.value)); setPage(1); }}><option value={10}>10</option><option value={25}>25</option><option value={50}>50</option></select></label>
+          <button className="secondary-btn viewer-reset-btn" onClick={() => { setSearchTerm(""); setStatusFilter("ALL"); setPage(1); }}><RotateCcw size={14}/> Reset</button>
+        </div>
+=======
         <div className="panel-head"><div><h2>Line Work Progress</h2><small className="panel-subtitle">{date} · {process === "ALL" ? "FATP first, then SMT" : `${process} only`} · Brand/model-wise daily records{loading ? " · Loading..." : ""}</small></div><span>{data.lines.length} records</span></div>
+>>>>>>> origin/main
         <div className="table-scroll detail-table-scroll">
           <table className="detail-table">
             <thead>
@@ -197,10 +247,17 @@ export default function ViewerDashboard({ session, onSignOut }) {
                 <th>Daily TRC In</th><th>Daily TRC Out</th><th>TRC Overall Failure %</th><th>TRC Lying &gt;3 Days</th><th>Issue Description</th>
               </tr>
             </thead>
+<<<<<<< HEAD
+            <tbody>{visibleLines.map(line => <tr key={line.dailyReportId || `${line.customerId}-${line.lineId}-empty`}>
+              <td><strong>{line.lineName}</strong></td><td>{line.sapLocation || "—"}</td><td>{line.customerName}</td>
+              <td><span className={`process ${String(line.process || "").toLowerCase()}`}>{line.process || "—"}</span></td><td>{line.modelName || "—"}</td>
+              <td><span className={`status ${String(line.status || "unknown").toLowerCase().replaceAll("_", "-")}`}>{String(line.status || "UNKNOWN").replaceAll("_", " ")}</span></td>
+=======
             <tbody>{data.lines.map(line => <tr key={line.dailyReportId || `${line.customerId}-${line.lineId}-empty`}>
               <td><strong>{line.lineName}</strong></td><td>{line.sapLocation || "—"}</td><td>{line.customerName}</td>
               <td><span className={`process ${line.process.toLowerCase()}`}>{line.process}</span></td><td>{line.modelName || "—"}</td>
               <td><span className={`status ${line.status.toLowerCase().replaceAll("_", "-")}`}>{line.status.replaceAll("_", " ")}</span></td>
+>>>>>>> origin/main
               <td>{metric(line.monthPlan)}</td><td>{metric(line.monthActual)}</td><td>{metric(line.productionPlan)}</td><td>{metric(line.productionActual)}</td>
               <td>{metric(line.uphTarget)}</td><td>{metric(line.uphActual)}</td><td>{metric(line.upphInstalled)}</td><td>{metric(line.upphActual)}</td>
               <td>{metric(line.fpyTarget, true)}</td><td>{metric(line.fpyActual, true)}</td><td>{metric(line.ftyTarget, true)}</td><td>{metric(line.ftyActual, true)}</td><td>{metric(line.rtyTarget, true)}</td><td>{metric(line.rtyActual, true)}</td>
@@ -211,8 +268,14 @@ export default function ViewerDashboard({ session, onSignOut }) {
               <td className="issue-cell" title={line.issueDescription || ""}>{line.issueDescription || "—"}</td>
             </tr>)}</tbody>
           </table>
+<<<<<<< HEAD
+          {!visibleLines.length && !loading && <div className="empty">{data.lines.length ? "No records match your search or status filter." : "No production records found for the selected date and filters."}</div>}
+        </div>
+        <div className="viewer-pagination"><span>Showing {filteredLines.length ? (safePage - 1) * pageSize + 1 : 0}–{Math.min(safePage * pageSize, filteredLines.length)} of {filteredLines.length}</span><div><button className="secondary-btn" onClick={() => setPage(current => Math.max(1, current - 1))} disabled={safePage <= 1}><ChevronLeft size={15}/> Previous</button><span className="viewer-page-indicator">Page {safePage} of {pageCount}</span><button className="secondary-btn" onClick={() => setPage(current => Math.min(pageCount, current + 1))} disabled={safePage >= pageCount}>Next <ChevronRight size={15}/></button></div></div>
+=======
           {!data.lines.length && !loading && <div className="empty">No production records found for the selected date and filters.</div>}
         </div>
+>>>>>>> origin/main
       </section>
     </main>
     <AppFooter />

@@ -20,6 +20,14 @@ export default function Header({ user, onSignOut }) {
         <span>Dixon <strong>Command Center</strong></span>
       </Link>
       <div className="header-actions">
+<<<<<<< HEAD
+        {user?.roleName === "Viewer" && <Link className="header-nav-link" to="/viewer">Dashboard</Link>}
+        {user?.roleName === "Viewer" && <Link className="header-nav-link" to="/viewer/exceptions">Exceptions</Link>}
+        {user?.roleName === "Viewer" && <Link className="header-nav-link" to="/viewer/comparison">Comparison</Link>}
+        {user?.roleName === "Viewer" && <Link className="header-nav-link" to="/viewer/tracker">Report Tracker</Link>}
+        {user?.roleName === "Viewer" && <Link className="header-nav-link" to="/viewer/reports">Report Center</Link>}
+=======
+>>>>>>> origin/main
         {user?.roleName === "Approver" && <Link className="header-nav-link" to="/approvals/overview">Overview</Link>}
         {user?.roleName === "Approver" && <Link className="header-nav-link" to="/approvals">Approval Queue</Link>}
         {user?.roleName === "Approver" && <Link className="header-nav-link" to="/approvals/history">History</Link>}

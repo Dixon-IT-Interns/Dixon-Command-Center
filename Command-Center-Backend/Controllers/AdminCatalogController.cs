@@ -1,9 +1,17 @@
 using System.Data;
+<<<<<<< HEAD
+using System.Security.Claims;
+using Dixon.CommandCenter.API.Data;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Data.SqlClient;
+=======
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 using Dixon.CommandCenter.API.Data;
 using System.Security.Claims;
+>>>>>>> origin/main
 
 namespace Dixon.CommandCenter.API.Controllers;
 

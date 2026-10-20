@@ -1,0 +1,99 @@
+[33mba14a44[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mfeature/gmaillogin[m[33m, [m[1;31morigin/feature/gmaillogin[m[33m)[m I have added email verification featuree in this push
+ Command-Center-Backend/ADMIN_SETUP.md              |   44 [32m+[m
+ .../Controllers/AdminCatalogController.cs          |  794 [32m++++++[m
+ .../Controllers/AdminController.cs                 |  320 [32m+++[m
+ .../Controllers/ApprovalController.cs              | 1228 [32m+++++++++[m
+ .../Controllers/AuthController.cs                  |  320 [32m+++[m
+ .../Controllers/CatalogController.cs               |   28 [32m+[m
+ .../Controllers/ContributorController.cs           |  122 [32m+[m
+ .../Controllers/DailyReportsController.cs          | 2653 [32m++++++++++++++++++++[m
+ .../Controllers/ReferenceDataController.cs         |  278 [32m++[m
+ .../Controllers/ViewerController.cs                |  251 [32m++[m
+ Command-Center-Backend/Data/CatalogRepository.cs   |  120 [32m+[m
+ .../Data/InvitationRepository.cs                   |  111 [32m+[m
+ .../Data/PasswordResetRepository.cs                |  146 [32m++[m
+ .../Data/SqlConnectionFactory.cs                   |   19 [32m+[m
+ Command-Center-Backend/Data/UserRepository.cs      | 1038 [32m++++++++[m
+ Command-Center-Backend/Data/ViewerRepository.cs    |  388 [32m+++[m
+ .../Database/003_approval_queue.sql                |   49 [32m+[m
+ .../Database/004_admin_catalog_and_line_model.sql  |   49 [32m+[m
+ .../Database/005_kpi_daily_snapshot_uniqueness.sql |   78 [32m+[m
+ .../Database/006_category_cph_fields.sql           |   23 [32m+[m
+ .../Database/007_plant_customer.sql                |   75 [32m+[m
+ .../Database/008_super_admin_hierarchy.sql         |   38 [32m+[m
+ .../009_plant_scoped_operational_configuration.sql |  446 [32m++++[m
+ .../Database/010_daily_report_kpi_plan_targets.sql |   32 [32m+[m
+ .../Database/APPROVAL_WORKFLOW_SETUP.md            |   58 [32m+[m
+ .../Database/CONTRIBUTOR_SETUP.md                  |   27 [32m+[m
+ .../Database/DAILY_REPORT_FIX_NOTES.md             |   54 [32m+[m
+ Command-Center-Backend/Database/full-schema.sql    |  Bin [31m0[m -> [32m41760[m bytes
+ Command-Center-Backend/Database/schema.sql         |  145 [32m++[m
+ Command-Center-Backend/Database/seed.sql           |  180 [32m++[m
+ .../Dixon.CommandCenter.API.csproj                 |   18 [32m+[m
+ .../Dixon.CommandCenter.API.http                   |    6 [32m+[m
+ Command-Center-Backend/Models/ApiModels.cs         |  119 [32m+[m
+ Command-Center-Backend/Program.cs                  |   65 [32m+[m
+ .../Properties/launchSettings.json                 |   41 [32m+[m
+ Command-Center-Backend/README.md                   |   53 [32m+[m
+ .../Services/DailyReportExcelImportService.cs      | 1417 [32m+++++++++++[m
+ .../Services/InvitationEmailService.cs             |   93 [32m+[m
+ Command-Center-Backend/Services/PasswordService.cs |   44 [32m+[m
+ Command-Center-Backend/Services/TokenIssuer.cs     |   30 [32m+[m
+ .../appsettings.Development.json                   |   11 [32m+[m
+ Command-Center-Backend/appsettings.json            |   15 [32m+[m
+ .../bin/Debug/net8.0/Azure.Core.dll                |  Bin [31m0[m -> [32m437304[m bytes
+ .../bin/Debug/net8.0/Azure.Identity.dll            |  Bin [31m0[m -> [32m356912[m bytes
+ .../bin/Debug/net8.0/ClosedXML.Parser.dll          |  Bin [31m0[m -> [32m192000[m bytes
+ .../bin/Debug/net8.0/ClosedXML.dll                 |  Bin [31m0[m -> [32m1692160[m bytes
+ .../Debug/net8.0/Dixon.CommandCenter.API.deps.json |  878 [32m+++++++[m
+ .../bin/Debug/net8.0/Dixon.CommandCenter.API.dll   |  Bin [31m0[m -> [32m678400[m bytes
+ .../bin/Debug/net8.0/Dixon.CommandCenter.API.exe   |  Bin [31m0[m -> [32m151552[m bytes
+ .../bin/Debug/net8.0/Dixon.CommandCenter.API.pdb   |  Bin [31m0[m -> [32m176916[m bytes
+ .../Dixon.CommandCenter.API.runtimeconfig.dev.json |    8 [32m+[m
+ .../Dixon.CommandCenter.API.runtimeconfig.json     |   19 [32m+[m
+ ...ommandCenter.API.staticwebassets.endpoints.json |    1 [32m+[m
+ .../net8.0/DocumentFormat.OpenXml.Framework.dll    |  Bin [31m0[m -> [32m471152[m bytes
+ .../bin/Debug/net8.0/DocumentFormat.OpenXml.dll    |  Bin [31m0[m -> [32m6349424[m bytes
+ .../bin/Debug/net8.0/ExcelNumberFormat.dll         |  Bin [31m0[m -> [32m30720[m bytes
+ ...crosoft.AspNetCore.Authentication.JwtBearer.dll |  Bin [31m0[m -> [32m51496[m bytes
+ .../Debug/net8.0/Microsoft.AspNetCore.OpenApi.dll  |  Bin [31m0[m -> [32m65360[m bytes
+ .../Debug/net8.0/Microsoft.Bcl.AsyncInterfaces.dll |  Bin [31m0[m -> [32m19104[m bytes
+ .../Debug/net8.0/Microsoft.Bcl.Cryptography.dll    |  Bin [31m0[m -> [32m16664[m bytes
+ .../bin/Debug/net8.0/Microsoft.Data.SqlClient.dll  |  Bin [31m0[m -> [32m928888[m bytes
+ .../net8.0/Microsoft.Extensions.Caching.Memory.dll |  Bin [31m0[m -> [32m45832[m bytes
+ ...Extensions.DependencyInjection.Abstractions.dll |  Bin [31m0[m -> [32m63768[m bytes
+ .../Microsoft.Extensions.Logging.Abstractions.dll  |  Bin [31m0[m -> [32m65288[m bytes
+ .../Debug/net8.0/Microsoft.Extensions.Options.dll  |  Bin [31m0[m -> [32m64776[m bytes
+ .../Microsoft.Identity.Client.Extensions.Msal.dll  |  Bin [31m0[m -> [32m66616[m bytes
+ .../bin/Debug/net8.0/Microsoft.Identity.Client.dll |  Bin [31m0[m -> [32m1028656[m bytes
+ .../Microsoft.IdentityModel.Abstractions.dll       |  Bin [31m0[m -> [32m19296[m bytes
+ .../Microsoft.IdentityModel.JsonWebTokens.dll      |  Bin [31m0[m -> [32m137528[m bytes
+ .../net8.0/Microsoft.IdentityModel.Logging.dll     |  Bin [31m0[m -> [32m36664[m bytes
+ ...osoft.IdentityModel.Protocols.OpenIdConnect.dll |  Bin [31m0[m -> [32m127840[m bytes
+ .../net8.0/Microsoft.IdentityModel.Protocols.dll   |  Bin [31m0[m -> [32m40760[m bytes
+ .../net8.0/Microsoft.IdentityModel.Tokens.dll      |  Bin [31m0[m -> [32m299872[m bytes
+ .../bin/Debug/net8.0/Microsoft.OpenApi.dll         |  Bin [31m0[m -> [32m241976[m bytes
+ .../Debug/net8.0/Microsoft.SqlServer.Server.dll    |  Bin [31m0[m -> [32m23976[m bytes
+ Command-Center-Backend/bin/Debug/net8.0/RBush.dll  |  Bin [31m0[m -> [32m34816[m bytes
+ .../bin/Debug/net8.0/SixLabors.Fonts.dll           |  Bin [31m0[m -> [32m1135616[m bytes
+ .../net8.0/Swashbuckle.AspNetCore.Swagger.dll      |  Bin [31m0[m -> [32m17408[m bytes
+ .../net8.0/Swashbuckle.AspNetCore.SwaggerGen.dll   |  Bin [31m0[m -> [32m118784[m bytes
+ .../net8.0/Swashbuckle.AspNetCore.SwaggerUI.dll    |  Bin [31m0[m -> [32m2270720[m bytes
+ .../bin/Debug/net8.0/System.ClientModel.dll        |  Bin [31m0[m -> [32m175664[m bytes
+ .../System.Configuration.ConfigurationManager.dll  |  Bin [31m0[m -> [32m442544[m bytes
+ .../Debug/net8.0/System.Diagnostics.EventLog.dll   |  Bin [31m0[m -> [32m51992[m bytes
+ .../bin/Debug/net8.0/System.IO.Packaging.dll       |  Bin [31m0[m -> [32m142136[m bytes
+ .../net8.0/System.IdentityModel.Tokens.Jwt.dll     |  Bin [31m0[m -> [32m88888[m bytes
+ .../bin/Debug/net8.0/System.Memory.Data.dll        |  Bin [31m0[m -> [32m30472[m bytes
+ .../net8.0/System.Security.Cryptography.Pkcs.dll   |  Bin [31m0[m -> [32m264864[m bytes
+ .../System.Security.Cryptography.ProtectedData.dll |  Bin [31m0[m -> [32m36616[m bytes
+ .../bin/Debug/net8.0/appsettings.Development.json  |   11 [32m+[m
+ .../bin/Debug/net8.0/appsettings.json              |   15 [32m+[m
+ .../cs/Microsoft.Data.SqlClient.resources.dll      |  Bin [31m0[m -> [32m257696[m bytes
+ .../de/Microsoft.Data.SqlClient.resources.dll      |  Bin [31m0[m -> [32m267384[m bytes
+ .../es/Microsoft.Data.SqlClient.resources.dll      |  Bin [31m0[m -> [32m259192[m bytes
+ .../fr/Microsoft.Data.SqlClient.resources.dll      |  Bin [31m0[m -> [32m268408[m bytes
+ .../it/Microsoft.Data.SqlClient.resources.dll      |  Bin [31m0[m -> [32m260216[m bytes
+ .../ja/Microsoft.Data.SqlClient.resources.dll      |  Bin [31m0[m -> [32m289400[m bytes
+ .../ko/Microsoft.Data.SqlClient.resources.dll      |  Bin [31m0[m -> [32m267384[m bytes
+ .../pl/Microsoft.Data.SqlClient.resources.dll      |  Bin

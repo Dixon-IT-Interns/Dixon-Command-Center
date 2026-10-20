@@ -42,9 +42,18 @@ builder.Services.AddAuthorization();
 builder.Services.AddSingleton(new TokenIssuer(signingKey));
 builder.Services.AddSingleton<SqlConnectionFactory>();
 builder.Services.AddScoped<UserRepository>();
+<<<<<<< HEAD
+builder.Services.AddScoped<InvitationRepository>();
 builder.Services.AddScoped<CatalogRepository>();
 builder.Services.AddScoped<DailyReportExcelImportService>();
 builder.Services.AddScoped<ViewerRepository>();
+builder.Services.AddScoped<InvitationEmailService>();
+builder.Services.AddScoped<PasswordResetRepository>();
+=======
+builder.Services.AddScoped<CatalogRepository>();
+builder.Services.AddScoped<DailyReportExcelImportService>();
+builder.Services.AddScoped<ViewerRepository>();
+>>>>>>> origin/main
 
 var app = builder.Build();
 

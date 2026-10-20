@@ -29,8 +29,12 @@ public sealed class DailyReportExcelImportService(
         int customerId,
         int categoryId,
         DateTime selectedReportDate,
+<<<<<<< HEAD
+        CancellationToken cancellationToken)
+=======
         CancellationToken cancellationToken,
         string importType = "production")
+>>>>>>> origin/main
     {
         await using var connection =
             await connectionFactory.OpenAsync(cancellationToken);
@@ -73,17 +77,30 @@ public sealed class DailyReportExcelImportService(
                 "The selected brand or category is not active or does not exist.");
         }
 
+<<<<<<< HEAD
+=======
         var normalizedImportType = importType.Trim().ToUpperInvariant();
+>>>>>>> origin/main
         var expectedMetric = categoryName.Trim().ToUpperInvariant() switch
         {
             "FATP" => "UPPH",
             "SMT" => "CPH",
             _ => null
         };
+<<<<<<< HEAD
+
+        if (expectedMetric is null)
+        {
+            return Failure(
+                selectedReportDate,
+                $"Excel import supports FATP and SMT categories, not '{categoryName}'.");
+        }
+=======
         if (normalizedImportType == "PRODUCTION" && expectedMetric is null)
             return Failure(selectedReportDate, $"Production Excel import supports FATP and SMT categories, not '{categoryName}'.");
         if (normalizedImportType is not ("PRODUCTION" or "QUALITY" or "WO_CLOSURE"))
             return Failure(selectedReportDate, $"Unsupported Excel import type '{importType}'.");
+>>>>>>> origin/main
 
         var catalog = await LoadCatalogAsync(
             connection,
@@ -112,6 +129,8 @@ public sealed class DailyReportExcelImportService(
         using (workbook)
         {
             var worksheets = workbook.Worksheets
+<<<<<<< HEAD
+=======
                 .ToArray();
 
             if (normalizedImportType == "QUALITY")
@@ -120,6 +139,7 @@ public sealed class DailyReportExcelImportService(
                 return PreviewWoClosure(worksheets, selectedReportDate, customerName, categoryName);
 
             worksheets = worksheets
+>>>>>>> origin/main
                 .Where(sheet => !string.Equals(
                     sheet.Name.Trim(),
                     "D-1 KPI Matrix loop Closer",
@@ -737,7 +757,11 @@ public sealed class DailyReportExcelImportService(
 
         foreach (var (name, column) in decimalFields)
         {
+<<<<<<< HEAD
+            if (!TryReadFATPNumber(section.Worksheet.Cell(row, column), out var value))
+=======
             if (!TryReadFATPNumber(GetValueCell(section.Worksheet, row, column), out var value))
+>>>>>>> origin/main
             {
                 errors.Add($"'{name}' is not a valid number (Excel errors are not imported).");
                 decimals[name] = null;
@@ -750,6 +774,13 @@ public sealed class DailyReportExcelImportService(
         var integerFields = new (string Name, int Column)[]
         {
             ("Open WO quantity", columns.OpenWoQty),
+<<<<<<< HEAD
+            (">7 Days WO quantity", columns.Over7DaysWoQty)
+        };
+        foreach (var (name, column) in integerFields)
+        {
+            if (!TryReadFATPNumber(section.Worksheet.Cell(row, column), out var value)
+=======
             (">7 Days WO quantity", columns.Over7DaysWoQty),
             ("WIP Lying >3 Days", columns.WipLyingGreater3Days),
             ("WIP Lying >7 Days", columns.WipLyingGreater7Days)
@@ -760,6 +791,7 @@ public sealed class DailyReportExcelImportService(
                 continue;
 
             if (!TryReadFATPNumber(GetValueCell(section.Worksheet, row, column), out var value)
+>>>>>>> origin/main
                 || value.HasValue
                 && (decimal.Truncate(value.Value) != value.Value
                     || value.Value < int.MinValue
@@ -775,7 +807,11 @@ public sealed class DailyReportExcelImportService(
         }
 
         decimal? Get(string name) => decimals[name];
+<<<<<<< HEAD
+        int? GetInt(string name) => integers[name];
+=======
         int? GetInt(string name) => integers.GetValueOrDefault(name);
+>>>>>>> origin/main
         return new DailyReportExcelImportValues(
             Get("Month Plan"),
             Get("Month Actual"),
@@ -802,8 +838,11 @@ public sealed class DailyReportExcelImportService(
             null,
             GetInt("Open WO quantity"),
             GetInt(">7 Days WO quantity"),
+<<<<<<< HEAD
+=======
             GetInt("WIP Lying >3 Days"),
             GetInt("WIP Lying >7 Days"),
+>>>>>>> origin/main
             null,
             null,
             null,
@@ -812,6 +851,8 @@ public sealed class DailyReportExcelImportService(
             GetPresentFields(columns, section.Metric));
     }
 
+<<<<<<< HEAD
+=======
     private static DailyReportExcelImportPreview PreviewQuality(
         IReadOnlyList<IXLWorksheet> worksheets,
         DateTime selectedReportDate,
@@ -1165,6 +1206,7 @@ public sealed class DailyReportExcelImportService(
         return 0;
     }
 
+>>>>>>> origin/main
     private static IReadOnlyList<DailySection> FindSections(IXLWorksheet worksheet)
     {
         var lastRow = worksheet.LastRowUsed()?.RowNumber() ?? 0;
@@ -1245,6 +1287,8 @@ public sealed class DailyReportExcelImportService(
         int model)
     {
         int Group(string label) => FindColumn(worksheet, headerRow, lastColumn, label);
+<<<<<<< HEAD
+=======
         int FirstGroup(params string[] labels)
         {
             foreach (var label in labels)
@@ -1290,6 +1334,7 @@ public sealed class DailyReportExcelImportService(
 
             return 0;
         }
+>>>>>>> origin/main
         int Pair(string group, string sub) =>
             FindSubColumn(worksheet, subHeaderRow, Group(group), sub);
         int CapacityTarget() =>
@@ -1322,8 +1367,11 @@ public sealed class DailyReportExcelImportService(
             Pair("Actual OT (Manhours)", "Unplanned"),
             Group("Open WO (Qty)"),
             Group(">7 Days WO (Qty)"),
+<<<<<<< HEAD
+=======
             WipColumn(3),
             WipColumn(7),
+>>>>>>> origin/main
             Group("Daily TRC In (Qty)"),
             Group("Daily TRC Out (Qty)"),
             Group("TRC Overall Failure Inflow %"),
@@ -1375,7 +1423,11 @@ public sealed class DailyReportExcelImportService(
             if (column <= 0)
                 continue;
 
+<<<<<<< HEAD
+            if (!TryReadNumber(section.Worksheet.Cell(row, column), out var value))
+=======
             if (!TryReadNumber(GetValueCell(section.Worksheet, row, column), out var value))
+>>>>>>> origin/main
             {
                 skippedFields.Add(field);
                 warnings.Add($"{rowLabel}: '{name}' was skipped because it does not contain a valid number.");
@@ -1389,8 +1441,11 @@ public sealed class DailyReportExcelImportService(
         {
             ("Open WO (Qty)", "openWOQty", columns.OpenWoQty),
             (">7 Days WO (Qty)", "over7DaysWOBalanceQty", columns.Over7DaysWoQty),
+<<<<<<< HEAD
+=======
             ("WIP Lying >3 Days", "wipLyingGreater3Days", columns.WipLyingGreater3Days),
             ("WIP Lying >7 Days", "wipLyingGreater7Days", columns.WipLyingGreater7Days),
+>>>>>>> origin/main
             ("Daily TRC In (Qty)", "dailyTRCInQty", columns.DailyTrcInQty),
             ("Daily TRC Out (Qty)", "dailyTRCOutQty", columns.DailyTrcOutQty)
         };
@@ -1401,7 +1456,11 @@ public sealed class DailyReportExcelImportService(
             if (column <= 0)
                 continue;
 
+<<<<<<< HEAD
+            if (!TryReadNumber(section.Worksheet.Cell(row, column), out var value))
+=======
             if (!TryReadNumber(GetValueCell(section.Worksheet, row, column), out var value))
+>>>>>>> origin/main
             {
                 skippedFields.Add(field);
                 warnings.Add($"{rowLabel}: '{name}' was skipped because it does not contain a valid whole number.");
@@ -1455,8 +1514,11 @@ public sealed class DailyReportExcelImportService(
             actualOt,
             GetInt("Open WO (Qty)"),
             GetInt(">7 Days WO (Qty)"),
+<<<<<<< HEAD
+=======
             GetInt("WIP Lying >3 Days"),
             GetInt("WIP Lying >7 Days"),
+>>>>>>> origin/main
             GetInt("Daily TRC In (Qty)"),
             GetInt("Daily TRC Out (Qty)"),
             Get("TRC Overall Failure Inflow %"),
@@ -1556,7 +1618,11 @@ public sealed class DailyReportExcelImportService(
     {
         if (column <= 0)
             return null;
+<<<<<<< HEAD
+        var value = worksheet.Cell(row, column).GetString().Trim();
+=======
         var value = GetValueCell(worksheet, row, column).GetString().Trim();
+>>>>>>> origin/main
         return value.Length == 0 ? null : value;
     }
 
@@ -1567,6 +1633,12 @@ public sealed class DailyReportExcelImportService(
     {
         if (column <= 0)
             return null;
+<<<<<<< HEAD
+        var value = worksheet.Cell(row, column).GetString();
+        return string.IsNullOrWhiteSpace(value) ? null : value;
+    }
+
+=======
         var value = GetValueCell(worksheet, row, column).GetString();
         return string.IsNullOrWhiteSpace(value) ? null : value;
     }
@@ -1595,6 +1667,7 @@ public sealed class DailyReportExcelImportService(
         return worksheet.Cell(row, column);
     }
 
+>>>>>>> origin/main
     private static int FindColumn(
         IXLWorksheet worksheet,
         int row,
@@ -1662,8 +1735,13 @@ public sealed class DailyReportExcelImportService(
     {
         var target = section.Columns.CapacityTarget;
         var actual = section.Columns.CapacityActual;
+<<<<<<< HEAD
+        return (target > 0 && !section.Worksheet.Cell(row, target).IsEmpty())
+            || (actual > 0 && !section.Worksheet.Cell(row, actual).IsEmpty());
+=======
         return (target > 0 && !GetValueCell(section.Worksheet, row, target).IsEmpty())
             || (actual > 0 && !GetValueCell(section.Worksheet, row, actual).IsEmpty());
+>>>>>>> origin/main
     }
 
     private static bool HasNumericValue(
@@ -1674,16 +1752,26 @@ public sealed class DailyReportExcelImportService(
         if (column <= 0)
             return false;
 
+<<<<<<< HEAD
+        return TryReadNumber(worksheet.Cell(row, column), out var value)
+=======
         return TryReadNumber(GetValueCell(worksheet, row, column), out var value)
+>>>>>>> origin/main
             && value.HasValue;
     }
 
     private static bool HasOtherCapacityValue(DailySection section, int row)
     {
         return (section.OtherCapacityTarget > 0
+<<<<<<< HEAD
+                && !section.Worksheet.Cell(row, section.OtherCapacityTarget).IsEmpty())
+            || (section.OtherCapacityActual > 0
+                && !section.Worksheet.Cell(row, section.OtherCapacityActual).IsEmpty());
+=======
                 && !GetValueCell(section.Worksheet, row, section.OtherCapacityTarget).IsEmpty())
             || (section.OtherCapacityActual > 0
                 && !GetValueCell(section.Worksheet, row, section.OtherCapacityActual).IsEmpty());
+>>>>>>> origin/main
     }
 
     private static IReadOnlyList<string> GetPresentFields(
@@ -1720,8 +1808,11 @@ public sealed class DailyReportExcelImportService(
         Add("actualOTManhours", columns.PlannedOt > 0 || columns.UnplannedOt > 0 ? 1 : 0);
         Add("openWOQty", columns.OpenWoQty);
         Add("over7DaysWOBalanceQty", columns.Over7DaysWoQty);
+<<<<<<< HEAD
+=======
         Add("wipLyingGreater3Days", columns.WipLyingGreater3Days);
         Add("wipLyingGreater7Days", columns.WipLyingGreater7Days);
+>>>>>>> origin/main
         Add("dailyTRCInQty", columns.DailyTrcInQty);
         Add("dailyTRCOutQty", columns.DailyTrcOutQty);
         Add("trcOverallFailureInflowPercent", columns.TrcOverallFailureInflowPercent);
@@ -1790,8 +1881,11 @@ public sealed record DailyReportExcelColumns(
     int UnplannedOt,
     int OpenWoQty,
     int Over7DaysWoQty,
+<<<<<<< HEAD
+=======
     int WipLyingGreater3Days,
     int WipLyingGreater7Days,
+>>>>>>> origin/main
     int DailyTrcInQty,
     int DailyTrcOutQty,
     int TrcOverallFailureInflowPercent,
@@ -1805,9 +1899,13 @@ public sealed record DailyReportExcelImportPreview(
     int Models,
     IReadOnlyList<string> Errors,
     IReadOnlyList<DailyReportExcelImportEntry> Data,
+<<<<<<< HEAD
+    IReadOnlyList<DailyReportExcelImportRow>? Rows = null);
+=======
     IReadOnlyList<DailyReportExcelImportRow>? Rows = null,
     string? ImportType = null,
     DailyReportExcelImportValues? SharedForm = null);
+>>>>>>> origin/main
 
 public sealed record DailyReportExcelImportRow(
     int RowNumber,
@@ -1857,13 +1955,19 @@ public sealed record DailyReportExcelImportValues(
     decimal? ActualOTManhours,
     int? OpenWOQty,
     int? Over7DaysWOBalanceQty,
+<<<<<<< HEAD
+=======
     int? WipLyingGreater3Days,
     int? WipLyingGreater7Days,
+>>>>>>> origin/main
     int? DailyTRCInQty,
     int? DailyTRCOutQty,
     decimal? TRCOverallFailureInflowPercent,
     decimal? TRCLyingOver3DaysCr,
     string? IssueDescription,
+<<<<<<< HEAD
+    IReadOnlyList<string> PresentFields);
+=======
     IReadOnlyList<string> PresentFields,
     decimal? FpyIntViTarget = null,
     decimal? FpyIntViActual = null,
@@ -1904,3 +2008,4 @@ internal sealed record WoClosureColumns(
     int ClearancePlan,
     int Responsible,
     int Timeline);
+>>>>>>> origin/main
