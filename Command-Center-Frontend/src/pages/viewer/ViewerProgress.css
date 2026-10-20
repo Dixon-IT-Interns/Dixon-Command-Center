@@ -1,0 +1,29 @@
+.detail-table-scroll {
+  max-height: min(72vh, 760px);
+  overflow: auto;
+}
+
+.detail-table {
+  min-width: 2450px;
+  table-layout: auto;
+}
+
+.detail-table th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  max-width: 150px;
+  white-space: normal;
+  line-height: 1.35;
+}
+
+.detail-table td {
+  padding: 9px 10px;
+}
+
+.detail-table .issue-cell {
+  min-width: 220px;
+  max-width: 320px;
+  white-space: normal;
+  line-height: 1.4;
+}

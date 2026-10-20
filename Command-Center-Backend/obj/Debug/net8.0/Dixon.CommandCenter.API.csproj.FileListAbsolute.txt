@@ -1,0 +1,568 @@
+C:\Users\Saksham Jain\AppData\Local\Temp\DixonCommandCenterBuild-7fcaa57380424b3da845a306df59b2cd\appsettings.Development.json
+C:\Users\Saksham Jain\AppData\Local\Temp\DixonCommandCenterBuild-7fcaa57380424b3da845a306df59b2cd\appsettings.json
+C:\Users\Saksham Jain\AppData\Local\Temp\DixonCommandCenterBuild-7fcaa57380424b3da845a306df59b2cd\Dixon.CommandCenter.API.staticwebassets.endpoints.json
+C:\Users\Saksham Jain\AppData\Local\Temp\DixonCommandCenterBuild-7fcaa57380424b3da845a306df59b2cd\Dixon.CommandCenter.API.deps.json
+C:\Users\Saksham Jain\AppData\Local\Temp\DixonCommandCenterBuild-7fcaa57380424b3da845a306df59b2cd\Dixon.CommandCenter.API.runtimeconfig.json
+C:\Users\Saksham Jain\AppData\Local\Temp\DixonCommandCenterBuild-7fcaa57380424b3da845a306df59b2cd\Dixon.CommandCenter.API.runtimeconfig.dev.json
+C:\Users\Saksham Jain\AppData\Local\Temp\DixonCommandCenterBuild-7fcaa57380424b3da845a306df59b2cd\Dixon.CommandCenter.API.dll
+C:\Users\Saksham Jain\AppData\Local\Temp\DixonCommandCenterBuild-7fcaa57380424b3da845a306df59b2cd\Dixon.CommandCenter.API.pdb
+C:\Users\Saksham Jain\AppData\Local\Temp\DixonCommandCenterBuild-ca3e55a844f042b894901c8302a57298\appsettings.Development.json
+C:\Users\Saksham Jain\AppData\Local\Temp\DixonCommandCenterBuild-ca3e55a844f042b894901c8302a57298\appsettings.json
+C:\Users\Saksham Jain\AppData\Local\Temp\DixonCommandCenterBuild-ca3e55a844f042b894901c8302a57298\Dixon.CommandCenter.API.staticwebassets.endpoints.json
+C:\Users\Saksham Jain\AppData\Local\Temp\DixonCommandCenterBuild-ca3e55a844f042b894901c8302a57298\Dixon.CommandCenter.API.deps.json
+C:\Users\Saksham Jain\AppData\Local\Temp\DixonCommandCenterBuild-ca3e55a844f042b894901c8302a57298\Dixon.CommandCenter.API.runtimeconfig.json
+C:\Users\Saksham Jain\AppData\Local\Temp\DixonCommandCenterBuild-ca3e55a844f042b894901c8302a57298\Dixon.CommandCenter.API.runtimeconfig.dev.json
+C:\Users\Saksham Jain\AppData\Local\Temp\DixonCommandCenterBuild-ca3e55a844f042b894901c8302a57298\Dixon.CommandCenter.API.dll
+C:\Users\Saksham Jain\AppData\Local\Temp\DixonCommandCenterBuild-ca3e55a844f042b894901c8302a57298\Dixon.CommandCenter.API.pdb
+C:\Users\Saksham Jain\AppData\Local\Temp\DixonExcelImportBuild-22bd9c521a8449408c54e607edbe97a1\appsettings.Development.json
+C:\Users\Saksham Jain\AppData\Local\Temp\DixonExcelImportBuild-22bd9c521a8449408c54e607edbe97a1\appsettings.json
+C:\Users\Saksham Jain\AppData\Local\Temp\DixonExcelImportBuild-22bd9c521a8449408c54e607edbe97a1\Dixon.CommandCenter.API.staticwebassets.endpoints.json
+C:\Users\Saksham Jain\AppData\Local\Temp\DixonExcelImportBuild-22bd9c521a8449408c54e607edbe97a1\Dixon.CommandCenter.API.deps.json
+C:\Users\Saksham Jain\AppData\Local\Temp\DixonExcelImportBuild-22bd9c521a8449408c54e607edbe97a1\Dixon.CommandCenter.API.runtimeconfig.json
+C:\Users\Saksham Jain\AppData\Local\Temp\DixonExcelImportBuild-22bd9c521a8449408c54e607edbe97a1\Dixon.CommandCenter.API.runtimeconfig.dev.json
+C:\Users\Saksham Jain\AppData\Local\Temp\DixonExcelImportBuild-22bd9c521a8449408c54e607edbe97a1\Dixon.CommandCenter.API.dll
+C:\Users\Saksham Jain\AppData\Local\Temp\DixonExcelImportBuild-22bd9c521a8449408c54e607edbe97a1\Dixon.CommandCenter.API.pdb
+C:\Users\Saksham Jain\Downloads\Dixon-Command-Center-Final-UI-Admin-KPI\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\appsettings.Development.json
+C:\Users\Saksham Jain\Downloads\Dixon-Command-Center-Final-UI-Admin-KPI\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\appsettings.json
+C:\Users\Saksham Jain\Downloads\Dixon-Command-Center-Final-UI-Admin-KPI\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\Dixon.CommandCenter.API.staticwebassets.endpoints.json
+C:\Users\Saksham Jain\Downloads\Dixon-Command-Center-Final-UI-Admin-KPI\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\Dixon.CommandCenter.API.exe
+C:\Users\Saksham Jain\Downloads\Dixon-Command-Center-Final-UI-Admin-KPI\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\Dixon.CommandCenter.API.deps.json
+C:\Users\Saksham Jain\Downloads\Dixon-Command-Center-Final-UI-Admin-KPI\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\Dixon.CommandCenter.API.runtimeconfig.json
+C:\Users\Saksham Jain\Downloads\Dixon-Command-Center-Final-UI-Admin-KPI\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\Dixon.CommandCenter.API.runtimeconfig.dev.json
+C:\Users\Saksham Jain\Downloads\Dixon-Command-Center-Final-UI-Admin-KPI\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\Dixon.CommandCenter.API.dll
+C:\Users\Saksham Jain\Downloads\Dixon-Command-Center-Final-UI-Admin-KPI\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\Dixon.CommandCenter.API.pdb
+C:\Users\Saksham Jain\Downloads\Dixon-Command-Center-Final-UI-Admin-KPI\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\Azure.Core.dll
+C:\Users\Saksham Jain\Downloads\Dixon-Command-Center-Final-UI-Admin-KPI\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\Azure.Identity.dll
+C:\Users\Saksham Jain\Downloads\Dixon-Command-Center-Final-UI-Admin-KPI\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\ClosedXML.dll
+C:\Users\Saksham Jain\Downloads\Dixon-Command-Center-Final-UI-Admin-KPI\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\ClosedXML.Parser.dll
+C:\Users\Saksham Jain\Downloads\Dixon-Command-Center-Final-UI-Admin-KPI\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\DocumentFormat.OpenXml.dll
+C:\Users\Saksham Jain\Downloads\Dixon-Command-Center-Final-UI-Admin-KPI\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\DocumentFormat.OpenXml.Framework.dll
+C:\Users\Saksham Jain\Downloads\Dixon-Command-Center-Final-UI-Admin-KPI\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\ExcelNumberFormat.dll
+C:\Users\Saksham Jain\Downloads\Dixon-Command-Center-Final-UI-Admin-KPI\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\Microsoft.AspNetCore.Authentication.JwtBearer.dll
+C:\Users\Saksham Jain\Downloads\Dixon-Command-Center-Final-UI-Admin-KPI\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\Microsoft.AspNetCore.OpenApi.dll
+C:\Users\Saksham Jain\Downloads\Dixon-Command-Center-Final-UI-Admin-KPI\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\Microsoft.Bcl.AsyncInterfaces.dll
+C:\Users\Saksham Jain\Downloads\Dixon-Command-Center-Final-UI-Admin-KPI\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\Microsoft.Bcl.Cryptography.dll
+C:\Users\Saksham Jain\Downloads\Dixon-Command-Center-Final-UI-Admin-KPI\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\Microsoft.Data.SqlClient.dll
+C:\Users\Saksham Jain\Downloads\Dixon-Command-Center-Final-UI-Admin-KPI\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\Microsoft.Extensions.Caching.Memory.dll
+C:\Users\Saksham Jain\Downloads\Dixon-Command-Center-Final-UI-Admin-KPI\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\Microsoft.Extensions.DependencyInjection.Abstractions.dll
+C:\Users\Saksham Jain\Downloads\Dixon-Command-Center-Final-UI-Admin-KPI\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\Microsoft.Extensions.Logging.Abstractions.dll
+C:\Users\Saksham Jain\Downloads\Dixon-Command-Center-Final-UI-Admin-KPI\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\Microsoft.Extensions.Options.dll
+C:\Users\Saksham Jain\Downloads\Dixon-Command-Center-Final-UI-Admin-KPI\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\Microsoft.Identity.Client.dll
+C:\Users\Saksham Jain\Downloads\Dixon-Command-Center-Final-UI-Admin-KPI\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\Microsoft.Identity.Client.Extensions.Msal.dll
+C:\Users\Saksham Jain\Downloads\Dixon-Command-Center-Final-UI-Admin-KPI\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\Microsoft.IdentityModel.Abstractions.dll
+C:\Users\Saksham Jain\Downloads\Dixon-Command-Center-Final-UI-Admin-KPI\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\Microsoft.IdentityModel.JsonWebTokens.dll
+C:\Users\Saksham Jain\Downloads\Dixon-Command-Center-Final-UI-Admin-KPI\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\Microsoft.IdentityModel.Logging.dll
+C:\Users\Saksham Jain\Downloads\Dixon-Command-Center-Final-UI-Admin-KPI\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\Microsoft.IdentityModel.Protocols.dll
+C:\Users\Saksham Jain\Downloads\Dixon-Command-Center-Final-UI-Admin-KPI\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\Microsoft.IdentityModel.Protocols.OpenIdConnect.dll
+C:\Users\Saksham Jain\Downloads\Dixon-Command-Center-Final-UI-Admin-KPI\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\Microsoft.IdentityModel.Tokens.dll
+C:\Users\Saksham Jain\Downloads\Dixon-Command-Center-Final-UI-Admin-KPI\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\Microsoft.OpenApi.dll
+C:\Users\Saksham Jain\Downloads\Dixon-Command-Center-Final-UI-Admin-KPI\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\Microsoft.SqlServer.Server.dll
+C:\Users\Saksham Jain\Downloads\Dixon-Command-Center-Final-UI-Admin-KPI\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\RBush.dll
+C:\Users\Saksham Jain\Downloads\Dixon-Command-Center-Final-UI-Admin-KPI\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\SixLabors.Fonts.dll
+C:\Users\Saksham Jain\Downloads\Dixon-Command-Center-Final-UI-Admin-KPI\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\Swashbuckle.AspNetCore.Swagger.dll
+C:\Users\Saksham Jain\Downloads\Dixon-Command-Center-Final-UI-Admin-KPI\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\Swashbuckle.AspNetCore.SwaggerGen.dll
+C:\Users\Saksham Jain\Downloads\Dixon-Command-Center-Final-UI-Admin-KPI\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\Swashbuckle.AspNetCore.SwaggerUI.dll
+C:\Users\Saksham Jain\Downloads\Dixon-Command-Center-Final-UI-Admin-KPI\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\System.ClientModel.dll
+C:\Users\Saksham Jain\Downloads\Dixon-Command-Center-Final-UI-Admin-KPI\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\System.Configuration.ConfigurationManager.dll
+C:\Users\Saksham Jain\Downloads\Dixon-Command-Center-Final-UI-Admin-KPI\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\System.Diagnostics.EventLog.dll
+C:\Users\Saksham Jain\Downloads\Dixon-Command-Center-Final-UI-Admin-KPI\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\System.IdentityModel.Tokens.Jwt.dll
+C:\Users\Saksham Jain\Downloads\Dixon-Command-Center-Final-UI-Admin-KPI\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\System.IO.Packaging.dll
+C:\Users\Saksham Jain\Downloads\Dixon-Command-Center-Final-UI-Admin-KPI\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\System.Memory.Data.dll
+C:\Users\Saksham Jain\Downloads\Dixon-Command-Center-Final-UI-Admin-KPI\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\System.Security.Cryptography.Pkcs.dll
+C:\Users\Saksham Jain\Downloads\Dixon-Command-Center-Final-UI-Admin-KPI\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\System.Security.Cryptography.ProtectedData.dll
+C:\Users\Saksham Jain\Downloads\Dixon-Command-Center-Final-UI-Admin-KPI\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\cs\Microsoft.Data.SqlClient.resources.dll
+C:\Users\Saksham Jain\Downloads\Dixon-Command-Center-Final-UI-Admin-KPI\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\de\Microsoft.Data.SqlClient.resources.dll
+C:\Users\Saksham Jain\Downloads\Dixon-Command-Center-Final-UI-Admin-KPI\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\es\Microsoft.Data.SqlClient.resources.dll
+C:\Users\Saksham Jain\Downloads\Dixon-Command-Center-Final-UI-Admin-KPI\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\fr\Microsoft.Data.SqlClient.resources.dll
+C:\Users\Saksham Jain\Downloads\Dixon-Command-Center-Final-UI-Admin-KPI\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\it\Microsoft.Data.SqlClient.resources.dll
+C:\Users\Saksham Jain\Downloads\Dixon-Command-Center-Final-UI-Admin-KPI\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\ja\Microsoft.Data.SqlClient.resources.dll
+C:\Users\Saksham Jain\Downloads\Dixon-Command-Center-Final-UI-Admin-KPI\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\ko\Microsoft.Data.SqlClient.resources.dll
+C:\Users\Saksham Jain\Downloads\Dixon-Command-Center-Final-UI-Admin-KPI\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\pl\Microsoft.Data.SqlClient.resources.dll
+C:\Users\Saksham Jain\Downloads\Dixon-Command-Center-Final-UI-Admin-KPI\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\pt-BR\Microsoft.Data.SqlClient.resources.dll
+C:\Users\Saksham Jain\Downloads\Dixon-Command-Center-Final-UI-Admin-KPI\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\ru\Microsoft.Data.SqlClient.resources.dll
+C:\Users\Saksham Jain\Downloads\Dixon-Command-Center-Final-UI-Admin-KPI\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\tr\Microsoft.Data.SqlClient.resources.dll
+C:\Users\Saksham Jain\Downloads\Dixon-Command-Center-Final-UI-Admin-KPI\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\zh-Hans\Microsoft.Data.SqlClient.resources.dll
+C:\Users\Saksham Jain\Downloads\Dixon-Command-Center-Final-UI-Admin-KPI\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\zh-Hant\Microsoft.Data.SqlClient.resources.dll
+C:\Users\Saksham Jain\Downloads\Dixon-Command-Center-Final-UI-Admin-KPI\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\runtimes\unix\lib\net8.0\Microsoft.Data.SqlClient.dll
+C:\Users\Saksham Jain\Downloads\Dixon-Command-Center-Final-UI-Admin-KPI\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\runtimes\win\lib\net8.0\Microsoft.Data.SqlClient.dll
+C:\Users\Saksham Jain\Downloads\Dixon-Command-Center-Final-UI-Admin-KPI\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\runtimes\win-arm64\native\Microsoft.Data.SqlClient.SNI.dll
+C:\Users\Saksham Jain\Downloads\Dixon-Command-Center-Final-UI-Admin-KPI\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\runtimes\win-x64\native\Microsoft.Data.SqlClient.SNI.dll
+C:\Users\Saksham Jain\Downloads\Dixon-Command-Center-Final-UI-Admin-KPI\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\runtimes\win-x86\native\Microsoft.Data.SqlClient.SNI.dll
+C:\Users\Saksham Jain\Downloads\Dixon-Command-Center-Final-UI-Admin-KPI\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\runtimes\win\lib\net8.0\System.Diagnostics.EventLog.dll
+C:\Users\Saksham Jain\Downloads\Dixon-Command-Center-Final-UI-Admin-KPI\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\runtimes\win\lib\net8.0\System.Security.Cryptography.Pkcs.dll
+C:\Users\Saksham Jain\Downloads\Dixon-Command-Center-Final-UI-Admin-KPI\Dixon-Command-Center\Command-Center-Backend\obj\Debug\net8.0\Dixon.CommandCenter.API.csproj.AssemblyReference.cache
+C:\Users\Saksham Jain\Downloads\Dixon-Command-Center-Final-UI-Admin-KPI\Dixon-Command-Center\Command-Center-Backend\obj\Debug\net8.0\rpswa.dswa.cache.json
+C:\Users\Saksham Jain\Downloads\Dixon-Command-Center-Final-UI-Admin-KPI\Dixon-Command-Center\Command-Center-Backend\obj\Debug\net8.0\Dixon.CommandCenter.API.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Saksham Jain\Downloads\Dixon-Command-Center-Final-UI-Admin-KPI\Dixon-Command-Center\Command-Center-Backend\obj\Debug\net8.0\Dixon.CommandCenter.API.AssemblyInfoInputs.cache
+C:\Users\Saksham Jain\Downloads\Dixon-Command-Center-Final-UI-Admin-KPI\Dixon-Command-Center\Command-Center-Backend\obj\Debug\net8.0\Dixon.CommandCenter.API.AssemblyInfo.cs
+C:\Users\Saksham Jain\Downloads\Dixon-Command-Center-Final-UI-Admin-KPI\Dixon-Command-Center\Command-Center-Backend\obj\Debug\net8.0\Dixon.CommandCenter.API.csproj.CoreCompileInputs.cache
+C:\Users\Saksham Jain\Downloads\Dixon-Command-Center-Final-UI-Admin-KPI\Dixon-Command-Center\Command-Center-Backend\obj\Debug\net8.0\Dixon.CommandCenter.API.MvcApplicationPartsAssemblyInfo.cs
+C:\Users\Saksham Jain\Downloads\Dixon-Command-Center-Final-UI-Admin-KPI\Dixon-Command-Center\Command-Center-Backend\obj\Debug\net8.0\Dixon.CommandCenter.API.MvcApplicationPartsAssemblyInfo.cache
+C:\Users\Saksham Jain\Downloads\Dixon-Command-Center-Final-UI-Admin-KPI\Dixon-Command-Center\Command-Center-Backend\obj\Debug\net8.0\Dixon.CommandCenter.API.sourcelink.json
+C:\Users\Saksham Jain\Downloads\Dixon-Command-Center-Final-UI-Admin-KPI\Dixon-Command-Center\Command-Center-Backend\obj\Debug\net8.0\rjimswa.dswa.cache.json
+C:\Users\Saksham Jain\Downloads\Dixon-Command-Center-Final-UI-Admin-KPI\Dixon-Command-Center\Command-Center-Backend\obj\Debug\net8.0\rjsmrazor.dswa.cache.json
+C:\Users\Saksham Jain\Downloads\Dixon-Command-Center-Final-UI-Admin-KPI\Dixon-Command-Center\Command-Center-Backend\obj\Debug\net8.0\rjsmcshtml.dswa.cache.json
+C:\Users\Saksham Jain\Downloads\Dixon-Command-Center-Final-UI-Admin-KPI\Dixon-Command-Center\Command-Center-Backend\obj\Debug\net8.0\scopedcss\scopedcss.cache
+C:\Users\Saksham Jain\Downloads\Dixon-Command-Center-Final-UI-Admin-KPI\Dixon-Command-Center\Command-Center-Backend\obj\Debug\net8.0\scopedcss\bundle\Dixon.CommandCenter.API.styles.css
+C:\Users\Saksham Jain\Downloads\Dixon-Command-Center-Final-UI-Admin-KPI\Dixon-Command-Center\Command-Center-Backend\obj\Debug\net8.0\staticwebassets.build.json
+C:\Users\Saksham Jain\Downloads\Dixon-Command-Center-Final-UI-Admin-KPI\Dixon-Command-Center\Command-Center-Backend\obj\Debug\net8.0\staticwebassets.build.json.cache
+C:\Users\Saksham Jain\Downloads\Dixon-Command-Center-Final-UI-Admin-KPI\Dixon-Command-Center\Command-Center-Backend\obj\Debug\net8.0\staticwebassets.development.json
+C:\Users\Saksham Jain\Downloads\Dixon-Command-Center-Final-UI-Admin-KPI\Dixon-Command-Center\Command-Center-Backend\obj\Debug\net8.0\staticwebassets.build.endpoints.json
+C:\Users\Saksham Jain\Downloads\Dixon-Command-Center-Final-UI-Admin-KPI\Dixon-Command-Center\Command-Center-Backend\obj\Debug\net8.0\swae.build.ex.cache
+C:\Users\Saksham Jain\Downloads\Dixon-Command-Center-Final-UI-Admin-KPI\Dixon-Command-Center\Command-Center-Backend\obj\Debug\net8.0\Dixon.Co.C327CEED.Up2Date
+C:\Users\Saksham Jain\Downloads\Dixon-Command-Center-Final-UI-Admin-KPI\Dixon-Command-Center\Command-Center-Backend\obj\Debug\net8.0\Dixon.CommandCenter.API.dll
+C:\Users\Saksham Jain\Downloads\Dixon-Command-Center-Final-UI-Admin-KPI\Dixon-Command-Center\Command-Center-Backend\obj\Debug\net8.0\refint\Dixon.CommandCenter.API.dll
+C:\Users\Saksham Jain\Downloads\Dixon-Command-Center-Final-UI-Admin-KPI\Dixon-Command-Center\Command-Center-Backend\obj\Debug\net8.0\Dixon.CommandCenter.API.pdb
+C:\Users\Saksham Jain\Downloads\Dixon-Command-Center-Final-UI-Admin-KPI\Dixon-Command-Center\Command-Center-Backend\obj\Debug\net8.0\Dixon.CommandCenter.API.genruntimeconfig.cache
+C:\Users\Saksham Jain\Downloads\Dixon-Command-Center-Final-UI-Admin-KPI\Dixon-Command-Center\Command-Center-Backend\obj\Debug\net8.0\ref\Dixon.CommandCenter.API.dll
+C:\Users\Saksham Jain\AppData\Local\Temp\DixonCommandCenterPlantCustomerBuild\appsettings.Development.json
+C:\Users\Saksham Jain\AppData\Local\Temp\DixonCommandCenterPlantCustomerBuild\appsettings.json
+C:\Users\Saksham Jain\AppData\Local\Temp\DixonCommandCenterPlantCustomerBuild\Dixon.CommandCenter.API.staticwebassets.endpoints.json
+C:\Users\Saksham Jain\AppData\Local\Temp\DixonCommandCenterPlantCustomerBuild\Dixon.CommandCenter.API.deps.json
+C:\Users\Saksham Jain\AppData\Local\Temp\DixonCommandCenterPlantCustomerBuild\Dixon.CommandCenter.API.runtimeconfig.json
+C:\Users\Saksham Jain\AppData\Local\Temp\DixonCommandCenterPlantCustomerBuild\Dixon.CommandCenter.API.runtimeconfig.dev.json
+C:\Users\Saksham Jain\AppData\Local\Temp\DixonCommandCenterPlantCustomerBuild\Dixon.CommandCenter.API.dll
+C:\Users\Saksham Jain\AppData\Local\Temp\DixonCommandCenterPlantCustomerBuild\Dixon.CommandCenter.API.pdb
+C:\Temp\DixonBuild\appsettings.Development.json
+C:\Temp\DixonBuild\appsettings.json
+C:\Temp\DixonBuild\Dixon.CommandCenter.API.staticwebassets.endpoints.json
+C:\Temp\DixonBuild\Dixon.CommandCenter.API.exe
+C:\Temp\DixonBuild\Dixon.CommandCenter.API.deps.json
+C:\Temp\DixonBuild\Dixon.CommandCenter.API.runtimeconfig.json
+C:\Temp\DixonBuild\Dixon.CommandCenter.API.runtimeconfig.dev.json
+C:\Temp\DixonBuild\Dixon.CommandCenter.API.dll
+C:\Temp\DixonBuild\Dixon.CommandCenter.API.pdb
+C:\Users\Saksham Jain\OneDrive\Desktop\Backup\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\appsettings.Development.json
+C:\Users\Saksham Jain\OneDrive\Desktop\Backup\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\appsettings.json
+C:\Users\Saksham Jain\OneDrive\Desktop\Backup\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\Dixon.CommandCenter.API.staticwebassets.endpoints.json
+C:\Users\Saksham Jain\OneDrive\Desktop\Backup\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\Dixon.CommandCenter.API.exe
+C:\Users\Saksham Jain\OneDrive\Desktop\Backup\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\Dixon.CommandCenter.API.deps.json
+C:\Users\Saksham Jain\OneDrive\Desktop\Backup\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\Dixon.CommandCenter.API.runtimeconfig.json
+C:\Users\Saksham Jain\OneDrive\Desktop\Backup\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\Dixon.CommandCenter.API.runtimeconfig.dev.json
+C:\Users\Saksham Jain\OneDrive\Desktop\Backup\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\Dixon.CommandCenter.API.dll
+C:\Users\Saksham Jain\OneDrive\Desktop\Backup\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\Dixon.CommandCenter.API.pdb
+C:\Users\Saksham Jain\OneDrive\Desktop\Backup\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\Azure.Core.dll
+C:\Users\Saksham Jain\OneDrive\Desktop\Backup\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\Azure.Identity.dll
+C:\Users\Saksham Jain\OneDrive\Desktop\Backup\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\ClosedXML.dll
+C:\Users\Saksham Jain\OneDrive\Desktop\Backup\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\ClosedXML.Parser.dll
+C:\Users\Saksham Jain\OneDrive\Desktop\Backup\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\DocumentFormat.OpenXml.dll
+C:\Users\Saksham Jain\OneDrive\Desktop\Backup\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\DocumentFormat.OpenXml.Framework.dll
+C:\Users\Saksham Jain\OneDrive\Desktop\Backup\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\ExcelNumberFormat.dll
+C:\Users\Saksham Jain\OneDrive\Desktop\Backup\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\Microsoft.AspNetCore.Authentication.JwtBearer.dll
+C:\Users\Saksham Jain\OneDrive\Desktop\Backup\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\Microsoft.AspNetCore.OpenApi.dll
+C:\Users\Saksham Jain\OneDrive\Desktop\Backup\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\Microsoft.Bcl.AsyncInterfaces.dll
+C:\Users\Saksham Jain\OneDrive\Desktop\Backup\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\Microsoft.Bcl.Cryptography.dll
+C:\Users\Saksham Jain\OneDrive\Desktop\Backup\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\Microsoft.Data.SqlClient.dll
+C:\Users\Saksham Jain\OneDrive\Desktop\Backup\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\Microsoft.Extensions.Caching.Memory.dll
+C:\Users\Saksham Jain\OneDrive\Desktop\Backup\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\Microsoft.Extensions.DependencyInjection.Abstractions.dll
+C:\Users\Saksham Jain\OneDrive\Desktop\Backup\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\Microsoft.Extensions.Logging.Abstractions.dll
+C:\Users\Saksham Jain\OneDrive\Desktop\Backup\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\Microsoft.Extensions.Options.dll
+C:\Users\Saksham Jain\OneDrive\Desktop\Backup\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\Microsoft.Identity.Client.dll
+C:\Users\Saksham Jain\OneDrive\Desktop\Backup\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\Microsoft.Identity.Client.Extensions.Msal.dll
+C:\Users\Saksham Jain\OneDrive\Desktop\Backup\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\Microsoft.IdentityModel.Abstractions.dll
+C:\Users\Saksham Jain\OneDrive\Desktop\Backup\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\Microsoft.IdentityModel.JsonWebTokens.dll
+C:\Users\Saksham Jain\OneDrive\Desktop\Backup\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\Microsoft.IdentityModel.Logging.dll
+C:\Users\Saksham Jain\OneDrive\Desktop\Backup\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\Microsoft.IdentityModel.Protocols.dll
+C:\Users\Saksham Jain\OneDrive\Desktop\Backup\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\Microsoft.IdentityModel.Protocols.OpenIdConnect.dll
+C:\Users\Saksham Jain\OneDrive\Desktop\Backup\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\Microsoft.IdentityModel.Tokens.dll
+C:\Users\Saksham Jain\OneDrive\Desktop\Backup\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\Microsoft.OpenApi.dll
+C:\Users\Saksham Jain\OneDrive\Desktop\Backup\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\Microsoft.SqlServer.Server.dll
+C:\Users\Saksham Jain\OneDrive\Desktop\Backup\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\RBush.dll
+C:\Users\Saksham Jain\OneDrive\Desktop\Backup\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\SixLabors.Fonts.dll
+C:\Users\Saksham Jain\OneDrive\Desktop\Backup\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\Swashbuckle.AspNetCore.Swagger.dll
+C:\Users\Saksham Jain\OneDrive\Desktop\Backup\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\Swashbuckle.AspNetCore.SwaggerGen.dll
+C:\Users\Saksham Jain\OneDrive\Desktop\Backup\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\Swashbuckle.AspNetCore.SwaggerUI.dll
+C:\Users\Saksham Jain\OneDrive\Desktop\Backup\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\System.ClientModel.dll
+C:\Users\Saksham Jain\OneDrive\Desktop\Backup\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\System.Configuration.ConfigurationManager.dll
+C:\Users\Saksham Jain\OneDrive\Desktop\Backup\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\System.Diagnostics.EventLog.dll
+C:\Users\Saksham Jain\OneDrive\Desktop\Backup\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\System.IdentityModel.Tokens.Jwt.dll
+C:\Users\Saksham Jain\OneDrive\Desktop\Backup\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\System.IO.Packaging.dll
+C:\Users\Saksham Jain\OneDrive\Desktop\Backup\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\System.Memory.Data.dll
+C:\Users\Saksham Jain\OneDrive\Desktop\Backup\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\System.Security.Cryptography.Pkcs.dll
+C:\Users\Saksham Jain\OneDrive\Desktop\Backup\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\System.Security.Cryptography.ProtectedData.dll
+C:\Users\Saksham Jain\OneDrive\Desktop\Backup\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\cs\Microsoft.Data.SqlClient.resources.dll
+C:\Users\Saksham Jain\OneDrive\Desktop\Backup\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\de\Microsoft.Data.SqlClient.resources.dll
+C:\Users\Saksham Jain\OneDrive\Desktop\Backup\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\es\Microsoft.Data.SqlClient.resources.dll
+C:\Users\Saksham Jain\OneDrive\Desktop\Backup\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\fr\Microsoft.Data.SqlClient.resources.dll
+C:\Users\Saksham Jain\OneDrive\Desktop\Backup\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\it\Microsoft.Data.SqlClient.resources.dll
+C:\Users\Saksham Jain\OneDrive\Desktop\Backup\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\ja\Microsoft.Data.SqlClient.resources.dll
+C:\Users\Saksham Jain\OneDrive\Desktop\Backup\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\ko\Microsoft.Data.SqlClient.resources.dll
+C:\Users\Saksham Jain\OneDrive\Desktop\Backup\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\pl\Microsoft.Data.SqlClient.resources.dll
+C:\Users\Saksham Jain\OneDrive\Desktop\Backup\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\pt-BR\Microsoft.Data.SqlClient.resources.dll
+C:\Users\Saksham Jain\OneDrive\Desktop\Backup\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\ru\Microsoft.Data.SqlClient.resources.dll
+C:\Users\Saksham Jain\OneDrive\Desktop\Backup\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\tr\Microsoft.Data.SqlClient.resources.dll
+C:\Users\Saksham Jain\OneDrive\Desktop\Backup\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\zh-Hans\Microsoft.Data.SqlClient.resources.dll
+C:\Users\Saksham Jain\OneDrive\Desktop\Backup\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\zh-Hant\Microsoft.Data.SqlClient.resources.dll
+C:\Users\Saksham Jain\OneDrive\Desktop\Backup\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\runtimes\unix\lib\net8.0\Microsoft.Data.SqlClient.dll
+C:\Users\Saksham Jain\OneDrive\Desktop\Backup\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\runtimes\win\lib\net8.0\Microsoft.Data.SqlClient.dll
+C:\Users\Saksham Jain\OneDrive\Desktop\Backup\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\runtimes\win-arm64\native\Microsoft.Data.SqlClient.SNI.dll
+C:\Users\Saksham Jain\OneDrive\Desktop\Backup\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\runtimes\win-x64\native\Microsoft.Data.SqlClient.SNI.dll
+C:\Users\Saksham Jain\OneDrive\Desktop\Backup\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\runtimes\win-x86\native\Microsoft.Data.SqlClient.SNI.dll
+C:\Users\Saksham Jain\OneDrive\Desktop\Backup\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\runtimes\win\lib\net8.0\System.Diagnostics.EventLog.dll
+C:\Users\Saksham Jain\OneDrive\Desktop\Backup\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\runtimes\win\lib\net8.0\System.Security.Cryptography.Pkcs.dll
+C:\Users\Saksham Jain\OneDrive\Desktop\Backup\Dixon-Command-Center\Command-Center-Backend\obj\Debug\net8.0\Dixon.CommandCenter.API.csproj.AssemblyReference.cache
+C:\Users\Saksham Jain\OneDrive\Desktop\Backup\Dixon-Command-Center\Command-Center-Backend\obj\Debug\net8.0\rpswa.dswa.cache.json
+C:\Users\Saksham Jain\OneDrive\Desktop\Backup\Dixon-Command-Center\Command-Center-Backend\obj\Debug\net8.0\Dixon.CommandCenter.API.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Saksham Jain\OneDrive\Desktop\Backup\Dixon-Command-Center\Command-Center-Backend\obj\Debug\net8.0\Dixon.CommandCenter.API.AssemblyInfoInputs.cache
+C:\Users\Saksham Jain\OneDrive\Desktop\Backup\Dixon-Command-Center\Command-Center-Backend\obj\Debug\net8.0\Dixon.CommandCenter.API.AssemblyInfo.cs
+C:\Users\Saksham Jain\OneDrive\Desktop\Backup\Dixon-Command-Center\Command-Center-Backend\obj\Debug\net8.0\Dixon.CommandCenter.API.csproj.CoreCompileInputs.cache
+C:\Users\Saksham Jain\OneDrive\Desktop\Backup\Dixon-Command-Center\Command-Center-Backend\obj\Debug\net8.0\Dixon.CommandCenter.API.MvcApplicationPartsAssemblyInfo.cs
+C:\Users\Saksham Jain\OneDrive\Desktop\Backup\Dixon-Command-Center\Command-Center-Backend\obj\Debug\net8.0\Dixon.CommandCenter.API.MvcApplicationPartsAssemblyInfo.cache
+C:\Users\Saksham Jain\OneDrive\Desktop\Backup\Dixon-Command-Center\Command-Center-Backend\obj\Debug\net8.0\Dixon.CommandCenter.API.sourcelink.json
+C:\Users\Saksham Jain\OneDrive\Desktop\Backup\Dixon-Command-Center\Command-Center-Backend\obj\Debug\net8.0\rjimswa.dswa.cache.json
+C:\Users\Saksham Jain\OneDrive\Desktop\Backup\Dixon-Command-Center\Command-Center-Backend\obj\Debug\net8.0\rjsmrazor.dswa.cache.json
+C:\Users\Saksham Jain\OneDrive\Desktop\Backup\Dixon-Command-Center\Command-Center-Backend\obj\Debug\net8.0\rjsmcshtml.dswa.cache.json
+C:\Users\Saksham Jain\OneDrive\Desktop\Backup\Dixon-Command-Center\Command-Center-Backend\obj\Debug\net8.0\scopedcss\scopedcss.cache
+C:\Users\Saksham Jain\OneDrive\Desktop\Backup\Dixon-Command-Center\Command-Center-Backend\obj\Debug\net8.0\scopedcss\bundle\Dixon.CommandCenter.API.styles.css
+C:\Users\Saksham Jain\OneDrive\Desktop\Backup\Dixon-Command-Center\Command-Center-Backend\obj\Debug\net8.0\staticwebassets.build.json
+C:\Users\Saksham Jain\OneDrive\Desktop\Backup\Dixon-Command-Center\Command-Center-Backend\obj\Debug\net8.0\staticwebassets.build.json.cache
+C:\Users\Saksham Jain\OneDrive\Desktop\Backup\Dixon-Command-Center\Command-Center-Backend\obj\Debug\net8.0\staticwebassets.development.json
+C:\Users\Saksham Jain\OneDrive\Desktop\Backup\Dixon-Command-Center\Command-Center-Backend\obj\Debug\net8.0\staticwebassets.build.endpoints.json
+C:\Users\Saksham Jain\OneDrive\Desktop\Backup\Dixon-Command-Center\Command-Center-Backend\obj\Debug\net8.0\swae.build.ex.cache
+C:\Users\Saksham Jain\OneDrive\Desktop\Backup\Dixon-Command-Center\Command-Center-Backend\obj\Debug\net8.0\Dixon.Co.C327CEED.Up2Date
+C:\Users\Saksham Jain\OneDrive\Desktop\Backup\Dixon-Command-Center\Command-Center-Backend\obj\Debug\net8.0\Dixon.CommandCenter.API.dll
+C:\Users\Saksham Jain\OneDrive\Desktop\Backup\Dixon-Command-Center\Command-Center-Backend\obj\Debug\net8.0\refint\Dixon.CommandCenter.API.dll
+C:\Users\Saksham Jain\OneDrive\Desktop\Backup\Dixon-Command-Center\Command-Center-Backend\obj\Debug\net8.0\Dixon.CommandCenter.API.pdb
+C:\Users\Saksham Jain\OneDrive\Desktop\Backup\Dixon-Command-Center\Command-Center-Backend\obj\Debug\net8.0\Dixon.CommandCenter.API.genruntimeconfig.cache
+C:\Users\Saksham Jain\OneDrive\Desktop\Backup\Dixon-Command-Center\Command-Center-Backend\obj\Debug\net8.0\ref\Dixon.CommandCenter.API.dll
+C:\Users\Saksham Jain\AppData\Local\Temp\dixon-command-center-build\appsettings.Development.json
+C:\Users\Saksham Jain\AppData\Local\Temp\dixon-command-center-build\appsettings.json
+C:\Users\Saksham Jain\AppData\Local\Temp\dixon-command-center-build\Dixon.CommandCenter.API.staticwebassets.endpoints.json
+C:\Users\Saksham Jain\AppData\Local\Temp\dixon-command-center-build\Dixon.CommandCenter.API.exe
+C:\Users\Saksham Jain\AppData\Local\Temp\dixon-command-center-build\Dixon.CommandCenter.API.deps.json
+C:\Users\Saksham Jain\AppData\Local\Temp\dixon-command-center-build\Dixon.CommandCenter.API.runtimeconfig.json
+C:\Users\Saksham Jain\AppData\Local\Temp\dixon-command-center-build\Dixon.CommandCenter.API.runtimeconfig.dev.json
+C:\Users\Saksham Jain\AppData\Local\Temp\dixon-command-center-build\Dixon.CommandCenter.API.dll
+C:\Users\Saksham Jain\AppData\Local\Temp\dixon-command-center-build\Dixon.CommandCenter.API.pdb
+C:\Users\Saksham Jain\AppData\Local\Temp\dixon-command-center-build-final\appsettings.Development.json
+C:\Users\Saksham Jain\AppData\Local\Temp\dixon-command-center-build-final\appsettings.json
+C:\Users\Saksham Jain\AppData\Local\Temp\dixon-command-center-build-final\Dixon.CommandCenter.API.staticwebassets.endpoints.json
+C:\Users\Saksham Jain\AppData\Local\Temp\dixon-command-center-build-final\Dixon.CommandCenter.API.exe
+C:\Users\Saksham Jain\AppData\Local\Temp\dixon-command-center-build-final\Dixon.CommandCenter.API.deps.json
+C:\Users\Saksham Jain\AppData\Local\Temp\dixon-command-center-build-final\Dixon.CommandCenter.API.runtimeconfig.json
+C:\Users\Saksham Jain\AppData\Local\Temp\dixon-command-center-build-final\Dixon.CommandCenter.API.runtimeconfig.dev.json
+C:\Users\Saksham Jain\AppData\Local\Temp\dixon-command-center-build-final\Dixon.CommandCenter.API.dll
+C:\Users\Saksham Jain\AppData\Local\Temp\dixon-command-center-build-final\Dixon.CommandCenter.API.pdb
+C:\Users\Saksham Jain\AppData\Local\Temp\dixon-command-center-build-verified\appsettings.Development.json
+C:\Users\Saksham Jain\AppData\Local\Temp\dixon-command-center-build-verified\appsettings.json
+C:\Users\Saksham Jain\AppData\Local\Temp\dixon-command-center-build-verified\Dixon.CommandCenter.API.staticwebassets.endpoints.json
+C:\Users\Saksham Jain\AppData\Local\Temp\dixon-command-center-build-verified\Dixon.CommandCenter.API.exe
+C:\Users\Saksham Jain\AppData\Local\Temp\dixon-command-center-build-verified\Dixon.CommandCenter.API.deps.json
+C:\Users\Saksham Jain\AppData\Local\Temp\dixon-command-center-build-verified\Dixon.CommandCenter.API.runtimeconfig.json
+C:\Users\Saksham Jain\AppData\Local\Temp\dixon-command-center-build-verified\Dixon.CommandCenter.API.runtimeconfig.dev.json
+C:\Users\Saksham Jain\AppData\Local\Temp\dixon-command-center-build-verified\Dixon.CommandCenter.API.dll
+C:\Users\Saksham Jain\AppData\Local\Temp\dixon-command-center-build-verified\Dixon.CommandCenter.API.pdb
+C:\Users\Saksham Jain\AppData\Local\Temp\dixon-command-center-build-final2\appsettings.Development.json
+C:\Users\Saksham Jain\AppData\Local\Temp\dixon-command-center-build-final2\appsettings.json
+C:\Users\Saksham Jain\AppData\Local\Temp\dixon-command-center-build-final2\Dixon.CommandCenter.API.staticwebassets.endpoints.json
+C:\Users\Saksham Jain\AppData\Local\Temp\dixon-command-center-build-final2\Dixon.CommandCenter.API.exe
+C:\Users\Saksham Jain\AppData\Local\Temp\dixon-command-center-build-final2\Dixon.CommandCenter.API.deps.json
+C:\Users\Saksham Jain\AppData\Local\Temp\dixon-command-center-build-final2\Dixon.CommandCenter.API.runtimeconfig.json
+C:\Users\Saksham Jain\AppData\Local\Temp\dixon-command-center-build-final2\Dixon.CommandCenter.API.runtimeconfig.dev.json
+C:\Users\Saksham Jain\AppData\Local\Temp\dixon-command-center-build-final2\Dixon.CommandCenter.API.dll
+C:\Users\Saksham Jain\AppData\Local\Temp\dixon-command-center-build-final2\Dixon.CommandCenter.API.pdb
+C:\Users\Saksham Jain\AppData\Local\Temp\DixonCommandCenterApiValidation\appsettings.Development.json
+C:\Users\Saksham Jain\AppData\Local\Temp\DixonCommandCenterApiValidation\appsettings.json
+C:\Users\Saksham Jain\AppData\Local\Temp\DixonCommandCenterApiValidation\Dixon.CommandCenter.API.staticwebassets.endpoints.json
+C:\Users\Saksham Jain\AppData\Local\Temp\DixonCommandCenterApiValidation\Dixon.CommandCenter.API.exe
+C:\Users\Saksham Jain\AppData\Local\Temp\DixonCommandCenterApiValidation\Dixon.CommandCenter.API.deps.json
+C:\Users\Saksham Jain\AppData\Local\Temp\DixonCommandCenterApiValidation\Dixon.CommandCenter.API.runtimeconfig.json
+C:\Users\Saksham Jain\AppData\Local\Temp\DixonCommandCenterApiValidation\Dixon.CommandCenter.API.runtimeconfig.dev.json
+C:\Users\Saksham Jain\AppData\Local\Temp\DixonCommandCenterApiValidation\Dixon.CommandCenter.API.dll
+C:\Users\Saksham Jain\AppData\Local\Temp\DixonCommandCenterApiValidation\Dixon.CommandCenter.API.pdb
+C:\Users\HP\OneDrive\Desktop\dixon\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\appsettings.Development.json
+C:\Users\HP\OneDrive\Desktop\dixon\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\appsettings.json
+C:\Users\HP\OneDrive\Desktop\dixon\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\Dixon.CommandCenter.API.staticwebassets.endpoints.json
+C:\Users\HP\OneDrive\Desktop\dixon\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\Dixon.CommandCenter.API.exe
+C:\Users\HP\OneDrive\Desktop\dixon\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\Dixon.CommandCenter.API.deps.json
+C:\Users\HP\OneDrive\Desktop\dixon\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\Dixon.CommandCenter.API.runtimeconfig.json
+C:\Users\HP\OneDrive\Desktop\dixon\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\Dixon.CommandCenter.API.dll
+C:\Users\HP\OneDrive\Desktop\dixon\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\Dixon.CommandCenter.API.pdb
+C:\Users\HP\OneDrive\Desktop\dixon\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\Azure.Core.dll
+C:\Users\HP\OneDrive\Desktop\dixon\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\Azure.Identity.dll
+C:\Users\HP\OneDrive\Desktop\dixon\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\ClosedXML.dll
+C:\Users\HP\OneDrive\Desktop\dixon\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\ClosedXML.Parser.dll
+C:\Users\HP\OneDrive\Desktop\dixon\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\DocumentFormat.OpenXml.dll
+C:\Users\HP\OneDrive\Desktop\dixon\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\DocumentFormat.OpenXml.Framework.dll
+C:\Users\HP\OneDrive\Desktop\dixon\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\ExcelNumberFormat.dll
+C:\Users\HP\OneDrive\Desktop\dixon\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\Microsoft.AspNetCore.Authentication.JwtBearer.dll
+C:\Users\HP\OneDrive\Desktop\dixon\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\Microsoft.AspNetCore.OpenApi.dll
+C:\Users\HP\OneDrive\Desktop\dixon\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\Microsoft.Bcl.AsyncInterfaces.dll
+C:\Users\HP\OneDrive\Desktop\dixon\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\Microsoft.Bcl.Cryptography.dll
+C:\Users\HP\OneDrive\Desktop\dixon\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\Microsoft.Data.SqlClient.dll
+C:\Users\HP\OneDrive\Desktop\dixon\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\Microsoft.Extensions.Caching.Memory.dll
+C:\Users\HP\OneDrive\Desktop\dixon\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\Microsoft.Extensions.DependencyInjection.Abstractions.dll
+C:\Users\HP\OneDrive\Desktop\dixon\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\Microsoft.Extensions.Logging.Abstractions.dll
+C:\Users\HP\OneDrive\Desktop\dixon\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\Microsoft.Extensions.Options.dll
+C:\Users\HP\OneDrive\Desktop\dixon\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\Microsoft.Identity.Client.dll
+C:\Users\HP\OneDrive\Desktop\dixon\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\Microsoft.Identity.Client.Extensions.Msal.dll
+C:\Users\HP\OneDrive\Desktop\dixon\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\Microsoft.IdentityModel.Abstractions.dll
+C:\Users\HP\OneDrive\Desktop\dixon\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\Microsoft.IdentityModel.JsonWebTokens.dll
+C:\Users\HP\OneDrive\Desktop\dixon\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\Microsoft.IdentityModel.Logging.dll
+C:\Users\HP\OneDrive\Desktop\dixon\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\Microsoft.IdentityModel.Protocols.dll
+C:\Users\HP\OneDrive\Desktop\dixon\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\Microsoft.IdentityModel.Protocols.OpenIdConnect.dll
+C:\Users\HP\OneDrive\Desktop\dixon\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\Microsoft.IdentityModel.Tokens.dll
+C:\Users\HP\OneDrive\Desktop\dixon\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\Microsoft.OpenApi.dll
+C:\Users\HP\OneDrive\Desktop\dixon\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\Microsoft.SqlServer.Server.dll
+C:\Users\HP\OneDrive\Desktop\dixon\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\RBush.dll
+C:\Users\HP\OneDrive\Desktop\dixon\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\SixLabors.Fonts.dll
+C:\Users\HP\OneDrive\Desktop\dixon\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\Swashbuckle.AspNetCore.Swagger.dll
+C:\Users\HP\OneDrive\Desktop\dixon\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\Swashbuckle.AspNetCore.SwaggerGen.dll
+C:\Users\HP\OneDrive\Desktop\dixon\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\Swashbuckle.AspNetCore.SwaggerUI.dll
+C:\Users\HP\OneDrive\Desktop\dixon\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\System.ClientModel.dll
+C:\Users\HP\OneDrive\Desktop\dixon\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\System.Configuration.ConfigurationManager.dll
+C:\Users\HP\OneDrive\Desktop\dixon\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\System.Diagnostics.EventLog.dll
+C:\Users\HP\OneDrive\Desktop\dixon\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\System.IdentityModel.Tokens.Jwt.dll
+C:\Users\HP\OneDrive\Desktop\dixon\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\System.IO.Packaging.dll
+C:\Users\HP\OneDrive\Desktop\dixon\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\System.Memory.Data.dll
+C:\Users\HP\OneDrive\Desktop\dixon\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\System.Security.Cryptography.Pkcs.dll
+C:\Users\HP\OneDrive\Desktop\dixon\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\System.Security.Cryptography.ProtectedData.dll
+C:\Users\HP\OneDrive\Desktop\dixon\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\cs\Microsoft.Data.SqlClient.resources.dll
+C:\Users\HP\OneDrive\Desktop\dixon\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\de\Microsoft.Data.SqlClient.resources.dll
+C:\Users\HP\OneDrive\Desktop\dixon\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\es\Microsoft.Data.SqlClient.resources.dll
+C:\Users\HP\OneDrive\Desktop\dixon\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\fr\Microsoft.Data.SqlClient.resources.dll
+C:\Users\HP\OneDrive\Desktop\dixon\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\it\Microsoft.Data.SqlClient.resources.dll
+C:\Users\HP\OneDrive\Desktop\dixon\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\ja\Microsoft.Data.SqlClient.resources.dll
+C:\Users\HP\OneDrive\Desktop\dixon\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\ko\Microsoft.Data.SqlClient.resources.dll
+C:\Users\HP\OneDrive\Desktop\dixon\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\pl\Microsoft.Data.SqlClient.resources.dll
+C:\Users\HP\OneDrive\Desktop\dixon\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\pt-BR\Microsoft.Data.SqlClient.resources.dll
+C:\Users\HP\OneDrive\Desktop\dixon\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\ru\Microsoft.Data.SqlClient.resources.dll
+C:\Users\HP\OneDrive\Desktop\dixon\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\tr\Microsoft.Data.SqlClient.resources.dll
+C:\Users\HP\OneDrive\Desktop\dixon\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\zh-Hans\Microsoft.Data.SqlClient.resources.dll
+C:\Users\HP\OneDrive\Desktop\dixon\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\zh-Hant\Microsoft.Data.SqlClient.resources.dll
+C:\Users\HP\OneDrive\Desktop\dixon\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\runtimes\unix\lib\net8.0\Microsoft.Data.SqlClient.dll
+C:\Users\HP\OneDrive\Desktop\dixon\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\runtimes\win\lib\net8.0\Microsoft.Data.SqlClient.dll
+C:\Users\HP\OneDrive\Desktop\dixon\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\runtimes\win-arm64\native\Microsoft.Data.SqlClient.SNI.dll
+C:\Users\HP\OneDrive\Desktop\dixon\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\runtimes\win-x64\native\Microsoft.Data.SqlClient.SNI.dll
+C:\Users\HP\OneDrive\Desktop\dixon\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\runtimes\win-x86\native\Microsoft.Data.SqlClient.SNI.dll
+C:\Users\HP\OneDrive\Desktop\dixon\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\runtimes\win\lib\net8.0\System.Diagnostics.EventLog.dll
+C:\Users\HP\OneDrive\Desktop\dixon\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\runtimes\win\lib\net8.0\System.Security.Cryptography.Pkcs.dll
+C:\Users\HP\OneDrive\Desktop\dixon\Dixon-Command-Center\Command-Center-Backend\obj\Debug\net8.0\Dixon.CommandCenter.API.csproj.AssemblyReference.cache
+C:\Users\HP\OneDrive\Desktop\dixon\Dixon-Command-Center\Command-Center-Backend\obj\Debug\net8.0\rpswa.dswa.cache.json
+C:\Users\HP\OneDrive\Desktop\dixon\Dixon-Command-Center\Command-Center-Backend\obj\Debug\net8.0\Dixon.CommandCenter.API.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\HP\OneDrive\Desktop\dixon\Dixon-Command-Center\Command-Center-Backend\obj\Debug\net8.0\Dixon.CommandCenter.API.AssemblyInfoInputs.cache
+C:\Users\HP\OneDrive\Desktop\dixon\Dixon-Command-Center\Command-Center-Backend\obj\Debug\net8.0\Dixon.CommandCenter.API.AssemblyInfo.cs
+C:\Users\HP\OneDrive\Desktop\dixon\Dixon-Command-Center\Command-Center-Backend\obj\Debug\net8.0\Dixon.CommandCenter.API.csproj.CoreCompileInputs.cache
+C:\Users\HP\OneDrive\Desktop\dixon\Dixon-Command-Center\Command-Center-Backend\obj\Debug\net8.0\Dixon.CommandCenter.API.MvcApplicationPartsAssemblyInfo.cs
+C:\Users\HP\OneDrive\Desktop\dixon\Dixon-Command-Center\Command-Center-Backend\obj\Debug\net8.0\Dixon.CommandCenter.API.MvcApplicationPartsAssemblyInfo.cache
+C:\Users\HP\OneDrive\Desktop\dixon\Dixon-Command-Center\Command-Center-Backend\obj\Debug\net8.0\Dixon.CommandCenter.API.sourcelink.json
+C:\Users\HP\OneDrive\Desktop\dixon\Dixon-Command-Center\Command-Center-Backend\obj\Debug\net8.0\rjimswa.dswa.cache.json
+C:\Users\HP\OneDrive\Desktop\dixon\Dixon-Command-Center\Command-Center-Backend\obj\Debug\net8.0\rjsmrazor.dswa.cache.json
+C:\Users\HP\OneDrive\Desktop\dixon\Dixon-Command-Center\Command-Center-Backend\obj\Debug\net8.0\rjsmcshtml.dswa.cache.json
+C:\Users\HP\OneDrive\Desktop\dixon\Dixon-Command-Center\Command-Center-Backend\obj\Debug\net8.0\scopedcss\bundle\Dixon.CommandCenter.API.styles.css
+C:\Users\HP\OneDrive\Desktop\dixon\Dixon-Command-Center\Command-Center-Backend\obj\Debug\net8.0\staticwebassets.build.json
+C:\Users\HP\OneDrive\Desktop\dixon\Dixon-Command-Center\Command-Center-Backend\obj\Debug\net8.0\staticwebassets.build.json.cache
+C:\Users\HP\OneDrive\Desktop\dixon\Dixon-Command-Center\Command-Center-Backend\obj\Debug\net8.0\staticwebassets.development.json
+C:\Users\HP\OneDrive\Desktop\dixon\Dixon-Command-Center\Command-Center-Backend\obj\Debug\net8.0\staticwebassets.build.endpoints.json
+C:\Users\HP\OneDrive\Desktop\dixon\Dixon-Command-Center\Command-Center-Backend\obj\Debug\net8.0\swae.build.ex.cache
+C:\Users\HP\OneDrive\Desktop\dixon\Dixon-Command-Center\Command-Center-Backend\obj\Debug\net8.0\Dixon.Co.C327CEED.Up2Date
+C:\Users\HP\OneDrive\Desktop\dixon\Dixon-Command-Center\Command-Center-Backend\obj\Debug\net8.0\Dixon.CommandCenter.API.dll
+C:\Users\HP\OneDrive\Desktop\dixon\Dixon-Command-Center\Command-Center-Backend\obj\Debug\net8.0\refint\Dixon.CommandCenter.API.dll
+C:\Users\HP\OneDrive\Desktop\dixon\Dixon-Command-Center\Command-Center-Backend\obj\Debug\net8.0\Dixon.CommandCenter.API.pdb
+C:\Users\HP\OneDrive\Desktop\dixon\Dixon-Command-Center\Command-Center-Backend\obj\Debug\net8.0\Dixon.CommandCenter.API.genruntimeconfig.cache
+C:\Users\HP\OneDrive\Desktop\dixon\Dixon-Command-Center\Command-Center-Backend\obj\Debug\net8.0\ref\Dixon.CommandCenter.API.dll
+E:\dixon\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\appsettings.Development.json
+E:\dixon\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\appsettings.json
+E:\dixon\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\Dixon.CommandCenter.API.staticwebassets.endpoints.json
+E:\dixon\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\Dixon.CommandCenter.API.exe
+E:\dixon\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\Dixon.CommandCenter.API.deps.json
+E:\dixon\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\Dixon.CommandCenter.API.runtimeconfig.json
+E:\dixon\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\Dixon.CommandCenter.API.dll
+E:\dixon\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\Dixon.CommandCenter.API.pdb
+E:\dixon\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\Azure.Core.dll
+E:\dixon\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\Azure.Identity.dll
+E:\dixon\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\ClosedXML.dll
+E:\dixon\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\ClosedXML.Parser.dll
+E:\dixon\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\DocumentFormat.OpenXml.dll
+E:\dixon\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\DocumentFormat.OpenXml.Framework.dll
+E:\dixon\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\ExcelNumberFormat.dll
+E:\dixon\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\Microsoft.AspNetCore.Authentication.JwtBearer.dll
+E:\dixon\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\Microsoft.AspNetCore.OpenApi.dll
+E:\dixon\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\Microsoft.Bcl.AsyncInterfaces.dll
+E:\dixon\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\Microsoft.Bcl.Cryptography.dll
+E:\dixon\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\Microsoft.Data.SqlClient.dll
+E:\dixon\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\Microsoft.Extensions.Caching.Memory.dll
+E:\dixon\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\Microsoft.Extensions.DependencyInjection.Abstractions.dll
+E:\dixon\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\Microsoft.Extensions.Logging.Abstractions.dll
+E:\dixon\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\Microsoft.Extensions.Options.dll
+E:\dixon\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\Microsoft.Identity.Client.dll
+E:\dixon\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\Microsoft.Identity.Client.Extensions.Msal.dll
+E:\dixon\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\Microsoft.IdentityModel.Abstractions.dll
+E:\dixon\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\Microsoft.IdentityModel.JsonWebTokens.dll
+E:\dixon\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\Microsoft.IdentityModel.Logging.dll
+E:\dixon\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\Microsoft.IdentityModel.Protocols.dll
+E:\dixon\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\Microsoft.IdentityModel.Protocols.OpenIdConnect.dll
+E:\dixon\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\Microsoft.IdentityModel.Tokens.dll
+E:\dixon\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\Microsoft.OpenApi.dll
+E:\dixon\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\Microsoft.SqlServer.Server.dll
+E:\dixon\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\RBush.dll
+E:\dixon\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\SixLabors.Fonts.dll
+E:\dixon\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\Swashbuckle.AspNetCore.Swagger.dll
+E:\dixon\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\Swashbuckle.AspNetCore.SwaggerGen.dll
+E:\dixon\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\Swashbuckle.AspNetCore.SwaggerUI.dll
+E:\dixon\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\System.ClientModel.dll
+E:\dixon\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\System.Configuration.ConfigurationManager.dll
+E:\dixon\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\System.Diagnostics.EventLog.dll
+E:\dixon\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\System.IdentityModel.Tokens.Jwt.dll
+E:\dixon\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\System.IO.Packaging.dll
+E:\dixon\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\System.Memory.Data.dll
+E:\dixon\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\System.Security.Cryptography.Pkcs.dll
+E:\dixon\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\System.Security.Cryptography.ProtectedData.dll
+E:\dixon\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\cs\Microsoft.Data.SqlClient.resources.dll
+E:\dixon\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\de\Microsoft.Data.SqlClient.resources.dll
+E:\dixon\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\es\Microsoft.Data.SqlClient.resources.dll
+E:\dixon\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\fr\Microsoft.Data.SqlClient.resources.dll
+E:\dixon\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\it\Microsoft.Data.SqlClient.resources.dll
+E:\dixon\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\ja\Microsoft.Data.SqlClient.resources.dll
+E:\dixon\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\ko\Microsoft.Data.SqlClient.resources.dll
+E:\dixon\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\pl\Microsoft.Data.SqlClient.resources.dll
+E:\dixon\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\pt-BR\Microsoft.Data.SqlClient.resources.dll
+E:\dixon\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\ru\Microsoft.Data.SqlClient.resources.dll
+E:\dixon\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\tr\Microsoft.Data.SqlClient.resources.dll
+E:\dixon\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\zh-Hans\Microsoft.Data.SqlClient.resources.dll
+E:\dixon\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\zh-Hant\Microsoft.Data.SqlClient.resources.dll
+E:\dixon\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\runtimes\unix\lib\net8.0\Microsoft.Data.SqlClient.dll
+E:\dixon\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\runtimes\win\lib\net8.0\Microsoft.Data.SqlClient.dll
+E:\dixon\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\runtimes\win-arm64\native\Microsoft.Data.SqlClient.SNI.dll
+E:\dixon\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\runtimes\win-x64\native\Microsoft.Data.SqlClient.SNI.dll
+E:\dixon\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\runtimes\win-x86\native\Microsoft.Data.SqlClient.SNI.dll
+E:\dixon\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\runtimes\win\lib\net8.0\System.Diagnostics.EventLog.dll
+E:\dixon\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\runtimes\win\lib\net8.0\System.Security.Cryptography.Pkcs.dll
+E:\dixon\Dixon-Command-Center\Command-Center-Backend\obj\Debug\net8.0\Dixon.CommandCenter.API.csproj.AssemblyReference.cache
+E:\dixon\Dixon-Command-Center\Command-Center-Backend\obj\Debug\net8.0\rpswa.dswa.cache.json
+E:\dixon\Dixon-Command-Center\Command-Center-Backend\obj\Debug\net8.0\Dixon.CommandCenter.API.GeneratedMSBuildEditorConfig.editorconfig
+E:\dixon\Dixon-Command-Center\Command-Center-Backend\obj\Debug\net8.0\Dixon.CommandCenter.API.AssemblyInfoInputs.cache
+E:\dixon\Dixon-Command-Center\Command-Center-Backend\obj\Debug\net8.0\Dixon.CommandCenter.API.AssemblyInfo.cs
+E:\dixon\Dixon-Command-Center\Command-Center-Backend\obj\Debug\net8.0\Dixon.CommandCenter.API.csproj.CoreCompileInputs.cache
+E:\dixon\Dixon-Command-Center\Command-Center-Backend\obj\Debug\net8.0\Dixon.CommandCenter.API.MvcApplicationPartsAssemblyInfo.cs
+E:\dixon\Dixon-Command-Center\Command-Center-Backend\obj\Debug\net8.0\Dixon.CommandCenter.API.MvcApplicationPartsAssemblyInfo.cache
+E:\dixon\Dixon-Command-Center\Command-Center-Backend\obj\Debug\net8.0\Dixon.CommandCenter.API.sourcelink.json
+E:\dixon\Dixon-Command-Center\Command-Center-Backend\obj\Debug\net8.0\rjimswa.dswa.cache.json
+E:\dixon\Dixon-Command-Center\Command-Center-Backend\obj\Debug\net8.0\rjsmrazor.dswa.cache.json
+E:\dixon\Dixon-Command-Center\Command-Center-Backend\obj\Debug\net8.0\rjsmcshtml.dswa.cache.json
+E:\dixon\Dixon-Command-Center\Command-Center-Backend\obj\Debug\net8.0\scopedcss\bundle\Dixon.CommandCenter.API.styles.css
+E:\dixon\Dixon-Command-Center\Command-Center-Backend\obj\Debug\net8.0\staticwebassets.build.json
+E:\dixon\Dixon-Command-Center\Command-Center-Backend\obj\Debug\net8.0\staticwebassets.build.json.cache
+E:\dixon\Dixon-Command-Center\Command-Center-Backend\obj\Debug\net8.0\staticwebassets.development.json
+E:\dixon\Dixon-Command-Center\Command-Center-Backend\obj\Debug\net8.0\staticwebassets.build.endpoints.json
+E:\dixon\Dixon-Command-Center\Command-Center-Backend\obj\Debug\net8.0\swae.build.ex.cache
+E:\dixon\Dixon-Command-Center\Command-Center-Backend\obj\Debug\net8.0\Dixon.Co.C327CEED.Up2Date
+E:\dixon\Dixon-Command-Center\Command-Center-Backend\obj\Debug\net8.0\Dixon.CommandCenter.API.dll
+E:\dixon\Dixon-Command-Center\Command-Center-Backend\obj\Debug\net8.0\refint\Dixon.CommandCenter.API.dll
+E:\dixon\Dixon-Command-Center\Command-Center-Backend\obj\Debug\net8.0\Dixon.CommandCenter.API.pdb
+E:\dixon\Dixon-Command-Center\Command-Center-Backend\obj\Debug\net8.0\Dixon.CommandCenter.API.genruntimeconfig.cache
+E:\dixon\Dixon-Command-Center\Command-Center-Backend\obj\Debug\net8.0\ref\Dixon.CommandCenter.API.dll
+C:\Users\abc\AppData\Local\Temp\DixonViewerBuild\appsettings.Development.json
+C:\Users\abc\AppData\Local\Temp\DixonViewerBuild\appsettings.json
+C:\Users\abc\AppData\Local\Temp\DixonViewerBuild\Dixon.CommandCenter.API.staticwebassets.endpoints.json
+C:\Users\abc\AppData\Local\Temp\DixonViewerBuild\Dixon.CommandCenter.API.deps.json
+C:\Users\abc\AppData\Local\Temp\DixonViewerBuild\Dixon.CommandCenter.API.runtimeconfig.json
+C:\Users\abc\AppData\Local\Temp\DixonViewerBuild\Dixon.CommandCenter.API.dll
+C:\Users\abc\AppData\Local\Temp\DixonViewerBuild\Dixon.CommandCenter.API.pdb
+C:\Users\abc\AppData\Local\Temp\Dixon-CommandCenter-Build\appsettings.Development.json
+C:\Users\abc\AppData\Local\Temp\Dixon-CommandCenter-Build\appsettings.json
+C:\Users\abc\AppData\Local\Temp\Dixon-CommandCenter-Build\Dixon.CommandCenter.API.staticwebassets.endpoints.json
+C:\Users\abc\AppData\Local\Temp\Dixon-CommandCenter-Build\Dixon.CommandCenter.API.exe
+C:\Users\abc\AppData\Local\Temp\Dixon-CommandCenter-Build\Dixon.CommandCenter.API.deps.json
+C:\Users\abc\AppData\Local\Temp\Dixon-CommandCenter-Build\Dixon.CommandCenter.API.runtimeconfig.json
+C:\Users\abc\AppData\Local\Temp\Dixon-CommandCenter-Build\Dixon.CommandCenter.API.dll
+C:\Users\abc\AppData\Local\Temp\Dixon-CommandCenter-Build\Dixon.CommandCenter.API.pdb
+E:\dixon\build-check\backend\appsettings.Development.json
+E:\dixon\build-check\backend\appsettings.json
+E:\dixon\build-check\backend\Dixon.CommandCenter.API.staticwebassets.endpoints.json
+E:\dixon\build-check\backend\Dixon.CommandCenter.API.deps.json
+E:\dixon\build-check\backend\Dixon.CommandCenter.API.runtimeconfig.json
+E:\dixon\build-check\backend\Dixon.CommandCenter.API.dll
+E:\dixon\build-check\backend\Dixon.CommandCenter.API.pdb
+C:\Users\Saksham Jain\Downloads\Dixon-Command-Center-Viewer-Next-Updates (1)\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\appsettings.Development.json
+C:\Users\Saksham Jain\Downloads\Dixon-Command-Center-Viewer-Next-Updates (1)\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\appsettings.json
+C:\Users\Saksham Jain\Downloads\Dixon-Command-Center-Viewer-Next-Updates (1)\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\Dixon.CommandCenter.API.staticwebassets.endpoints.json
+C:\Users\Saksham Jain\Downloads\Dixon-Command-Center-Viewer-Next-Updates (1)\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\Dixon.CommandCenter.API.exe
+C:\Users\Saksham Jain\Downloads\Dixon-Command-Center-Viewer-Next-Updates (1)\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\Dixon.CommandCenter.API.deps.json
+C:\Users\Saksham Jain\Downloads\Dixon-Command-Center-Viewer-Next-Updates (1)\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\Dixon.CommandCenter.API.runtimeconfig.json
+C:\Users\Saksham Jain\Downloads\Dixon-Command-Center-Viewer-Next-Updates (1)\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\Dixon.CommandCenter.API.runtimeconfig.dev.json
+C:\Users\Saksham Jain\Downloads\Dixon-Command-Center-Viewer-Next-Updates (1)\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\Dixon.CommandCenter.API.dll
+C:\Users\Saksham Jain\Downloads\Dixon-Command-Center-Viewer-Next-Updates (1)\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\Dixon.CommandCenter.API.pdb
+C:\Users\Saksham Jain\Downloads\Dixon-Command-Center-Viewer-Next-Updates (1)\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\Azure.Core.dll
+C:\Users\Saksham Jain\Downloads\Dixon-Command-Center-Viewer-Next-Updates (1)\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\Azure.Identity.dll
+C:\Users\Saksham Jain\Downloads\Dixon-Command-Center-Viewer-Next-Updates (1)\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\ClosedXML.dll
+C:\Users\Saksham Jain\Downloads\Dixon-Command-Center-Viewer-Next-Updates (1)\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\ClosedXML.Parser.dll
+C:\Users\Saksham Jain\Downloads\Dixon-Command-Center-Viewer-Next-Updates (1)\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\DocumentFormat.OpenXml.dll
+C:\Users\Saksham Jain\Downloads\Dixon-Command-Center-Viewer-Next-Updates (1)\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\DocumentFormat.OpenXml.Framework.dll
+C:\Users\Saksham Jain\Downloads\Dixon-Command-Center-Viewer-Next-Updates (1)\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\ExcelNumberFormat.dll
+C:\Users\Saksham Jain\Downloads\Dixon-Command-Center-Viewer-Next-Updates (1)\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\Microsoft.AspNetCore.Authentication.JwtBearer.dll
+C:\Users\Saksham Jain\Downloads\Dixon-Command-Center-Viewer-Next-Updates (1)\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\Microsoft.AspNetCore.OpenApi.dll
+C:\Users\Saksham Jain\Downloads\Dixon-Command-Center-Viewer-Next-Updates (1)\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\Microsoft.Bcl.AsyncInterfaces.dll
+C:\Users\Saksham Jain\Downloads\Dixon-Command-Center-Viewer-Next-Updates (1)\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\Microsoft.Bcl.Cryptography.dll
+C:\Users\Saksham Jain\Downloads\Dixon-Command-Center-Viewer-Next-Updates (1)\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\Microsoft.Data.SqlClient.dll
+C:\Users\Saksham Jain\Downloads\Dixon-Command-Center-Viewer-Next-Updates (1)\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\Microsoft.Extensions.Caching.Memory.dll
+C:\Users\Saksham Jain\Downloads\Dixon-Command-Center-Viewer-Next-Updates (1)\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\Microsoft.Extensions.DependencyInjection.Abstractions.dll
+C:\Users\Saksham Jain\Downloads\Dixon-Command-Center-Viewer-Next-Updates (1)\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\Microsoft.Extensions.Logging.Abstractions.dll
+C:\Users\Saksham Jain\Downloads\Dixon-Command-Center-Viewer-Next-Updates (1)\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\Microsoft.Extensions.Options.dll
+C:\Users\Saksham Jain\Downloads\Dixon-Command-Center-Viewer-Next-Updates (1)\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\Microsoft.Identity.Client.dll
+C:\Users\Saksham Jain\Downloads\Dixon-Command-Center-Viewer-Next-Updates (1)\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\Microsoft.Identity.Client.Extensions.Msal.dll
+C:\Users\Saksham Jain\Downloads\Dixon-Command-Center-Viewer-Next-Updates (1)\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\Microsoft.IdentityModel.Abstractions.dll
+C:\Users\Saksham Jain\Downloads\Dixon-Command-Center-Viewer-Next-Updates (1)\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\Microsoft.IdentityModel.JsonWebTokens.dll
+C:\Users\Saksham Jain\Downloads\Dixon-Command-Center-Viewer-Next-Updates (1)\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\Microsoft.IdentityModel.Logging.dll
+C:\Users\Saksham Jain\Downloads\Dixon-Command-Center-Viewer-Next-Updates (1)\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\Microsoft.IdentityModel.Protocols.dll
+C:\Users\Saksham Jain\Downloads\Dixon-Command-Center-Viewer-Next-Updates (1)\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\Microsoft.IdentityModel.Protocols.OpenIdConnect.dll
+C:\Users\Saksham Jain\Downloads\Dixon-Command-Center-Viewer-Next-Updates (1)\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\Microsoft.IdentityModel.Tokens.dll
+C:\Users\Saksham Jain\Downloads\Dixon-Command-Center-Viewer-Next-Updates (1)\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\Microsoft.OpenApi.dll
+C:\Users\Saksham Jain\Downloads\Dixon-Command-Center-Viewer-Next-Updates (1)\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\Microsoft.SqlServer.Server.dll
+C:\Users\Saksham Jain\Downloads\Dixon-Command-Center-Viewer-Next-Updates (1)\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\RBush.dll
+C:\Users\Saksham Jain\Downloads\Dixon-Command-Center-Viewer-Next-Updates (1)\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\SixLabors.Fonts.dll
+C:\Users\Saksham Jain\Downloads\Dixon-Command-Center-Viewer-Next-Updates (1)\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\Swashbuckle.AspNetCore.Swagger.dll
+C:\Users\Saksham Jain\Downloads\Dixon-Command-Center-Viewer-Next-Updates (1)\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\Swashbuckle.AspNetCore.SwaggerGen.dll
+C:\Users\Saksham Jain\Downloads\Dixon-Command-Center-Viewer-Next-Updates (1)\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\Swashbuckle.AspNetCore.SwaggerUI.dll
+C:\Users\Saksham Jain\Downloads\Dixon-Command-Center-Viewer-Next-Updates (1)\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\System.ClientModel.dll
+C:\Users\Saksham Jain\Downloads\Dixon-Command-Center-Viewer-Next-Updates (1)\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\System.Configuration.ConfigurationManager.dll
+C:\Users\Saksham Jain\Downloads\Dixon-Command-Center-Viewer-Next-Updates (1)\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\System.Diagnostics.EventLog.dll
+C:\Users\Saksham Jain\Downloads\Dixon-Command-Center-Viewer-Next-Updates (1)\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\System.IdentityModel.Tokens.Jwt.dll
+C:\Users\Saksham Jain\Downloads\Dixon-Command-Center-Viewer-Next-Updates (1)\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\System.IO.Packaging.dll
+C:\Users\Saksham Jain\Downloads\Dixon-Command-Center-Viewer-Next-Updates (1)\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\System.Memory.Data.dll
+C:\Users\Saksham Jain\Downloads\Dixon-Command-Center-Viewer-Next-Updates (1)\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\System.Security.Cryptography.Pkcs.dll
+C:\Users\Saksham Jain\Downloads\Dixon-Command-Center-Viewer-Next-Updates (1)\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\System.Security.Cryptography.ProtectedData.dll
+C:\Users\Saksham Jain\Downloads\Dixon-Command-Center-Viewer-Next-Updates (1)\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\cs\Microsoft.Data.SqlClient.resources.dll
+C:\Users\Saksham Jain\Downloads\Dixon-Command-Center-Viewer-Next-Updates (1)\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\de\Microsoft.Data.SqlClient.resources.dll
+C:\Users\Saksham Jain\Downloads\Dixon-Command-Center-Viewer-Next-Updates (1)\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\es\Microsoft.Data.SqlClient.resources.dll
+C:\Users\Saksham Jain\Downloads\Dixon-Command-Center-Viewer-Next-Updates (1)\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\fr\Microsoft.Data.SqlClient.resources.dll
+C:\Users\Saksham Jain\Downloads\Dixon-Command-Center-Viewer-Next-Updates (1)\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\it\Microsoft.Data.SqlClient.resources.dll
+C:\Users\Saksham Jain\Downloads\Dixon-Command-Center-Viewer-Next-Updates (1)\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\ja\Microsoft.Data.SqlClient.resources.dll
+C:\Users\Saksham Jain\Downloads\Dixon-Command-Center-Viewer-Next-Updates (1)\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\ko\Microsoft.Data.SqlClient.resources.dll
+C:\Users\Saksham Jain\Downloads\Dixon-Command-Center-Viewer-Next-Updates (1)\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\pl\Microsoft.Data.SqlClient.resources.dll
+C:\Users\Saksham Jain\Downloads\Dixon-Command-Center-Viewer-Next-Updates (1)\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\pt-BR\Microsoft.Data.SqlClient.resources.dll
+C:\Users\Saksham Jain\Downloads\Dixon-Command-Center-Viewer-Next-Updates (1)\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\ru\Microsoft.Data.SqlClient.resources.dll
+C:\Users\Saksham Jain\Downloads\Dixon-Command-Center-Viewer-Next-Updates (1)\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\tr\Microsoft.Data.SqlClient.resources.dll
+C:\Users\Saksham Jain\Downloads\Dixon-Command-Center-Viewer-Next-Updates (1)\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\zh-Hans\Microsoft.Data.SqlClient.resources.dll
+C:\Users\Saksham Jain\Downloads\Dixon-Command-Center-Viewer-Next-Updates (1)\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\zh-Hant\Microsoft.Data.SqlClient.resources.dll
+C:\Users\Saksham Jain\Downloads\Dixon-Command-Center-Viewer-Next-Updates (1)\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\runtimes\unix\lib\net8.0\Microsoft.Data.SqlClient.dll
+C:\Users\Saksham Jain\Downloads\Dixon-Command-Center-Viewer-Next-Updates (1)\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\runtimes\win\lib\net8.0\Microsoft.Data.SqlClient.dll
+C:\Users\Saksham Jain\Downloads\Dixon-Command-Center-Viewer-Next-Updates (1)\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\runtimes\win-arm64\native\Microsoft.Data.SqlClient.SNI.dll
+C:\Users\Saksham Jain\Downloads\Dixon-Command-Center-Viewer-Next-Updates (1)\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\runtimes\win-x64\native\Microsoft.Data.SqlClient.SNI.dll
+C:\Users\Saksham Jain\Downloads\Dixon-Command-Center-Viewer-Next-Updates (1)\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\runtimes\win-x86\native\Microsoft.Data.SqlClient.SNI.dll
+C:\Users\Saksham Jain\Downloads\Dixon-Command-Center-Viewer-Next-Updates (1)\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\runtimes\win\lib\net8.0\System.Diagnostics.EventLog.dll
+C:\Users\Saksham Jain\Downloads\Dixon-Command-Center-Viewer-Next-Updates (1)\Dixon-Command-Center\Command-Center-Backend\bin\Debug\net8.0\runtimes\win\lib\net8.0\System.Security.Cryptography.Pkcs.dll
+C:\Users\Saksham Jain\Downloads\Dixon-Command-Center-Viewer-Next-Updates (1)\Dixon-Command-Center\Command-Center-Backend\obj\Debug\net8.0\Dixon.CommandCenter.API.csproj.AssemblyReference.cache
+C:\Users\Saksham Jain\Downloads\Dixon-Command-Center-Viewer-Next-Updates (1)\Dixon-Command-Center\Command-Center-Backend\obj\Debug\net8.0\rpswa.dswa.cache.json
+C:\Users\Saksham Jain\Downloads\Dixon-Command-Center-Viewer-Next-Updates (1)\Dixon-Command-Center\Command-Center-Backend\obj\Debug\net8.0\Dixon.CommandCenter.API.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Saksham Jain\Downloads\Dixon-Command-Center-Viewer-Next-Updates (1)\Dixon-Command-Center\Command-Center-Backend\obj\Debug\net8.0\Dixon.CommandCenter.API.AssemblyInfoInputs.cache
+C:\Users\Saksham Jain\Downloads\Dixon-Command-Center-Viewer-Next-Updates (1)\Dixon-Command-Center\Command-Center-Backend\obj\Debug\net8.0\Dixon.CommandCenter.API.AssemblyInfo.cs
+C:\Users\Saksham Jain\Downloads\Dixon-Command-Center-Viewer-Next-Updates (1)\Dixon-Command-Center\Command-Center-Backend\obj\Debug\net8.0\Dixon.CommandCenter.API.csproj.CoreCompileInputs.cache
+C:\Users\Saksham Jain\Downloads\Dixon-Command-Center-Viewer-Next-Updates (1)\Dixon-Command-Center\Command-Center-Backend\obj\Debug\net8.0\Dixon.CommandCenter.API.MvcApplicationPartsAssemblyInfo.cs
+C:\Users\Saksham Jain\Downloads\Dixon-Command-Center-Viewer-Next-Updates (1)\Dixon-Command-Center\Command-Center-Backend\obj\Debug\net8.0\Dixon.CommandCenter.API.MvcApplicationPartsAssemblyInfo.cache
+C:\Users\Saksham Jain\Downloads\Dixon-Command-Center-Viewer-Next-Updates (1)\Dixon-Command-Center\Command-Center-Backend\obj\Debug\net8.0\rjimswa.dswa.cache.json
+C:\Users\Saksham Jain\Downloads\Dixon-Command-Center-Viewer-Next-Updates (1)\Dixon-Command-Center\Command-Center-Backend\obj\Debug\net8.0\rjsmrazor.dswa.cache.json
+C:\Users\Saksham Jain\Downloads\Dixon-Command-Center-Viewer-Next-Updates (1)\Dixon-Command-Center\Command-Center-Backend\obj\Debug\net8.0\rjsmcshtml.dswa.cache.json
+C:\Users\Saksham Jain\Downloads\Dixon-Command-Center-Viewer-Next-Updates (1)\Dixon-Command-Center\Command-Center-Backend\obj\Debug\net8.0\scopedcss\scopedcss.cache
+C:\Users\Saksham Jain\Downloads\Dixon-Command-Center-Viewer-Next-Updates (1)\Dixon-Command-Center\Command-Center-Backend\obj\Debug\net8.0\scopedcss\bundle\Dixon.CommandCenter.API.styles.css
+C:\Users\Saksham Jain\Downloads\Dixon-Command-Center-Viewer-Next-Updates (1)\Dixon-Command-Center\Command-Center-Backend\obj\Debug\net8.0\staticwebassets.build.json
+C:\Users\Saksham Jain\Downloads\Dixon-Command-Center-Viewer-Next-Updates (1)\Dixon-Command-Center\Command-Center-Backend\obj\Debug\net8.0\staticwebassets.build.json.cache
+C:\Users\Saksham Jain\Downloads\Dixon-Command-Center-Viewer-Next-Updates (1)\Dixon-Command-Center\Command-Center-Backend\obj\Debug\net8.0\staticwebassets.development.json
+C:\Users\Saksham Jain\Downloads\Dixon-Command-Center-Viewer-Next-Updates (1)\Dixon-Command-Center\Command-Center-Backend\obj\Debug\net8.0\staticwebassets.build.endpoints.json
+C:\Users\Saksham Jain\Downloads\Dixon-Command-Center-Viewer-Next-Updates (1)\Dixon-Command-Center\Command-Center-Backend\obj\Debug\net8.0\swae.build.ex.cache
+C:\Users\Saksham Jain\Downloads\Dixon-Command-Center-Viewer-Next-Updates (1)\Dixon-Command-Center\Command-Center-Backend\obj\Debug\net8.0\Dixon.Co.C327CEED.Up2Date
+C:\Users\Saksham Jain\Downloads\Dixon-Command-Center-Viewer-Next-Updates (1)\Dixon-Command-Center\Command-Center-Backend\obj\Debug\net8.0\Dixon.CommandCenter.API.dll
+C:\Users\Saksham Jain\Downloads\Dixon-Command-Center-Viewer-Next-Updates (1)\Dixon-Command-Center\Command-Center-Backend\obj\Debug\net8.0\refint\Dixon.CommandCenter.API.dll
+C:\Users\Saksham Jain\Downloads\Dixon-Command-Center-Viewer-Next-Updates (1)\Dixon-Command-Center\Command-Center-Backend\obj\Debug\net8.0\Dixon.CommandCenter.API.pdb
+C:\Users\Saksham Jain\Downloads\Dixon-Command-Center-Viewer-Next-Updates (1)\Dixon-Command-Center\Command-Center-Backend\obj\Debug\net8.0\Dixon.CommandCenter.API.genruntimeconfig.cache
+C:\Users\Saksham Jain\Downloads\Dixon-Command-Center-Viewer-Next-Updates (1)\Dixon-Command-Center\Command-Center-Backend\obj\Debug\net8.0\ref\Dixon.CommandCenter.API.dll
