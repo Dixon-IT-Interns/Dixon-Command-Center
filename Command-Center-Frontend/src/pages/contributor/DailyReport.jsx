@@ -25,6 +25,10 @@ const EMPTY_FORM = {
   otTarget: "",
   plannedOTManhours: null, unplannedOTManhours: null, actualOTManhours: "",
   openWOQty: "", over7DaysWOBalanceQty: "",
+<<<<<<< HEAD
+=======
+  wipLyingGreater3Days: "0", wipLyingGreater7Days: "0",
+>>>>>>> origin/main
   dailyTRCInQty: "", dailyTRCOutQty: "",
   trcOverallFailureInflowPercent: "", trcLyingOver3DaysCr: "",
   issueDescription: "",
@@ -66,6 +70,11 @@ const GROUPS = [
       ] },
       { label: "Open WO (Qty)", fields: [{ key: "openWOQty", label: "Value" }] },
       { label: ">7 Days WO (Qty)", fields: [{ key: "over7DaysWOBalanceQty", label: "Value" }] },
+<<<<<<< HEAD
+=======
+      { label: "WIP Lying >3 Days (Qty)", fields: [{ key: "wipLyingGreater3Days", label: "Value" }] },
+      { label: "WIP Lying >7 Days (Qty)", fields: [{ key: "wipLyingGreater7Days", label: "Value" }] },
+>>>>>>> origin/main
     ],
   },
   {
@@ -85,6 +94,15 @@ const KPI_PLAN_FIELDS = [
   "fpyTarget", "ftyTarget", "rtyTarget", "osdTarget", "otTarget",
 ];
 
+<<<<<<< HEAD
+=======
+const INTEGER_FIELDS = new Set([
+  "openWOQty", "over7DaysWOBalanceQty",
+  "wipLyingGreater3Days", "wipLyingGreater7Days",
+  "dailyTRCInQty", "dailyTRCOutQty",
+]);
+
+>>>>>>> origin/main
 const FATP_IMPORT_PREVIEW_FIELDS = [
   ["Month Plan", "monthPlan"], ["Month Actual", "monthActual"],
   ["Production Plan", "productionPlan"], ["Production Actual", "productionActual"],
@@ -94,6 +112,10 @@ const FATP_IMPORT_PREVIEW_FIELDS = [
   ["OS&D Reporting Date %", "osdReportingDatePercent"],
   ["OS&D MTD", "osdMtdValue"], ["OS&D MTD %", "osdMtdPercent"],
   ["Open WO Qty", "openWOQty"], [">7 Days WO Qty", "over7DaysWOBalanceQty"],
+<<<<<<< HEAD
+=======
+  ["WIP Lying >3 Days", "wipLyingGreater3Days"], ["WIP Lying >7 Days", "wipLyingGreater7Days"],
+>>>>>>> origin/main
   ["Issue", "issueDescription"],
 ];
 
@@ -485,6 +507,11 @@ export default function DailyReport({ session, onSignOut }) {
     plannedOTManhours: asNumber(entry.form.plannedOTManhours), unplannedOTManhours: asNumber(entry.form.unplannedOTManhours),
     actualOTManhours: asNumber(entry.form.actualOTManhours), openWOQty: asInteger(entry.form.openWOQty),
     over7DaysWOBalanceQty: asInteger(entry.form.over7DaysWOBalanceQty), dailyTRCInQty: asInteger(entry.form.dailyTRCInQty),
+<<<<<<< HEAD
+=======
+    wipLyingGreater3Days: asInteger(entry.form.wipLyingGreater3Days) ?? 0,
+    wipLyingGreater7Days: asInteger(entry.form.wipLyingGreater7Days) ?? 0,
+>>>>>>> origin/main
     dailyTRCOutQty: asInteger(entry.form.dailyTRCOutQty), trcOverallFailureInflowPercent: asNumber(entry.form.trcOverallFailureInflowPercent),
     trcLyingOver3DaysCr: asNumber(entry.form.trcLyingOver3DaysCr), issueDescription: entry.form.issueDescription?.trim() || null,
   });
@@ -1155,7 +1182,11 @@ export default function DailyReport({ session, onSignOut }) {
               {importPreview.reportDate === reportDate && loading && (
                 <div className="excel-date-warning">Loading saved reports and plan data for {reportDate} before these rows can be applied…</div>
               )}
+<<<<<<< HEAD
               <p className="excel-field-note">WIP Lying &gt;3 Days and WIP Lying &gt;7 Days have no equivalent Daily Report fields and are not imported. The workbook also has no FPY/FTY/RTY, overtime, or TRC columns; existing form values for absent columns are left unchanged.</p>
+=======
+              <p className="excel-field-note">WIP Lying &gt;3 Days and WIP Lying &gt;7 Days are imported when matching columns are present. The workbook also has no FPY/FTY/RTY, overtime, or TRC columns; existing form values for absent columns are left unchanged.</p>
+>>>>>>> origin/main
               <div className="excel-review-scroll">
                 <table className="excel-review-table">
                   <thead><tr><th>Use</th><th>Source row</th><th>Original Excel values</th><th>Map to active line</th><th>Map to brand model</th><th>Values to stage</th><th>Review status</th></tr></thead>
@@ -1371,7 +1402,11 @@ function MatrixGroup({ group, columns, lineData, onChange }) {
                 <span>{label}</span>
                 {key === "issueDescription"
                   ? <textarea aria-label={`${row.label} ${label}`} value={entry.form?.[key] ?? ""} disabled={disabled} placeholder="Issue / observation" onChange={(event) => onChange(lineId, entry.entryId, key, event.target.value)} />
+<<<<<<< HEAD
                   : <input aria-label={`${row.label} ${label}`} type="number" min="0" step="0.01" value={entry.form?.[key] ?? ""} disabled={disabled} placeholder="—" onChange={(event) => onChange(lineId, entry.entryId, key, event.target.value)} />}
+=======
+                  : <input aria-label={`${row.label} ${label}`} type="number" min="0" step={INTEGER_FIELDS.has(key) ? "1" : "0.01"} value={entry.form?.[key] ?? ""} disabled={disabled} placeholder="—" onChange={(event) => onChange(lineId, entry.entryId, key, event.target.value)} />}
+>>>>>>> origin/main
               </label>
             ))}
           </div>

@@ -2390,23 +2390,39 @@
     ]
   },
   "packageFolders": {
+<<<<<<< HEAD
     "C:\\Users\\Saksham Jain\\.nuget\\packages\\": {},
+=======
+    "C:\\Users\\HP\\.nuget\\packages\\": {},
+>>>>>>> origin/main
     "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
+<<<<<<< HEAD
       "projectUniqueName": "C:\\Users\\Saksham Jain\\Downloads\\Dixon-Command-Center-Viewer-Next-Updates (1)\\Dixon-Command-Center\\Command-Center-Backend\\Dixon.CommandCenter.API.csproj",
       "projectName": "Dixon.CommandCenter.API",
       "projectPath": "C:\\Users\\Saksham Jain\\Downloads\\Dixon-Command-Center-Viewer-Next-Updates (1)\\Dixon-Command-Center\\Command-Center-Backend\\Dixon.CommandCenter.API.csproj",
       "packagesPath": "C:\\Users\\Saksham Jain\\.nuget\\packages\\",
       "outputPath": "C:\\Users\\Saksham Jain\\Downloads\\Dixon-Command-Center-Viewer-Next-Updates (1)\\Dixon-Command-Center\\Command-Center-Backend\\obj\\",
+=======
+      "projectUniqueName": "D:\\Dixon-Command-Center\\Command-Center-Backend\\Dixon.CommandCenter.API.csproj",
+      "projectName": "Dixon.CommandCenter.API",
+      "projectPath": "D:\\Dixon-Command-Center\\Command-Center-Backend\\Dixon.CommandCenter.API.csproj",
+      "packagesPath": "C:\\Users\\HP\\.nuget\\packages\\",
+      "outputPath": "D:\\Dixon-Command-Center\\Command-Center-Backend\\obj\\",
+>>>>>>> origin/main
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
       ],
       "configFilePaths": [
+<<<<<<< HEAD
         "C:\\Users\\Saksham Jain\\AppData\\Roaming\\NuGet\\NuGet.Config",
+=======
+        "C:\\Users\\HP\\AppData\\Roaming\\NuGet\\NuGet.Config",
+>>>>>>> origin/main
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
@@ -2434,7 +2450,11 @@
         "auditLevel": "low",
         "auditMode": "direct"
       },
+<<<<<<< HEAD
       "SdkAnalysisLevel": "11.0.100"
+=======
+      "SdkAnalysisLevel": "10.0.400"
+>>>>>>> origin/main
     },
     "frameworks": {
       "net8.0": {
@@ -2473,6 +2493,27 @@
         ],
         "assetTargetFallback": true,
         "warn": true,
+<<<<<<< HEAD
+=======
+        "downloadDependencies": [
+          {
+            "name": "Microsoft.AspNetCore.App.Ref",
+            "version": "[8.0.31, 8.0.31]"
+          },
+          {
+            "name": "Microsoft.NETCore.App.Host.win-x64",
+            "version": "[8.0.31, 8.0.31]"
+          },
+          {
+            "name": "Microsoft.NETCore.App.Ref",
+            "version": "[8.0.31, 8.0.31]"
+          },
+          {
+            "name": "Microsoft.WindowsDesktop.App.Ref",
+            "version": "[8.0.31, 8.0.31]"
+          }
+        ],
+>>>>>>> origin/main
         "frameworkReferences": {
           "Microsoft.AspNetCore.App": {
             "privateAssets": "none"
@@ -2481,7 +2522,11 @@
             "privateAssets": "all"
           }
         },
+<<<<<<< HEAD
         "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\11.0.100-rc.1.26425.128/PortableRuntimeIdentifierGraph.json"
+=======
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.401/PortableRuntimeIdentifierGraph.json"
+>>>>>>> origin/main
       }
     }
   }

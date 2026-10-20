@@ -164,7 +164,13 @@ public sealed class ViewerRepository(SqlConnectionFactory connectionFactory)
                 dr.DailyTRCOutQty,
                 dr.TRCOverallFailureInflowPercent,
                 dr.TRCLyingOver3DaysCr,
+<<<<<<< HEAD
                 dr.IssueDescription
+=======
+                dr.IssueDescription,
+                dr.wip_lying_greater_3_days,
+                dr.wip_lying_greater_7_days
+>>>>>>> origin/main
             FROM AccessibleLines al
             LEFT JOIN DailyReport dr
                 ON dr.CustomerId = al.CustomerId
@@ -227,7 +233,13 @@ public sealed class ViewerRepository(SqlConnectionFactory connectionFactory)
                 DailyTRCOutQty: GetInt(reader, 34),
                 TRCOverallFailureInflowPercent: GetDecimal(reader, 35),
                 TRCLyingOver3DaysCr: GetDecimal(reader, 36),
+<<<<<<< HEAD
                 IssueDescription: GetString(reader, 37)));
+=======
+                IssueDescription: GetString(reader, 37),
+                WipLyingGreater3Days: GetInt(reader, 38),
+                WipLyingGreater7Days: GetInt(reader, 39)));
+>>>>>>> origin/main
         }
 
         var totalPlan = lines.Sum(line => line.ProductionPlan ?? 0);
@@ -368,7 +380,13 @@ public sealed record ViewerLineProgress(
     int? DailyTRCOutQty,
     decimal? TRCOverallFailureInflowPercent,
     decimal? TRCLyingOver3DaysCr,
+<<<<<<< HEAD
     string? IssueDescription)
+=======
+    string? IssueDescription,
+    int? WipLyingGreater3Days,
+    int? WipLyingGreater7Days)
+>>>>>>> origin/main
 {
     public decimal Achievement =>
         ProductionPlan is decimal plan && plan > 0

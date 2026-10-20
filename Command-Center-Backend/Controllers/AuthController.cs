@@ -1,16 +1,23 @@
+<<<<<<< HEAD
 ﻿
+=======
+>>>>>>> origin/main
 using System.Security.Claims;
 using Dixon.CommandCenter.API.Data;
 using Dixon.CommandCenter.API.Models;
 using Dixon.CommandCenter.API.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+<<<<<<< HEAD
 using Microsoft.Extensions.Configuration;
+=======
+>>>>>>> origin/main
 
 namespace Dixon.CommandCenter.API.Controllers;
 
 [ApiController]
 [Route("api/auth")]
+<<<<<<< HEAD
 public sealed class AuthController(
     UserRepository users,
     TokenIssuer tokens,
@@ -29,11 +36,21 @@ public sealed class AuthController(
             setupRequired = await users.IsBootstrapRequiredAsync(
                 cancellationToken)
         });
+=======
+public sealed class AuthController(UserRepository users, TokenIssuer tokens) : ControllerBase
+{
+    [HttpGet("setup-status")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    public async Task<IActionResult> SetupStatus(CancellationToken cancellationToken)
+    {
+        return Ok(new { setupRequired = await users.IsBootstrapRequiredAsync(cancellationToken) });
+>>>>>>> origin/main
     }
 
     [HttpPost("bootstrap")]
     [ProducesResponseType<LoginResponse>(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status409Conflict)]
+<<<<<<< HEAD
     public async Task<IActionResult> Bootstrap(
         BootstrapAdminRequest request,
         CancellationToken cancellationToken)
@@ -69,11 +86,24 @@ public sealed class AuthController(
             nameof(Me),
             new { },
             tokens.Issue(storedUser.User));
+=======
+    public async Task<IActionResult> Bootstrap(BootstrapAdminRequest request, CancellationToken cancellationToken)
+    {
+        var id = await users.BootstrapAdminAsync(request, PasswordService.Hash(request.Password), cancellationToken);
+        if (id is null)
+        {
+            return Conflict(new { message = "Initial setup is already complete." });
+        }
+
+        var storedUser = await users.FindForLoginAsync(request.Email.Trim(), cancellationToken);
+        return CreatedAtAction(nameof(Me), new { }, tokens.Issue(storedUser!.User));
+>>>>>>> origin/main
     }
 
     [HttpPost("login")]
     [ProducesResponseType<LoginResponse>(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+<<<<<<< HEAD
     public async Task<IActionResult> Login(
         LoginRequest request,
         CancellationToken cancellationToken)
@@ -91,11 +121,20 @@ public sealed class AuthController(
             {
                 message = "Email or password is incorrect."
             });
+=======
+    public async Task<IActionResult> Login(LoginRequest request, CancellationToken cancellationToken)
+    {
+        var storedUser = await users.FindForLoginAsync(request.Email.Trim(), cancellationToken);
+        if (storedUser is null || !PasswordService.Verify(request.Password, storedUser.PasswordHash))
+        {
+            return Unauthorized(new { message = "Email or password is incorrect." });
+>>>>>>> origin/main
         }
 
         return Ok(tokens.Issue(storedUser.User));
     }
 
+<<<<<<< HEAD
     [HttpPost("set-password")]
     [AllowAnonymous]
     [ProducesResponseType(StatusCodes.Status200OK)]
@@ -301,6 +340,8 @@ public sealed class AuthController(
         });
     }
 
+=======
+>>>>>>> origin/main
     [HttpGet("me")]
     [Authorize]
     [ProducesResponseType<AuthenticatedUser>(StatusCodes.Status200OK)]
@@ -314,7 +355,13 @@ public sealed class AuthController(
             User.FindFirstValue(ClaimTypes.Role) ?? string.Empty,
             int.Parse(User.FindFirstValue("plantId")!),
             User.FindFirstValue("plantName") ?? string.Empty);
+<<<<<<< HEAD
 
         return Ok(user);
     }
 }
+=======
+        return Ok(user);
+    }
+}
+>>>>>>> origin/main

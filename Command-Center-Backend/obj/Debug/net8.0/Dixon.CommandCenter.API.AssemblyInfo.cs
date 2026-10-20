@@ -10,11 +10,18 @@
 using System;
 using System.Reflection;
 
+<<<<<<< HEAD
 [assembly: Microsoft.Extensions.Configuration.UserSecrets.UserSecretsIdAttribute("85e3671a-bb23-40b0-9e59-33b40891b1e2")]
 [assembly: System.Reflection.AssemblyCompanyAttribute("Dixon.CommandCenter.API")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
 [assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+=======
+[assembly: System.Reflection.AssemblyCompanyAttribute("Dixon.CommandCenter.API")]
+[assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
+[assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+9a903455070512aa267b42333cccf78f1f9e16b1")]
+>>>>>>> origin/main
 [assembly: System.Reflection.AssemblyProductAttribute("Dixon.CommandCenter.API")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Dixon.CommandCenter.API")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

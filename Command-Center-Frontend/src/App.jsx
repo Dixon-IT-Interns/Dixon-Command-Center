@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 ﻿import { useEffect, useState } from "react";
+=======
+import { useEffect, useState } from "react";
+>>>>>>> origin/main
 import { BrowserRouter, Navigate, Route, Routes, useParams } from "react-router-dom";
 import AdminPage from "./pages/AdminPage";
 import DashboardPage from "./pages/DashboardPage";
@@ -9,14 +13,20 @@ import ContributorReports from "./pages/contributor/ContributorReports";
 import ContributorActivity from "./pages/contributor/ContributorActivity";
 import ContributorDashboard from "./pages/contributor/ContributorDashboard";
 import Login from "./pages/Login";
+<<<<<<< HEAD
 import SetupPassword from "./pages/SetupPassword";
+=======
+>>>>>>> origin/main
 import BrandSelection from "./pages/contributor/BrandSelection";
 import CategorySelection from "./pages/contributor/CategorySelection";
 import DailyReport from "./pages/contributor/DailyReport";
 import ViewerDashboard from "./pages/viewer/viewerDashboard";
+<<<<<<< HEAD
 import ViewerInsights from "./pages/viewer/ViewerInsights";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
+=======
+>>>>>>> origin/main
 import "./App.css";
 
 function ProtectedRoute({ session, children }) {
@@ -86,7 +96,10 @@ function AppRoutes() {
 
   return (
     <Routes>
+<<<<<<< HEAD
       <Route path="/setup-password" element={<SetupPassword />} />
+=======
+>>>>>>> origin/main
       <Route path="/" element={session ? <Navigate to={home} replace /> : <Login onSignIn={signIn} />} />
 
       <Route path="/contributor/dashboard" element={<ContributorRoute session={session}><ContributorDashboard session={session} onSignOut={signOut}/></ContributorRoute>} />
@@ -96,10 +109,13 @@ function AppRoutes() {
       <Route path="/approvals" element={<ApproverRoute session={session}><ApprovalPage session={session} onSignOut={signOut}/></ApproverRoute>} />
       <Route path="/approvals/history" element={<ApproverRoute session={session}><ApprovalHistory session={session} onSignOut={signOut}/></ApproverRoute>} />
       <Route path="/viewer" element={<ViewerRoute session={session}><ViewerDashboard session={session} onSignOut={signOut}/></ViewerRoute>} />
+<<<<<<< HEAD
       <Route path="/viewer/exceptions" element={<ViewerRoute session={session}><ViewerInsights mode="exceptions" session={session} onSignOut={signOut}/></ViewerRoute>} />
       <Route path="/viewer/comparison" element={<ViewerRoute session={session}><ViewerInsights mode="comparison" session={session} onSignOut={signOut}/></ViewerRoute>} />
       <Route path="/viewer/tracker" element={<ViewerRoute session={session}><ViewerInsights mode="tracker" session={session} onSignOut={signOut}/></ViewerRoute>} />
       <Route path="/viewer/reports" element={<ViewerRoute session={session}><ViewerInsights mode="center" session={session} onSignOut={signOut}/></ViewerRoute>} />
+=======
+>>>>>>> origin/main
 
       <Route path="/contributor/brands" element={<ContributorRoute session={session}><BrandSelection session={session} onSignOut={signOut}/></ContributorRoute>} />
       <Route path="/contributor/brands/:customerId/categories" element={<ContributorRoute session={session}><CategorySelection session={session} onSignOut={signOut}/></ContributorRoute>} />
@@ -117,8 +133,11 @@ function AppRoutes() {
       <Route path="/dashboard" element={<ProtectedRoute session={session}>{session && ["Admin", "SuperAdmin"].includes(session.user.roleName) ? <Navigate to="/admin" replace /> : session?.user?.roleName === "Viewer" ? <Navigate to="/viewer" replace /> : <DashboardPage session={session} onSignOut={signOut}/>}</ProtectedRoute>} />
       <Route path="/admin" element={<AdminRoute session={session}><AdminPage session={session} onSignOut={signOut}/></AdminRoute>} />
       <Route path="*" element={<Navigate to={home} replace />} />
+<<<<<<< HEAD
       <Route path="/forgot-password" element={<ForgotPassword />} />
 <Route path="/reset-password" element={<ResetPassword />} />
+=======
+>>>>>>> origin/main
     </Routes>
   );
 }
@@ -131,4 +150,8 @@ function LegacyCategoryRedirect() {
 function LegacyLineRedirect() {
   const { customerId, categoryId } = useParams();
   return <Navigate to={`/contributor/brands/${customerId}/categories/${categoryId}/lines`} replace />;
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> origin/main

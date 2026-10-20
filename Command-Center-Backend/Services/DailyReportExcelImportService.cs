@@ -29,7 +29,12 @@ public sealed class DailyReportExcelImportService(
         int customerId,
         int categoryId,
         DateTime selectedReportDate,
+<<<<<<< HEAD
         CancellationToken cancellationToken)
+=======
+        CancellationToken cancellationToken,
+        string importType = "production")
+>>>>>>> origin/main
     {
         await using var connection =
             await connectionFactory.OpenAsync(cancellationToken);
@@ -72,12 +77,17 @@ public sealed class DailyReportExcelImportService(
                 "The selected brand or category is not active or does not exist.");
         }
 
+<<<<<<< HEAD
+=======
+        var normalizedImportType = importType.Trim().ToUpperInvariant();
+>>>>>>> origin/main
         var expectedMetric = categoryName.Trim().ToUpperInvariant() switch
         {
             "FATP" => "UPPH",
             "SMT" => "CPH",
             _ => null
         };
+<<<<<<< HEAD
 
         if (expectedMetric is null)
         {
@@ -85,6 +95,12 @@ public sealed class DailyReportExcelImportService(
                 selectedReportDate,
                 $"Excel import supports FATP and SMT categories, not '{categoryName}'.");
         }
+=======
+        if (normalizedImportType == "PRODUCTION" && expectedMetric is null)
+            return Failure(selectedReportDate, $"Production Excel import supports FATP and SMT categories, not '{categoryName}'.");
+        if (normalizedImportType is not ("PRODUCTION" or "QUALITY" or "WO_CLOSURE"))
+            return Failure(selectedReportDate, $"Unsupported Excel import type '{importType}'.");
+>>>>>>> origin/main
 
         var catalog = await LoadCatalogAsync(
             connection,
@@ -113,6 +129,17 @@ public sealed class DailyReportExcelImportService(
         using (workbook)
         {
             var worksheets = workbook.Worksheets
+<<<<<<< HEAD
+=======
+                .ToArray();
+
+            if (normalizedImportType == "QUALITY")
+                return PreviewQuality(worksheets, selectedReportDate, customerName, catalog);
+            if (normalizedImportType == "WO_CLOSURE")
+                return PreviewWoClosure(worksheets, selectedReportDate, customerName, categoryName);
+
+            worksheets = worksheets
+>>>>>>> origin/main
                 .Where(sheet => !string.Equals(
                     sheet.Name.Trim(),
                     "D-1 KPI Matrix loop Closer",
@@ -730,7 +757,11 @@ public sealed class DailyReportExcelImportService(
 
         foreach (var (name, column) in decimalFields)
         {
+<<<<<<< HEAD
             if (!TryReadFATPNumber(section.Worksheet.Cell(row, column), out var value))
+=======
+            if (!TryReadFATPNumber(GetValueCell(section.Worksheet, row, column), out var value))
+>>>>>>> origin/main
             {
                 errors.Add($"'{name}' is not a valid number (Excel errors are not imported).");
                 decimals[name] = null;
@@ -743,11 +774,24 @@ public sealed class DailyReportExcelImportService(
         var integerFields = new (string Name, int Column)[]
         {
             ("Open WO quantity", columns.OpenWoQty),
+<<<<<<< HEAD
             (">7 Days WO quantity", columns.Over7DaysWoQty)
         };
         foreach (var (name, column) in integerFields)
         {
             if (!TryReadFATPNumber(section.Worksheet.Cell(row, column), out var value)
+=======
+            (">7 Days WO quantity", columns.Over7DaysWoQty),
+            ("WIP Lying >3 Days", columns.WipLyingGreater3Days),
+            ("WIP Lying >7 Days", columns.WipLyingGreater7Days)
+        };
+        foreach (var (name, column) in integerFields)
+        {
+            if (column <= 0)
+                continue;
+
+            if (!TryReadFATPNumber(GetValueCell(section.Worksheet, row, column), out var value)
+>>>>>>> origin/main
                 || value.HasValue
                 && (decimal.Truncate(value.Value) != value.Value
                     || value.Value < int.MinValue
@@ -763,7 +807,11 @@ public sealed class DailyReportExcelImportService(
         }
 
         decimal? Get(string name) => decimals[name];
+<<<<<<< HEAD
         int? GetInt(string name) => integers[name];
+=======
+        int? GetInt(string name) => integers.GetValueOrDefault(name);
+>>>>>>> origin/main
         return new DailyReportExcelImportValues(
             Get("Month Plan"),
             Get("Month Actual"),
@@ -790,6 +838,11 @@ public sealed class DailyReportExcelImportService(
             null,
             GetInt("Open WO quantity"),
             GetInt(">7 Days WO quantity"),
+<<<<<<< HEAD
+=======
+            GetInt("WIP Lying >3 Days"),
+            GetInt("WIP Lying >7 Days"),
+>>>>>>> origin/main
             null,
             null,
             null,
@@ -798,6 +851,362 @@ public sealed class DailyReportExcelImportService(
             GetPresentFields(columns, section.Metric));
     }
 
+<<<<<<< HEAD
+=======
+    private static DailyReportExcelImportPreview PreviewQuality(
+        IReadOnlyList<IXLWorksheet> worksheets,
+        DateTime selectedReportDate,
+        string customerName,
+        ImportCatalog catalog)
+    {
+        var rows = new List<DailyReportExcelImportRow>();
+        var errors = new List<string>();
+        DateTime? workbookDate = null;
+
+        foreach (var worksheet in worksheets)
+        {
+            workbookDate ??= ReadReportDate(worksheet);
+            var lastRow = worksheet.LastRowUsed()?.RowNumber() ?? 0;
+            var lastColumn = worksheet.LastColumnUsed()?.ColumnNumber() ?? 0;
+            for (var headerRow = 1; headerRow <= lastRow; headerRow++)
+            {
+                var lineColumn = FindColumn(worksheet, headerRow, lastColumn, "Line No.");
+                var sapColumn = FindColumn(worksheet, headerRow, lastColumn, "SAP Location");
+                var customerColumn = FindColumn(worksheet, headerRow, lastColumn, "Customer");
+                var modelColumn = FindColumn(worksheet, headerRow, lastColumn, "Model");
+                if (lineColumn == 0 || sapColumn == 0 || customerColumn == 0 || modelColumn == 0)
+                    continue;
+
+                var qualityColumns = BuildQualityColumns(
+                    worksheet,
+                    headerRow,
+                    lastColumn);
+                var missing = qualityColumns.Metrics
+                    .Where(metric => metric.Target == 0 || metric.Actual == 0)
+                    .Select(metric => $"{metric.Label} Target/Actual")
+                    .ToArray();
+                if (missing.Length > 0)
+                {
+                    errors.Add($"{worksheet.Name}: missing quality columns {string.Join(", ", missing)}.");
+                    continue;
+                }
+
+                var dataStart = headerRow + 1;
+                while (dataStart <= lastRow
+                    && string.IsNullOrWhiteSpace(ReadText(worksheet, dataStart, lineColumn)))
+                    dataStart++;
+                var nextHeader = Enumerable.Range(dataStart, Math.Max(0, lastRow - dataStart + 1))
+                    .FirstOrDefault(candidate =>
+                        candidate > dataStart
+                        && FindColumn(worksheet, candidate, lastColumn, "Line No.") > 0);
+                var lastDataRow = nextHeader > 0 ? nextHeader - 1 : lastRow;
+
+                for (var rowNumber = dataStart; rowNumber <= lastDataRow; rowNumber++)
+                {
+                    var lineNo = ReadText(worksheet, rowNumber, lineColumn);
+                    if (string.IsNullOrWhiteSpace(lineNo))
+                        continue;
+                    if (string.Equals(lineNo, "Total", StringComparison.OrdinalIgnoreCase))
+                        break;
+
+                    var sourceCustomer = ReadText(worksheet, rowNumber, customerColumn);
+                    if (!string.IsNullOrWhiteSpace(sourceCustomer)
+                        && NormalizeMatchName(sourceCustomer) != NormalizeMatchName(customerName))
+                        continue;
+
+                    var sapLocation = ReadText(worksheet, rowNumber, sapColumn);
+                    var modelName = ReadText(worksheet, rowNumber, modelColumn);
+                    var reasonParts = new List<string>();
+                    var lineMatches = catalog.Lines
+                        .Where(line => NormalizeMatchName(line.LineName) == NormalizeMatchName(lineNo))
+                        .Where(line => NormalizeMatchName(line.SapLocation ?? "") == NormalizeMatchName(sapLocation ?? ""))
+                        .ToArray();
+                    var modelMatches = catalog.Models
+                        .Where(model => NormalizeMatchName(model.Name) == NormalizeMatchName(modelName ?? ""))
+                        .ToArray();
+
+                    int? lineId = lineMatches.Length == 1 ? lineMatches[0].Id : null;
+                    string? mappedLine = lineMatches.Length == 1 ? lineMatches[0].LineName : null;
+                    int? modelId = modelMatches.Length == 1 ? modelMatches[0].Id : null;
+                    string? mappedModel = modelMatches.Length == 1 ? modelMatches[0].Name : null;
+
+                    if (lineId is null)
+                        reasonParts.Add(lineMatches.Length == 0
+                            ? $"Line '{lineNo}' and SAP location '{sapLocation ?? "(blank)"}' do not match an active line."
+                            : $"Line '{lineNo}' and SAP location '{sapLocation}' are ambiguous.");
+                    if (modelId is null)
+                        reasonParts.Add(modelMatches.Length == 0
+                            ? $"Model '{modelName ?? "(blank)"}' is not active for this brand."
+                            : $"Model '{modelName}' is ambiguous for this brand.");
+                    if (string.IsNullOrWhiteSpace(sourceCustomer))
+                        reasonParts.Add("Customer is blank.");
+
+                    var valueErrors = new List<string>();
+                    var form = ReadQualityValues(worksheet, rowNumber, qualityColumns, valueErrors);
+                    reasonParts.AddRange(valueErrors);
+                    var status = valueErrors.Count > 0
+                        ? "invalid"
+                        : reasonParts.Count > 0
+                            ? "unmatched"
+                            : "matched";
+                    rows.Add(new DailyReportExcelImportRow(
+                        rowNumber,
+                        lineNo,
+                        sapLocation,
+                        sourceCustomer,
+                        modelName,
+                        status,
+                        reasonParts.Count == 0 ? null : string.Join(" ", reasonParts),
+                        lineId,
+                        mappedLine,
+                        modelId,
+                        mappedModel,
+                        form));
+                }
+
+                headerRow = lastDataRow;
+            }
+        }
+
+        if (rows.Count == 0)
+            return Failure(selectedReportDate, errors.Count > 0
+                ? string.Join(" ", errors)
+                : "No matching Quality rows were found in the workbook.");
+
+        var duplicateKeys = rows
+            .Where(row => row.LineId.HasValue && row.ModelId.HasValue)
+            .GroupBy(row => (row.LineId, row.ModelId))
+            .Where(group => group.Count() > 1)
+            .SelectMany(group => group.Select(row => row.RowNumber))
+            .ToHashSet();
+        for (var index = 0; index < rows.Count; index++)
+        {
+            if (duplicateKeys.Contains(rows[index].RowNumber))
+                rows[index] = rows[index] with { Status = "duplicate", Reason = "Multiple Quality rows match the same line and model." };
+        }
+
+        var date = workbookDate ?? selectedReportDate;
+        return new DailyReportExcelImportPreview(
+            true,
+            date.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture),
+            rows.Where(row => row.LineId.HasValue).Select(row => row.LineId!.Value).Distinct().Count(),
+            rows.Where(row => row.ModelId.HasValue).Select(row => row.ModelId!.Value).Distinct().Count(),
+            errors,
+            [],
+            rows,
+            ImportType: "quality");
+    }
+
+    private static QualityExcelColumns BuildQualityColumns(
+        IXLWorksheet worksheet,
+        int headerRow,
+        int lastColumn)
+    {
+        var metrics = new[]
+        {
+            new QualityExcelMetric("Int-VI", "fpyIntVi", ["INTVI", "INTERNALVI"]),
+            new QualityExcelMetric("PT", "fpyPt", ["PT"]),
+            new QualityExcelMetric("RI", "fpyRi", ["RI"]),
+            new QualityExcelMetric("RI Image", "fpyRiImage", ["RIIMAGE"]),
+            new QualityExcelMetric("Packing VI", "fpyPackingVi", ["PACKINGVI"]),
+            new QualityExcelMetric("RTY (%)", "rty", ["RTY"])
+        };
+
+        int Resolve(string field, string subcolumn)
+        {
+            for (var column = 1; column <= lastColumn; column++)
+            {
+                var labels = Enumerable.Range(headerRow, Math.Min(3, lastRow(worksheet) - headerRow + 1))
+                    .Select(row => Normalize(GetValueCell(worksheet, row, column).GetString()))
+                    .Where(value => value.Length > 0)
+                    .ToArray();
+                var labelPath = string.Join("|", labels);
+                var fieldMatch = field == "rty"
+                    ? labelPath.Contains("RTY", StringComparison.Ordinal)
+                    : labelPath.Contains("FPY", StringComparison.Ordinal)
+                        && metrics.First(metric => metric.Field == field).Aliases
+                            .Any(alias => labelPath.Contains(alias, StringComparison.Ordinal));
+                if (fieldMatch && labels.Contains(Normalize(subcolumn)))
+                    return column;
+            }
+
+            return 0;
+        }
+
+        return new QualityExcelColumns(metrics.Select(metric => metric with
+        {
+            Target = Resolve(metric.Field, "Target"),
+            Actual = Resolve(metric.Field, "Actual")
+        }).ToArray());
+
+        static int lastRow(IXLWorksheet sheet) => sheet.LastRowUsed()?.RowNumber() ?? 0;
+    }
+
+    private static DailyReportExcelImportValues ReadQualityValues(
+        IXLWorksheet worksheet,
+        int row,
+        QualityExcelColumns columns,
+        List<string> errors)
+    {
+        var values = new Dictionary<string, decimal?>(StringComparer.Ordinal);
+        foreach (var metric in columns.Metrics)
+        {
+            foreach (var (suffix, column) in new[] { ("Target", metric.Target), ("Actual", metric.Actual) })
+            {
+                var field = $"{metric.Field}{suffix}";
+                if (!TryReadNumber(GetValueCell(worksheet, row, column), out var value))
+                {
+                    errors.Add($"{metric.Label} {suffix} is not a valid number.");
+                    continue;
+                }
+                values[field] = value;
+            }
+        }
+
+        decimal? Value(string field) => values.GetValueOrDefault(field);
+        var fields = columns.Metrics
+            .SelectMany(metric => new[] { $"{metric.Field}Target", $"{metric.Field}Actual" })
+            .ToArray();
+        return new DailyReportExcelImportValues(
+            null, null, null, null, null, null, null, null, null, null,
+            null, null, null, null, Value("rtyTarget"), Value("rtyActual"), null, null, null, null,
+            null, null, null, null, null, null, null, null, null, null,
+            null, null, fields,
+            FpyIntViTarget: Value("fpyIntViTarget"),
+            FpyIntViActual: Value("fpyIntViActual"),
+            FpyPtTarget: Value("fpyPtTarget"),
+            FpyPtActual: Value("fpyPtActual"),
+            FpyRiTarget: Value("fpyRiTarget"),
+            FpyRiActual: Value("fpyRiActual"),
+            FpyRiImageTarget: Value("fpyRiImageTarget"),
+            FpyRiImageActual: Value("fpyRiImageActual"),
+            FpyPackingViTarget: Value("fpyPackingViTarget"),
+            FpyPackingViActual: Value("fpyPackingViActual"));
+    }
+
+    private static DailyReportExcelImportPreview PreviewWoClosure(
+        IReadOnlyList<IXLWorksheet> worksheets,
+        DateTime selectedReportDate,
+        string customerName,
+        string categoryName)
+    {
+        var worksheet = worksheets.FirstOrDefault(sheet =>
+            string.Equals(sheet.Name.Trim(), "Summary", StringComparison.OrdinalIgnoreCase));
+        if (worksheet is null)
+            return Failure(selectedReportDate, "WO Closure workbook is missing the Summary sheet.");
+
+        var lastRow = worksheet.LastRowUsed()?.RowNumber() ?? 0;
+        var lastColumn = worksheet.LastColumnUsed()?.ColumnNumber() ?? 0;
+        var headerRow = Enumerable.Range(1, lastRow)
+            .FirstOrDefault(row =>
+                FindAnyColumn(worksheet, row, lastColumn, "Customer / Process", "Customer/Process") > 0
+                && FindAnyColumn(worksheet, row, lastColumn, "Metric") > 0);
+        if (headerRow == 0)
+            return Failure(selectedReportDate, "WO Closure Summary is missing Customer / Process and Metric headers.");
+
+        var processColumn = FindAnyColumn(worksheet, headerRow, lastColumn, "Customer / Process", "Customer/Process");
+        var metricColumn = FindAnyColumn(worksheet, headerRow, lastColumn, "Metric");
+        var columns = new WoClosureColumns(
+            FindAnyColumn(worksheet, headerRow, lastColumn, "0-3 days", "0–3 days", "0 to 3 days"),
+            FindAnyColumn(worksheet, headerRow, lastColumn, "4-7 days", "4–7 days", "4 to 7 days"),
+            FindAnyColumn(worksheet, headerRow, lastColumn, ">7 days", "greater than 7 days", "over 7 days"),
+            FindAnyColumn(worksheet, headerRow, lastColumn, "TTL", "Total"),
+            FindAnyColumn(worksheet, headerRow, lastColumn, "Clearance Plan of >7 Days", "Clearance Plan"),
+            FindAnyColumn(worksheet, headerRow, lastColumn, "Resp.", "Responsible"),
+            FindAnyColumn(worksheet, headerRow, lastColumn, "Timeline"));
+        if (columns.Bucket0To3 == 0 || columns.Bucket4To7 == 0 || columns.BucketGreater7 == 0 || columns.Total == 0)
+            return Failure(selectedReportDate, "WO Closure Summary is missing one or more aging bucket columns.");
+
+        var countRow = 0;
+        var qtyRow = 0;
+        for (var row = headerRow + 1; row <= lastRow; row++)
+        {
+            var process = ReadText(worksheet, row, processColumn);
+            if (!MatchesCustomerProcess(process, customerName, categoryName))
+                continue;
+            var metric = Normalize(ReadText(worksheet, row, metricColumn) ?? "");
+            if (metric == "COUNT")
+                countRow = row;
+            else if (metric == "QTY" || metric == "QUANTITY")
+                qtyRow = row;
+        }
+
+        if (countRow == 0 && qtyRow == 0)
+            return Failure(selectedReportDate, $"WO Closure Summary has no section for {customerName} - {categoryName}.");
+
+        var errors = new List<string>();
+        int? ReadInteger(int row, int column, string label)
+        {
+            if (row == 0 || column == 0)
+                return null;
+            if (!TryReadNumber(GetValueCell(worksheet, row, column), out var value)
+                || value.HasValue && (decimal.Truncate(value.Value) != value.Value
+                    || value.Value < int.MinValue || value.Value > int.MaxValue))
+            {
+                errors.Add($"WO Closure {label} is not a valid whole number.");
+                return null;
+            }
+            return value.HasValue ? decimal.ToInt32(value.Value) : null;
+        }
+
+        var form = new DailyReportExcelImportValues(
+            null, null, null, null, null, null, null, null, null, null,
+            null, null, null, null, null, null, null, null, null, null,
+            null, null, null, null, null, null, null, null, null, null,
+            null, null, [],
+            WoCount0To3Days: ReadInteger(countRow, columns.Bucket0To3, "Count 0-3"),
+            WoCount4To7Days: ReadInteger(countRow, columns.Bucket4To7, "Count 4-7"),
+            WoCountGreater7Days: ReadInteger(countRow, columns.BucketGreater7, "Count >7"),
+            WoCountTotal: ReadInteger(countRow, columns.Total, "Count total"),
+            WoQty0To3Days: ReadInteger(qtyRow, columns.Bucket0To3, "Qty 0-3"),
+            WoQty4To7Days: ReadInteger(qtyRow, columns.Bucket4To7, "Qty 4-7"),
+            WoQtyGreater7Days: ReadInteger(qtyRow, columns.BucketGreater7, "Qty >7"),
+            WoQtyTotal: ReadInteger(qtyRow, columns.Total, "Qty total"),
+            WoClearancePlanGreater7Days: ReadInteger(qtyRow > 0 ? qtyRow : countRow, columns.ClearancePlan, "clearance plan"),
+            WoResponsible: ReadText(worksheet, qtyRow > 0 ? qtyRow : countRow, columns.Responsible),
+            WoTimeline: ReadText(worksheet, qtyRow > 0 ? qtyRow : countRow, columns.Timeline));
+
+        return new DailyReportExcelImportPreview(
+            true,
+            (ReadReportDate(worksheet) ?? selectedReportDate).ToString("yyyy-MM-dd", CultureInfo.InvariantCulture),
+            0,
+            0,
+            errors,
+            [],
+            [],
+            ImportType: "woClosure",
+            SharedForm: form);
+    }
+
+    private static bool MatchesCustomerProcess(
+        string? value,
+        string customerName,
+        string categoryName)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+            return false;
+        var parts = value.Split('-', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
+        return parts.Length >= 2
+            && NormalizeMatchName(parts[0]) == NormalizeMatchName(customerName)
+            && NormalizeMatchName(parts[^1]) == NormalizeMatchName(categoryName);
+    }
+
+    private static int FindAnyColumn(
+        IXLWorksheet worksheet,
+        int row,
+        int lastColumn,
+        params string[] labels)
+    {
+        foreach (var label in labels)
+        {
+            var column = FindColumn(worksheet, row, lastColumn, label);
+            if (column > 0)
+                return column;
+        }
+        return 0;
+    }
+
+>>>>>>> origin/main
     private static IReadOnlyList<DailySection> FindSections(IXLWorksheet worksheet)
     {
         var lastRow = worksheet.LastRowUsed()?.RowNumber() ?? 0;
@@ -878,6 +1287,54 @@ public sealed class DailyReportExcelImportService(
         int model)
     {
         int Group(string label) => FindColumn(worksheet, headerRow, lastColumn, label);
+<<<<<<< HEAD
+=======
+        int FirstGroup(params string[] labels)
+        {
+            foreach (var label in labels)
+            {
+                var column = Group(label);
+                if (column > 0)
+                    return column;
+            }
+
+            return 0;
+        }
+        int WipColumn(int days)
+        {
+            var standaloneColumn = days == 3
+                ? FirstGroup(
+                    "WIP Lying >3 Days (Qty)",
+                    "WIP Lying >3 Days",
+                    "WIP >3 Days (Qty)",
+                    "WIP >3 Days",
+                    "WIP > 3 Days (Qty)",
+                    "WIP > 3 Days")
+                : FirstGroup(
+                    "WIP Lying >7 Days (Qty)",
+                    "WIP Lying >7 Days",
+                    "WIP >7 Days (Qty)",
+                    "WIP >7 Days",
+                    "WIP > 7 Days (Qty)",
+                    "WIP > 7 Days");
+            if (standaloneColumn > 0)
+                return standaloneColumn;
+
+            var ageLabel = $">{days} Days";
+            foreach (var group in new[] { "WIP Lying", "WIP" })
+            {
+                var column = FindSubColumn(
+                    worksheet,
+                    subHeaderRow,
+                    Group(group),
+                    ageLabel);
+                if (column > 0)
+                    return column;
+            }
+
+            return 0;
+        }
+>>>>>>> origin/main
         int Pair(string group, string sub) =>
             FindSubColumn(worksheet, subHeaderRow, Group(group), sub);
         int CapacityTarget() =>
@@ -910,6 +1367,11 @@ public sealed class DailyReportExcelImportService(
             Pair("Actual OT (Manhours)", "Unplanned"),
             Group("Open WO (Qty)"),
             Group(">7 Days WO (Qty)"),
+<<<<<<< HEAD
+=======
+            WipColumn(3),
+            WipColumn(7),
+>>>>>>> origin/main
             Group("Daily TRC In (Qty)"),
             Group("Daily TRC Out (Qty)"),
             Group("TRC Overall Failure Inflow %"),
@@ -961,7 +1423,11 @@ public sealed class DailyReportExcelImportService(
             if (column <= 0)
                 continue;
 
+<<<<<<< HEAD
             if (!TryReadNumber(section.Worksheet.Cell(row, column), out var value))
+=======
+            if (!TryReadNumber(GetValueCell(section.Worksheet, row, column), out var value))
+>>>>>>> origin/main
             {
                 skippedFields.Add(field);
                 warnings.Add($"{rowLabel}: '{name}' was skipped because it does not contain a valid number.");
@@ -975,6 +1441,11 @@ public sealed class DailyReportExcelImportService(
         {
             ("Open WO (Qty)", "openWOQty", columns.OpenWoQty),
             (">7 Days WO (Qty)", "over7DaysWOBalanceQty", columns.Over7DaysWoQty),
+<<<<<<< HEAD
+=======
+            ("WIP Lying >3 Days", "wipLyingGreater3Days", columns.WipLyingGreater3Days),
+            ("WIP Lying >7 Days", "wipLyingGreater7Days", columns.WipLyingGreater7Days),
+>>>>>>> origin/main
             ("Daily TRC In (Qty)", "dailyTRCInQty", columns.DailyTrcInQty),
             ("Daily TRC Out (Qty)", "dailyTRCOutQty", columns.DailyTrcOutQty)
         };
@@ -985,7 +1456,11 @@ public sealed class DailyReportExcelImportService(
             if (column <= 0)
                 continue;
 
+<<<<<<< HEAD
             if (!TryReadNumber(section.Worksheet.Cell(row, column), out var value))
+=======
+            if (!TryReadNumber(GetValueCell(section.Worksheet, row, column), out var value))
+>>>>>>> origin/main
             {
                 skippedFields.Add(field);
                 warnings.Add($"{rowLabel}: '{name}' was skipped because it does not contain a valid whole number.");
@@ -1039,6 +1514,11 @@ public sealed class DailyReportExcelImportService(
             actualOt,
             GetInt("Open WO (Qty)"),
             GetInt(">7 Days WO (Qty)"),
+<<<<<<< HEAD
+=======
+            GetInt("WIP Lying >3 Days"),
+            GetInt("WIP Lying >7 Days"),
+>>>>>>> origin/main
             GetInt("Daily TRC In (Qty)"),
             GetInt("Daily TRC Out (Qty)"),
             Get("TRC Overall Failure Inflow %"),
@@ -1138,7 +1618,11 @@ public sealed class DailyReportExcelImportService(
     {
         if (column <= 0)
             return null;
+<<<<<<< HEAD
         var value = worksheet.Cell(row, column).GetString().Trim();
+=======
+        var value = GetValueCell(worksheet, row, column).GetString().Trim();
+>>>>>>> origin/main
         return value.Length == 0 ? null : value;
     }
 
@@ -1149,10 +1633,41 @@ public sealed class DailyReportExcelImportService(
     {
         if (column <= 0)
             return null;
+<<<<<<< HEAD
         var value = worksheet.Cell(row, column).GetString();
         return string.IsNullOrWhiteSpace(value) ? null : value;
     }
 
+=======
+        var value = GetValueCell(worksheet, row, column).GetString();
+        return string.IsNullOrWhiteSpace(value) ? null : value;
+    }
+
+    private static IXLCell GetValueCell(
+        IXLWorksheet worksheet,
+        int row,
+        int column)
+    {
+        if (column <= 0)
+            return worksheet.Cell(row, Math.Max(column, 1));
+
+        foreach (var mergedRange in worksheet.MergedRanges)
+        {
+            var first = mergedRange.RangeAddress.FirstAddress;
+            var last = mergedRange.RangeAddress.LastAddress;
+            if (row >= first.RowNumber
+                && row <= last.RowNumber
+                && column >= first.ColumnNumber
+                && column <= last.ColumnNumber)
+            {
+                return worksheet.Cell(first.RowNumber, first.ColumnNumber);
+            }
+        }
+
+        return worksheet.Cell(row, column);
+    }
+
+>>>>>>> origin/main
     private static int FindColumn(
         IXLWorksheet worksheet,
         int row,
@@ -1220,8 +1735,13 @@ public sealed class DailyReportExcelImportService(
     {
         var target = section.Columns.CapacityTarget;
         var actual = section.Columns.CapacityActual;
+<<<<<<< HEAD
         return (target > 0 && !section.Worksheet.Cell(row, target).IsEmpty())
             || (actual > 0 && !section.Worksheet.Cell(row, actual).IsEmpty());
+=======
+        return (target > 0 && !GetValueCell(section.Worksheet, row, target).IsEmpty())
+            || (actual > 0 && !GetValueCell(section.Worksheet, row, actual).IsEmpty());
+>>>>>>> origin/main
     }
 
     private static bool HasNumericValue(
@@ -1232,16 +1752,26 @@ public sealed class DailyReportExcelImportService(
         if (column <= 0)
             return false;
 
+<<<<<<< HEAD
         return TryReadNumber(worksheet.Cell(row, column), out var value)
+=======
+        return TryReadNumber(GetValueCell(worksheet, row, column), out var value)
+>>>>>>> origin/main
             && value.HasValue;
     }
 
     private static bool HasOtherCapacityValue(DailySection section, int row)
     {
         return (section.OtherCapacityTarget > 0
+<<<<<<< HEAD
                 && !section.Worksheet.Cell(row, section.OtherCapacityTarget).IsEmpty())
             || (section.OtherCapacityActual > 0
                 && !section.Worksheet.Cell(row, section.OtherCapacityActual).IsEmpty());
+=======
+                && !GetValueCell(section.Worksheet, row, section.OtherCapacityTarget).IsEmpty())
+            || (section.OtherCapacityActual > 0
+                && !GetValueCell(section.Worksheet, row, section.OtherCapacityActual).IsEmpty());
+>>>>>>> origin/main
     }
 
     private static IReadOnlyList<string> GetPresentFields(
@@ -1278,6 +1808,11 @@ public sealed class DailyReportExcelImportService(
         Add("actualOTManhours", columns.PlannedOt > 0 || columns.UnplannedOt > 0 ? 1 : 0);
         Add("openWOQty", columns.OpenWoQty);
         Add("over7DaysWOBalanceQty", columns.Over7DaysWoQty);
+<<<<<<< HEAD
+=======
+        Add("wipLyingGreater3Days", columns.WipLyingGreater3Days);
+        Add("wipLyingGreater7Days", columns.WipLyingGreater7Days);
+>>>>>>> origin/main
         Add("dailyTRCInQty", columns.DailyTrcInQty);
         Add("dailyTRCOutQty", columns.DailyTrcOutQty);
         Add("trcOverallFailureInflowPercent", columns.TrcOverallFailureInflowPercent);
@@ -1346,6 +1881,11 @@ public sealed record DailyReportExcelColumns(
     int UnplannedOt,
     int OpenWoQty,
     int Over7DaysWoQty,
+<<<<<<< HEAD
+=======
+    int WipLyingGreater3Days,
+    int WipLyingGreater7Days,
+>>>>>>> origin/main
     int DailyTrcInQty,
     int DailyTrcOutQty,
     int TrcOverallFailureInflowPercent,
@@ -1359,7 +1899,13 @@ public sealed record DailyReportExcelImportPreview(
     int Models,
     IReadOnlyList<string> Errors,
     IReadOnlyList<DailyReportExcelImportEntry> Data,
+<<<<<<< HEAD
     IReadOnlyList<DailyReportExcelImportRow>? Rows = null);
+=======
+    IReadOnlyList<DailyReportExcelImportRow>? Rows = null,
+    string? ImportType = null,
+    DailyReportExcelImportValues? SharedForm = null);
+>>>>>>> origin/main
 
 public sealed record DailyReportExcelImportRow(
     int RowNumber,
@@ -1409,9 +1955,57 @@ public sealed record DailyReportExcelImportValues(
     decimal? ActualOTManhours,
     int? OpenWOQty,
     int? Over7DaysWOBalanceQty,
+<<<<<<< HEAD
+=======
+    int? WipLyingGreater3Days,
+    int? WipLyingGreater7Days,
+>>>>>>> origin/main
     int? DailyTRCInQty,
     int? DailyTRCOutQty,
     decimal? TRCOverallFailureInflowPercent,
     decimal? TRCLyingOver3DaysCr,
     string? IssueDescription,
+<<<<<<< HEAD
     IReadOnlyList<string> PresentFields);
+=======
+    IReadOnlyList<string> PresentFields,
+    decimal? FpyIntViTarget = null,
+    decimal? FpyIntViActual = null,
+    decimal? FpyPtTarget = null,
+    decimal? FpyPtActual = null,
+    decimal? FpyRiTarget = null,
+    decimal? FpyRiActual = null,
+    decimal? FpyRiImageTarget = null,
+    decimal? FpyRiImageActual = null,
+    decimal? FpyPackingViTarget = null,
+    decimal? FpyPackingViActual = null,
+    int? WoCount0To3Days = null,
+    int? WoCount4To7Days = null,
+    int? WoCountGreater7Days = null,
+    int? WoCountTotal = null,
+    int? WoQty0To3Days = null,
+    int? WoQty4To7Days = null,
+    int? WoQtyGreater7Days = null,
+    int? WoQtyTotal = null,
+    int? WoClearancePlanGreater7Days = null,
+    string? WoResponsible = null,
+    string? WoTimeline = null);
+
+internal sealed record QualityExcelMetric(
+    string Label,
+    string Field,
+    string[] Aliases,
+    int Target = 0,
+    int Actual = 0);
+
+internal sealed record QualityExcelColumns(QualityExcelMetric[] Metrics);
+
+internal sealed record WoClosureColumns(
+    int Bucket0To3,
+    int Bucket4To7,
+    int BucketGreater7,
+    int Total,
+    int ClearancePlan,
+    int Responsible,
+    int Timeline);
+>>>>>>> origin/main

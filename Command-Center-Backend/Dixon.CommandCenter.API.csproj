@@ -1,10 +1,17 @@
+<<<<<<< HEAD
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+=======
+<Project Sdk="Microsoft.NET.Sdk.Web">
+>>>>>>> origin/main
 
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+<<<<<<< HEAD
     <UserSecretsId>85e3671a-bb23-40b0-9e59-33b40891b1e2</UserSecretsId>
+=======
+>>>>>>> origin/main
   </PropertyGroup>
 
   <ItemGroup>

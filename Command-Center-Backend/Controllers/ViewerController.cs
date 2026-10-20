@@ -1,8 +1,15 @@
+<<<<<<< HEAD
 using System.Security.Claims;
+=======
+>>>>>>> origin/main
 using ClosedXML.Excel;
 using Dixon.CommandCenter.API.Data;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+<<<<<<< HEAD
+=======
+using System.Security.Claims;
+>>>>>>> origin/main
 
 namespace Dixon.CommandCenter.API.Controllers;
 
@@ -164,6 +171,10 @@ public sealed class ViewerController(ViewerRepository viewer) : ControllerBase
             "OS&D Reporting Date Value", "OS&D Reporting Date %",
             "OS&D MTD Value", "OS&D MTD %",
             "Actual OT", "Planned OT", "Unplanned OT", "Open WO Qty", ">7 Days WO",
+<<<<<<< HEAD
+=======
+            "WIP Lying >3 Days", "WIP Lying >7 Days",
+>>>>>>> origin/main
             "Daily TRC In", "Daily TRC Out", "TRC Overall Failure %",
             "TRC Lying >3 Days", "Issue Description"
         };
@@ -187,6 +198,10 @@ public sealed class ViewerController(ViewerRepository viewer) : ControllerBase
                 line.OSDMTDValue, line.OSDMTDPercent,
                 line.ActualOTManhours, line.PlannedOTManhours, line.UnplannedOTManhours,
                 line.OpenWOQty, line.Over7DaysWOBalanceQty,
+<<<<<<< HEAD
+=======
+                line.WipLyingGreater3Days, line.WipLyingGreater7Days,
+>>>>>>> origin/main
                 line.DailyTRCInQty, line.DailyTRCOutQty, line.TRCOverallFailureInflowPercent,
                 line.TRCLyingOver3DaysCr, line.IssueDescription
             };
